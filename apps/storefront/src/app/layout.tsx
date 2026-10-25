@@ -1,5 +1,10 @@
 import { getBaseURL } from "@lib/util/env"
 import { Metadata } from "next"
+import "@fontsource/cormorant-garamond/latin-400.css"
+import "@fontsource/cormorant-garamond/latin-500.css"
+import "@fontsource/cormorant-garamond/latin-600.css"
+import "@fontsource/montserrat/latin-400.css"
+import "@fontsource/montserrat/latin-500.css"
 import "styles/globals.css"
 
 export const metadata: Metadata = {

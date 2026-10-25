@@ -8,6 +8,8 @@ node_modules/
 **/.next/
 **/out/
 **/build/
+**/storybook-static/
+**/debug-storybook.log
 .turbo/
 coverage/
 *.tsbuildinfo

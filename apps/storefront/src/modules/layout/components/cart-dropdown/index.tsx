@@ -18,6 +18,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Thumbnail from "@modules/products/components/thumbnail"
 import { usePathname } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
+import Image from "next/image"
 
 const countItems = (cart?: HttpTypes.StoreCart | null) =>
   cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0
@@ -31,7 +32,7 @@ const CartDropdown = ({
   const [clientCart, setClientCart] = useState<HttpTypes.StoreCart | null>(null)
   const cartState = serverCart ?? clientCart
   const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(
-    undefined
+    undefined,
   )
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
 
@@ -99,7 +100,7 @@ const CartDropdown = ({
       timedOpen()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalItems, itemRef.current])
+  }, [totalItems])
 
   return (
     <div
@@ -110,10 +111,27 @@ const CartDropdown = ({
       <Popover className="relative h-full">
         <PopoverButton className="h-full">
           <LocalizedClientLink
-            className="hover:text-ui-fg-base"
+            className="sg-nav-icon"
             href="/cart"
             data-testid="nav-cart-link"
-          >{`Cart (${totalItems})`}</LocalizedClientLink>
+            aria-label={`Shopping cart, ${totalItems} item${totalItems === 1 ? "" : "s"}`}
+          >
+            <picture>
+              <source
+                media="(max-width: 767px)"
+                srcSet="/assets/icons/cart-mobile.svg"
+              />
+              <Image
+                src="/assets/icons/cart.svg"
+                alt=""
+                width={28}
+                height={28}
+              />
+            </picture>
+            {totalItems > 0 && (
+              <span className="sg-cart-count">{totalItems}</span>
+            )}
+          </LocalizedClientLink>
         </PopoverButton>
         <Transition
           show={cartDropdownOpen}

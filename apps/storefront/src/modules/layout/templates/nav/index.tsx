@@ -4,10 +4,11 @@ import { listLocales } from "@lib/data/locales"
 import { getLocale } from "@lib/data/locale-actions"
 import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
+import SiteHeader from "@modules/brand/components/site-header"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
-import Search from "@modules/layout/components/search"
 import SideMenu from "@modules/layout/components/side-menu"
+import Image from "next/image"
 
 export default async function Nav() {
   const [regions, locales, currentLocale] = await Promise.all([
@@ -18,63 +19,35 @@ export default async function Nav() {
 
   return (
     <div className="sticky top-0 inset-x-0 z-50 group">
-      <div className="sg-announcement">
-        Complimentary local delivery on selected orders
-      </div>
-      <header className="sg-header">
-        <nav className="content-container sg-nav">
-          <div className="flex-1 basis-0 h-full flex items-center">
-            <div className="h-full">
-              <SideMenu
-                regions={regions}
-                locales={locales}
-                currentLocale={currentLocale}
-              />
-            </div>
-            <div className="sg-nav__links">
-              <LocalizedClientLink href="/store">Shop</LocalizedClientLink>
-              <LocalizedClientLink href="/contact">Bespoke</LocalizedClientLink>
-            </div>
-          </div>
-
-          <div className="flex items-center h-full">
-            <LocalizedClientLink
-              href="/"
-              className="sg-wordmark"
-              data-testid="nav-store-link"
-            >
-              <span>Shore & Grace</span>
-              <small>Floral & Gift Studio</small>
-            </LocalizedClientLink>
-          </div>
-
-          <div className="sg-nav__actions">
-            <Search />
-            <div className="hidden small:flex items-center gap-x-6 h-full">
+      <SiteHeader
+        menu={
+          <SideMenu
+            regions={regions}
+            locales={locales}
+            currentLocale={currentLocale}
+          />
+        }
+        cart={
+          <Suspense
+            fallback={
               <LocalizedClientLink
-                className="sg-nav__account"
-                href="/account"
-                data-testid="nav-account-link"
+                className="sg-nav-icon"
+                href="/cart"
+                aria-label="Cart, empty"
               >
-                Account
+                <Image
+                  src="/assets/icons/cart.svg"
+                  alt=""
+                  width={28}
+                  height={28}
+                />
               </LocalizedClientLink>
-            </div>
-            <Suspense
-              fallback={
-                <LocalizedClientLink
-                  className="hover:text-ui-fg-base flex gap-2"
-                  href="/cart"
-                  data-testid="nav-cart-link"
-                >
-                  Cart (0)
-                </LocalizedClientLink>
-              }
-            >
-              <CartButton />
-            </Suspense>
-          </div>
-        </nav>
-      </header>
+            }
+          >
+            <CartButton />
+          </Suspense>
+        }
+      />
     </div>
   )
 }

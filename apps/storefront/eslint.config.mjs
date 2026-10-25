@@ -21,6 +21,7 @@ export default defineConfig([
   },
   globalIgnores([
     ".next/**",
+    "storybook-static/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
