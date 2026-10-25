@@ -1,0 +1,27 @@
+[Unit]
+Description=Shore & Grace launch-list signup service
+After=network.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+StateDirectory=shoreandgrace-signup
+WorkingDirectory=/opt/shoreandgrace-signup
+Environment=SHORE_SIGNUP_DATABASE=/var/lib/shoreandgrace-signup/subscribers.sqlite3
+Environment=SHORE_SIGNUP_HOST=127.0.0.1
+Environment=SHORE_SIGNUP_PORT=8017
+ExecStart=/usr/bin/python3 /opt/shoreandgrace-signup/signup_service.py
+Restart=on-failure
+RestartSec=5s
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

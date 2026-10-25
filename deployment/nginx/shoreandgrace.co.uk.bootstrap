@@ -1,0 +1,13 @@
+server {
+    listen 80;
+    listen [::]:80;
+    server_name shoreandgrace.co.uk www.shoreandgrace.co.uk;
+
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/shoreandgrace.com;
+    }
+
+    location / {
+        return 301 https://shoreandgrace.com$request_uri;
+    }
+}

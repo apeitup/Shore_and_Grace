@@ -1,0 +1,26 @@
+server {
+    listen 80;
+    listen [::]:80;
+    server_name shoreandgrace.co.uk www.shoreandgrace.co.uk;
+
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/shoreandgrace.com;
+    }
+
+    location / {
+        return 301 https://shoreandgrace.com$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name shoreandgrace.co.uk www.shoreandgrace.co.uk;
+
+    ssl_certificate /etc/letsencrypt/live/shoreandgrace.co.uk/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/shoreandgrace.co.uk/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    return 301 https://shoreandgrace.com$request_uri;
+}
