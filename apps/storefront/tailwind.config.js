@@ -20,6 +20,13 @@ module.exports = {
         padding: "padding-top padding-right padding-bottom padding-left",
       },
       colors: {
+        sg: {
+          linen: "#f3f0ea",
+          sage: "#848b7b",
+          ink: "#403a33",
+          cream: "#faf8f3",
+          clay: "#b78f7b",
+        },
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",
@@ -58,8 +65,15 @@ module.exports = {
         "3xl": "2rem",
       },
       fontFamily: {
+        display: [
+          "Cormorant Garamond",
+          "Iowan Old Style",
+          "Baskerville",
+          "Georgia",
+          "serif",
+        ],
         sans: [
-          "Inter",
+          "Montserrat",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",

@@ -18,29 +18,41 @@ export default async function Nav() {
 
   return (
     <div className="sticky top-0 inset-x-0 z-50 group">
-      <header className="relative h-16 mx-auto border-b duration-200 bg-white border-ui-border-base">
-        <nav className="content-container txt-xsmall-plus text-ui-fg-subtle flex items-center justify-between w-full h-full text-small-regular">
+      <div className="sg-announcement">
+        Complimentary local delivery on selected orders
+      </div>
+      <header className="sg-header">
+        <nav className="content-container sg-nav">
           <div className="flex-1 basis-0 h-full flex items-center">
             <div className="h-full">
-              <SideMenu regions={regions} locales={locales} currentLocale={currentLocale} />
+              <SideMenu
+                regions={regions}
+                locales={locales}
+                currentLocale={currentLocale}
+              />
+            </div>
+            <div className="sg-nav__links">
+              <LocalizedClientLink href="/store">Shop</LocalizedClientLink>
+              <LocalizedClientLink href="/contact">Bespoke</LocalizedClientLink>
             </div>
           </div>
 
           <div className="flex items-center h-full">
             <LocalizedClientLink
               href="/"
-              className="txt-compact-xlarge-plus hover:text-ui-fg-base uppercase"
+              className="sg-wordmark"
               data-testid="nav-store-link"
             >
-              Medusa Store
+              <span>Shore & Grace</span>
+              <small>Floral & Gift Studio</small>
             </LocalizedClientLink>
           </div>
 
-          <div className="flex items-center gap-x-6 h-full flex-1 basis-0 justify-end">
+          <div className="sg-nav__actions">
             <Search />
             <div className="hidden small:flex items-center gap-x-6 h-full">
               <LocalizedClientLink
-                className="hover:text-ui-fg-base"
+                className="sg-nav__account"
                 href="/account"
                 data-testid="nav-account-link"
               >

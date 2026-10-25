@@ -33,10 +33,10 @@ export default async function initial_data_seed({
   const link = container.resolve(ContainerRegistrationKeys.LINK);
   const query = container.resolve(ContainerRegistrationKeys.QUERY);
   const fulfillmentModuleService = container.resolve(
-    ModuleRegistrationName.FULFILLMENT
+    ModuleRegistrationName.FULFILLMENT,
   );
 
-  const countries = ["gb", "de", "dk", "se", "fr", "es", "it"];
+  const countries = ["gb"];
 
   logger.info("Seeding store data...");
   const {
@@ -45,8 +45,8 @@ export default async function initial_data_seed({
     input: {
       salesChannelsData: [
         {
-          name: "Default Sales Channel",
-          description: "Created by Medusa",
+          name: "Shore & Grace UK",
+          description: "United Kingdom online sales",
         },
       ],
     },
@@ -58,7 +58,7 @@ export default async function initial_data_seed({
     input: {
       api_keys: [
         {
-          title: "Default Publishable API Key",
+          title: "Shore & Grace Storefront",
           type: "publishable",
           created_by: "",
         },
@@ -79,10 +79,10 @@ export default async function initial_data_seed({
     input: {
       stores: [
         {
-          name: "Default Store",
+          name: "Shore & Grace",
           supported_currencies: [
             {
-              currency_code: "eur",
+              currency_code: "gbp",
               is_default: true,
             },
             {
@@ -101,8 +101,8 @@ export default async function initial_data_seed({
     input: {
       regions: [
         {
-          name: "Europe",
-          currency_code: "eur",
+          name: "United Kingdom",
+          currency_code: "gbp",
           countries,
           payment_providers: ["pp_system_default"],
           metadata: DEFAULT_REGION_STORE_POLICIES,
@@ -124,15 +124,15 @@ export default async function initial_data_seed({
 
   logger.info("Seeding stock location data...");
   const { result: stockLocationResult } = await createStockLocationsWorkflow(
-    container
+    container,
   ).run({
     input: {
       locations: [
         {
-          name: "European Warehouse",
+          name: "Shore & Grace Studio",
           address: {
-            city: "Copenhagen",
-            country_code: "DK",
+            city: "Walton-on-the-Naze",
+            country_code: "GB",
             address_1: "",
           },
         },
@@ -159,38 +159,14 @@ export default async function initial_data_seed({
   const shippingProfile = shippingProfileResult[0];
 
   const fulfillmentSet = await fulfillmentModuleService.createFulfillmentSets({
-    name: "European Warehouse delivery",
+    name: "Shore & Grace delivery",
     type: "shipping",
     service_zones: [
       {
-        name: "Europe",
+        name: "United Kingdom",
         geo_zones: [
           {
             country_code: "gb",
-            type: "country",
-          },
-          {
-            country_code: "de",
-            type: "country",
-          },
-          {
-            country_code: "dk",
-            type: "country",
-          },
-          {
-            country_code: "se",
-            type: "country",
-          },
-          {
-            country_code: "fr",
-            type: "country",
-          },
-          {
-            country_code: "es",
-            type: "country",
-          },
-          {
-            country_code: "it",
             type: "country",
           },
         ],
@@ -217,7 +193,7 @@ export default async function initial_data_seed({
         shipping_profile_id: shippingProfile.id,
         type: {
           label: "Standard",
-          description: "Ship in 2-3 days.",
+          description: "Delivery in 2–3 working days.",
           code: "standard",
         },
         prices: [
@@ -226,7 +202,7 @@ export default async function initial_data_seed({
             amount: 10,
           },
           {
-            currency_code: "eur",
+            currency_code: "gbp",
             amount: 10,
           },
           {
@@ -255,7 +231,7 @@ export default async function initial_data_seed({
         shipping_profile_id: shippingProfile.id,
         type: {
           label: "Express",
-          description: "Ship in 24 hours.",
+          description: "Next working day delivery.",
           code: "express",
         },
         prices: [
@@ -264,7 +240,7 @@ export default async function initial_data_seed({
             amount: 10,
           },
           {
-            currency_code: "eur",
+            currency_code: "gbp",
             amount: 10,
           },
           {
@@ -300,7 +276,7 @@ export default async function initial_data_seed({
   logger.info("Seeding product data...");
 
   const { result: categoryResult } = await createProductCategoriesWorkflow(
-    container
+    container,
   ).run({
     input: {
       product_categories: [
@@ -325,7 +301,7 @@ export default async function initial_data_seed({
   });
 
   const { result: productOptionsResult } = await createProductOptionsWorkflow(
-    container
+    container,
   ).run({
     input: {
       product_options: [
@@ -371,10 +347,7 @@ export default async function initial_data_seed({
               url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-white-back.png",
             },
           ],
-          options: [
-            { id: sizeOption.id },
-            { id: colorOption.id },
-          ],
+          options: [{ id: sizeOption.id }, { id: colorOption.id }],
           variants: [
             {
               title: "S / Black",
@@ -386,7 +359,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -404,7 +377,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -422,7 +395,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -440,7 +413,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -458,7 +431,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -476,7 +449,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -494,7 +467,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -512,7 +485,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -557,7 +530,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -574,7 +547,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -591,7 +564,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -608,7 +581,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -653,7 +626,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -670,7 +643,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -687,7 +660,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -704,7 +677,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -749,7 +722,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -766,7 +739,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -783,7 +756,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,
@@ -800,7 +773,7 @@ export default async function initial_data_seed({
               prices: [
                 {
                   amount: 10,
-                  currency_code: "eur",
+                  currency_code: "gbp",
                 },
                 {
                   amount: 15,

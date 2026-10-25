@@ -1,31 +1,53 @@
-import { Github } from "@medusajs/icons";
-import { Button, Heading } from "@modules/common/components/ui";
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
+
 const Hero = () => {
   return (
-    <div className="h-[75vh] w-full border-b border-ui-border-base relative bg-ui-bg-subtle">
-      <div className="absolute inset-0 z-10 flex flex-col justify-center items-center text-center small:p-32 gap-6">
-        <span>
-          <Heading
-            level="h1"
-            className="text-3xl leading-10 text-ui-fg-base font-normal"
-          >
-            Ecommerce Starter Template
-          </Heading>
-          <Heading
-            level="h2"
-            className="text-3xl leading-10 text-ui-fg-subtle font-normal"
-          >
-            Powered by Medusa and Next.js
-          </Heading>
-        </span>
-        <a href="https://github.com/medusajs/dtc-starter" target="_blank">
-          <Button variant="secondary">
-            View on GitHub <Github />
-          </Button>
-        </a>
+    <section className="sg-hero">
+      <div className="sg-hero__art" aria-hidden="true">
+        <div className="sg-hero__sun" />
+        <div className="sg-hero__stem sg-hero__stem--one">
+          <i />
+          <i />
+        </div>
+        <div className="sg-hero__stem sg-hero__stem--two">
+          <i />
+          <i />
+        </div>
+        <div className="sg-hero__bloom">
+          <span />
+          <span />
+          <span />
+          <span />
+        </div>
       </div>
-    </div>
-  );
-};
 
-export default Hero;
+      <div className="content-container sg-hero__inner">
+        <div className="sg-hero__copy">
+          <p className="sg-kicker">Floral & gift studio · Essex coast</p>
+          <h1>Flowers for life&apos;s quietest and brightest moments.</h1>
+          <p className="sg-hero__intro">
+            Fresh flowers, lasting botanicals and thoughtful gifts—arranged with
+            care and made to mean something.
+          </p>
+          <div className="sg-hero__actions">
+            <LocalizedClientLink
+              href="/store"
+              className="sg-button sg-button--primary"
+            >
+              Shop the collection
+            </LocalizedClientLink>
+            <LocalizedClientLink
+              href="/contact"
+              className="sg-button sg-button--quiet"
+            >
+              Bespoke enquiries
+            </LocalizedClientLink>
+          </div>
+        </div>
+      </div>
+      <p className="sg-hero__note">Created slowly · Given wholeheartedly</p>
+    </section>
+  )
+}
+
+export default Hero

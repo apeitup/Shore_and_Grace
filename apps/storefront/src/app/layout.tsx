@@ -8,11 +8,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-mode="light">
+    <html lang="en-GB" data-mode="light">
       <head>
         <link rel="ucp" href="/.well-known/ucp" />
       </head>
-      <body>
+      <body className="bg-sg-linen text-sg-ink">
         <main className="relative">{props.children}</main>
       </body>
     </html>

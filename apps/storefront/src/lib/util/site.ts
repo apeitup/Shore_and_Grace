@@ -1,7 +1,7 @@
 import "server-only"
 import { headers } from "next/headers"
 
-export const STORE_NAME = "Medusa Store"
+export const STORE_NAME = "Shore & Grace"
 
 export const DEFAULT_COUNTRY_CODE = (
   process.env.NEXT_PUBLIC_DEFAULT_REGION || "dk"
@@ -30,20 +30,23 @@ export const getSiteOrigin = async (): Promise<string> => {
     return configured
   }
   const requestHeaders = await headers()
-  return originFromHeaders((name) => requestHeaders.get(name)) || "http://localhost:8000"
+  return (
+    originFromHeaders((name) => requestHeaders.get(name)) ||
+    "http://localhost:8000"
+  )
 }
 
 export const listCountryCodes = (
-  regions: { countries?: { iso_2?: string | null }[] | null }[]
+  regions: { countries?: { iso_2?: string | null }[] | null }[],
 ): string[] =>
   regions.flatMap((region) =>
     (region.countries ?? [])
       .map((country) => country.iso_2?.toLowerCase())
-      .filter((code): code is string => Boolean(code))
+      .filter((code): code is string => Boolean(code)),
   )
 
 export const getDefaultCountryCode = (
-  regions: { countries?: { iso_2?: string | null }[] | null }[]
+  regions: { countries?: { iso_2?: string | null }[] | null }[],
 ) => {
   const codes = listCountryCodes(regions)
   return codes.includes(DEFAULT_COUNTRY_CODE) ? DEFAULT_COUNTRY_CODE : codes[0]

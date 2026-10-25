@@ -51,6 +51,19 @@ pnpm holding:dev
 
 Use `pnpm dev` to start all three applications together after the database has been migrated and the storefront API key has been configured.
 
+## UK market configuration
+
+Fresh databases are seeded as a United Kingdom store with GBP pricing. To
+convert an older local demo database, run:
+
+```bash
+pnpm --dir apps/backend exec medusa exec ./src/scripts/configure-uk-market.ts
+pnpm --dir apps/backend exec medusa db:migrate:search --execute-all-search
+```
+
+Restart the backend after the search migration so Medusa fills and activates
+the rebuilt GBP product index.
+
 ## Verification
 
 ```bash
