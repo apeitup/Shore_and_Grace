@@ -1,5 +1,39 @@
+# Dependencies
 node_modules/
-dist/
-.DS_Store
-*.local
+.pnp
+.pnp.js
+
+# Build output
+**/dist/
+**/.next/
+**/out/
+**/build/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# Local environment files
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+
+# Tooling and platform output
+.vercel/
+.vscode/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local reference renders
 reference/
+
+# Certificates and operating-system files
+*.pem
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db

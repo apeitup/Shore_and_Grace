@@ -22,10 +22,10 @@ cleanup() {
 trap cleanup EXIT
 
 echo "Building Shore & Grace…"
-npm run build
+pnpm --dir apps/holding build
 
 echo "Packaging production files…"
-COPYFILE_DISABLE=1 tar --no-xattrs -C dist -czf "$LOCAL_ARCHIVE" .
+COPYFILE_DISABLE=1 tar --no-xattrs -C apps/holding/dist -czf "$LOCAL_ARCHIVE" .
 
 echo "Uploading staged release…"
 scp -i "$SSH_KEY" "$LOCAL_ARCHIVE" "$SERVER:$REMOTE_ARCHIVE"
