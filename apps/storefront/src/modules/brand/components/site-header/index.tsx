@@ -16,7 +16,15 @@ export default function SiteHeader({ cart, menu }: SiteHeaderProps) {
           {menu ?? (
             <button className="sg-nav-icon" aria-label="Open menu">
               <Image
+                className="sg-theme-asset sg-theme-asset--light"
                 src="/assets/icons/menu.svg"
+                alt=""
+                width={28}
+                height={28}
+              />
+              <Image
+                className="sg-theme-asset sg-theme-asset--dark"
+                src="/assets/icons/menu-dark.svg"
                 alt=""
                 width={28}
                 height={28}
@@ -49,18 +57,20 @@ export default function SiteHeader({ cart, menu }: SiteHeaderProps) {
               className="sg-nav-icon"
               aria-label="Shopping cart"
             >
-              <picture>
-                <source
-                  media="(max-width: 767px)"
-                  srcSet="/assets/icons/cart-mobile.svg"
-                />
-                <Image
-                  src="/assets/icons/cart.svg"
-                  alt=""
-                  width={28}
-                  height={28}
-                />
-              </picture>
+              <Image
+                className="sg-theme-asset sg-theme-asset--light"
+                src="/assets/icons/cart.svg"
+                alt=""
+                width={28}
+                height={28}
+              />
+              <Image
+                className="sg-theme-asset sg-theme-asset--dark"
+                src="/assets/icons/cart-dark.svg"
+                alt=""
+                width={28}
+                height={28}
+              />
             </LocalizedClientLink>
           )}
           <LocalizedClientLink
@@ -68,7 +78,20 @@ export default function SiteHeader({ cart, menu }: SiteHeaderProps) {
             href="/account"
             aria-label="My account"
           >
-            <Image src="/assets/icons/user.svg" alt="" width={28} height={28} />
+            <Image
+              className="sg-theme-asset sg-theme-asset--light"
+              src="/assets/icons/user.svg"
+              alt=""
+              width={28}
+              height={28}
+            />
+            <Image
+              className="sg-theme-asset sg-theme-asset--dark"
+              src="/assets/icons/user-dark.svg"
+              alt=""
+              width={28}
+              height={28}
+            />
           </LocalizedClientLink>
         </div>
       </nav>

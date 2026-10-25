@@ -7,12 +7,15 @@ checkEnvVariables()
  */
 const S3_HOSTNAME = process.env.MEDUSA_CLOUD_S3_HOSTNAME
 const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
+const MEDUSA_BACKEND_URL =
+  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
 
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
   reactStrictMode: true,
+  allowedDevOrigins: ["192.168.1.163"],
   async headers() {
     return [
       {
@@ -28,6 +31,14 @@ const nextConfig = {
   async rewrites() {
     return {
       beforeFiles: [
+        {
+          source: "/medusa/:path*",
+          destination: `${MEDUSA_BACKEND_URL}/:path*`,
+        },
+        {
+          source: "/:countryCode/medusa/:path*",
+          destination: `${MEDUSA_BACKEND_URL}/:path*`,
+        },
         {
           source: "/:countryCode/products/:handle([^/.]+).md",
           destination: "/:countryCode/products/:handle/markdown",

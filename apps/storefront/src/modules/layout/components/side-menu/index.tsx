@@ -40,7 +40,20 @@ export default function SideMenu(_: SideMenuProps) {
             className="sg-nav-icon"
             aria-label="Open menu"
           >
-            <Image src="/assets/icons/menu.svg" alt="" width={28} height={28} />
+            <Image
+              className="sg-theme-asset sg-theme-asset--light"
+              src="/assets/icons/menu.svg"
+              alt=""
+              width={28}
+              height={28}
+            />
+            <Image
+              className="sg-theme-asset sg-theme-asset--dark"
+              src="/assets/icons/menu-dark.svg"
+              alt=""
+              width={28}
+              height={28}
+            />
           </Popover.Button>
 
           {open && (

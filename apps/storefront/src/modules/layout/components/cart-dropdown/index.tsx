@@ -116,18 +116,20 @@ const CartDropdown = ({
             data-testid="nav-cart-link"
             aria-label={`Shopping cart, ${totalItems} item${totalItems === 1 ? "" : "s"}`}
           >
-            <picture>
-              <source
-                media="(max-width: 767px)"
-                srcSet="/assets/icons/cart-mobile.svg"
-              />
-              <Image
-                src="/assets/icons/cart.svg"
-                alt=""
-                width={28}
-                height={28}
-              />
-            </picture>
+            <Image
+              className="sg-theme-asset sg-theme-asset--light"
+              src="/assets/icons/cart.svg"
+              alt=""
+              width={28}
+              height={28}
+            />
+            <Image
+              className="sg-theme-asset sg-theme-asset--dark"
+              src="/assets/icons/cart-dark.svg"
+              alt=""
+              width={28}
+              height={28}
+            />
             {totalItems > 0 && (
               <span className="sg-cart-count">{totalItems}</span>
             )}

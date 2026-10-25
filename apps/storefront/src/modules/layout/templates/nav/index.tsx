@@ -5,6 +5,7 @@ import { getLocale } from "@lib/data/locale-actions"
 import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import SiteHeader from "@modules/brand/components/site-header"
+import ScrollHeader from "@modules/brand/components/scroll-header"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
 import SideMenu from "@modules/layout/components/side-menu"
@@ -18,7 +19,7 @@ export default async function Nav() {
   ])
 
   return (
-    <div className="sticky top-0 inset-x-0 z-50 group">
+    <ScrollHeader>
       <SiteHeader
         menu={
           <SideMenu
@@ -36,7 +37,15 @@ export default async function Nav() {
                 aria-label="Cart, empty"
               >
                 <Image
+                  className="sg-theme-asset sg-theme-asset--light"
                   src="/assets/icons/cart.svg"
+                  alt=""
+                  width={28}
+                  height={28}
+                />
+                <Image
+                  className="sg-theme-asset sg-theme-asset--dark"
+                  src="/assets/icons/cart-dark.svg"
                   alt=""
                   width={28}
                   height={28}
@@ -48,6 +57,6 @@ export default async function Nav() {
           </Suspense>
         }
       />
-    </div>
+    </ScrollHeader>
   )
 }

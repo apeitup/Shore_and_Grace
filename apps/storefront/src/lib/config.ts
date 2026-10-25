@@ -1,12 +1,15 @@
 import { getLocaleHeader } from "@lib/util/get-locale-header"
 import Medusa, { FetchArgs, FetchInput } from "@medusajs/js-sdk"
 
-// Defaults to standard port for Medusa server
-let MEDUSA_BACKEND_URL = "http://localhost:9000"
-
-if (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {
-  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
-}
+// Server-side requests can reach Medusa directly. Browser requests use the
+// storefront's same-origin proxy so local-network devices never resolve
+// `localhost` as the phone or tablet itself.
+const SERVER_MEDUSA_BACKEND_URL =
+  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+const MEDUSA_BACKEND_URL =
+  typeof window === "undefined"
+    ? SERVER_MEDUSA_BACKEND_URL
+    : `${window.location.origin}/medusa`
 
 export const sdk = new Medusa({
   baseUrl: MEDUSA_BACKEND_URL,
