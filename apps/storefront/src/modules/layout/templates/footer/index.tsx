@@ -106,6 +106,11 @@ export default function Footer() {
                 Contact Us
               </LocalizedClientLink>
             </li>
+            <li>
+              <LocalizedClientLink href="/privacy-request">
+                Privacy Requests
+              </LocalizedClientLink>
+            </li>
           </ul>
         </nav>
 

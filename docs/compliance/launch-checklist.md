@@ -50,11 +50,14 @@ owner, evidence and a completion date.
 ## Individual rights
 
 - [x] Authenticated account data download and deletion controls exist.
-- [ ] Verify exports include every Medusa module and every production processor.
+- [x] Current Medusa exports include profile, addresses, orders, preferences,
+      wishlist, occasions, reviews, gift-order details and delivery
+      reservations.
+- [ ] Verify exports include every production processor before launch.
 - [ ] Test deletion through live systems, retained order records and backups.
-- [ ] Publish a route for requests from guests and gift recipients.
-- [ ] Create an internal request log, identity-check process and one-month timer.
-- [ ] Document correction, restriction, objection and portability handling.
+- [x] Publish a route for requests from guests and gift recipients.
+- [x] Create an internal request log, identity-check process and one-month timer.
+- [x] Document correction, restriction, objection and portability handling.
 
 ## Marketing
 
@@ -74,5 +77,9 @@ owner, evidence and a completion date.
 - [ ] Confirm processor contracts and breach-notification clauses.
 - [ ] Adopt an incident register and a documented 72-hour assessment process.
 - [ ] Implement approved retention and deletion jobs.
+- [x] Add a read-only retention candidate report that logs counts without
+      deleting personal data.
+- [ ] Approve each retention period, then replace report-only candidates with
+      tested legal-hold-aware workflows where deletion is appropriate.
 - [ ] Perform and retain a final launch audit covering cookies, forms, orders,
       exports, deletion and provider data flows.

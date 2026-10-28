@@ -9,6 +9,7 @@ import PaymentContainer, {
 } from "@modules/checkout/components/payment-container"
 import CartTotals from "@modules/common/components/cart-totals"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import NativeSelect from "@modules/common/components/native-select"
 import { Button, Heading } from "@modules/common/components/ui"
 import { HttpTypes } from "@medusajs/types"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
@@ -230,14 +231,21 @@ const Payment = ({
                 <span>Postcode</span>
                 <input name="postal_code" autoComplete="billing postal-code" value={billing.postal_code} onChange={updateBillingField} required />
               </label>
-              <label className="sg-checkout-payment-field">
-                <span>Country</span>
-                <select name="country_code" autoComplete="billing country" value={billing.country_code} onChange={updateBillingField} required>
-                  {cart.region?.countries?.map((country) => (
-                    <option key={country.iso_2} value={country.iso_2}>{country.display_name}</option>
-                  ))}
-                </select>
-              </label>
+              <NativeSelect
+                label="Country"
+                wrapperClassName="sg-checkout-payment-field"
+                name="country_code"
+                autoComplete="billing country"
+                value={billing.country_code}
+                onChange={updateBillingField}
+                required
+              >
+                {cart.region?.countries?.map((country) => (
+                  <option key={country.iso_2} value={country.iso_2}>
+                    {country.display_name}
+                  </option>
+                ))}
+              </NativeSelect>
             </div>
           </section>
 

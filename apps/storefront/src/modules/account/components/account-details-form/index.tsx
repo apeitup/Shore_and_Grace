@@ -2,7 +2,7 @@
 
 import { updateCustomer } from "@lib/data/customer"
 import { HttpTypes } from "@medusajs/types"
-import { NavArrowDown } from "iconoir-react"
+import NativeSelect from "@modules/common/components/native-select"
 import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 
@@ -47,17 +47,16 @@ export default function AccountDetailsForm({ customer }: { customer: HttpTypes.S
         <label><span>Last name *</span><input name="last_name" defaultValue={customer.last_name || ""} required autoComplete="family-name" /></label>
         <label><span>Email address</span><input value={customer.email} readOnly autoComplete="email" /></label>
         <label><span>Phone number</span><input name="phone" defaultValue={customer.phone || ""} autoComplete="tel" /></label>
-        <label className="sg-account-form-grid__wide">
-          <span>Billing address</span>
-          <span className="sg-account-select">
-            <select defaultValue={billing?.id || ""} disabled={!billing}>
-              <option value={billing?.id || ""}>
-                Billing address - {billingLabel}
-              </option>
-            </select>
-            <NavArrowDown aria-hidden="true" />
-          </span>
-        </label>
+        <NativeSelect
+          label="Billing address"
+          wrapperClassName="sg-account-form-grid__wide"
+          defaultValue={billing?.id || ""}
+          readOnly
+        >
+          <option value={billing?.id || ""}>
+            Billing address - {billingLabel}
+          </option>
+        </NativeSelect>
       </div>
       {state.success && <p className="sg-form-message sg-form-message--success">Your account details have been updated.</p>}
       {state.error && <p className="sg-form-message sg-form-message--error">{state.error}</p>}

@@ -193,6 +193,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 data-testid="state-input"
               />
               <CountrySelect
+                label="Country"
                 name="country_code"
                 region={region}
                 required

@@ -21,6 +21,9 @@ import { PostStoreOccasionSchema } from "./store/occasions/route"
 import { PostStoreOccasionUpdateSchema } from "./store/occasions/personal/[id]/route"
 import { PostStoreOccasionPreferenceSchema } from "./store/occasions/preferences/route"
 import { PostCustomerPreferencesSchema } from "./store/customer-preferences/route"
+import { PostStorePrivacyRequestSchema } from "./store/privacy-requests/route"
+import { GetAdminPrivacyRequestsSchema } from "./admin/privacy-requests/route"
+import { PostAdminPrivacyRequestSchema } from "./admin/privacy-requests/[id]/route"
 
 // The product index declares filterable `status` and `sales_channel_ids`, so
 // the route narrows it to published products in the key's sales channels.
@@ -104,6 +107,11 @@ export default defineMiddlewares({
       middlewares: [validateAndTransformBody(PostCustomerPreferencesSchema)],
     },
     {
+      matcher: "/store/privacy-requests",
+      methods: ["POST"],
+      middlewares: [validateAndTransformBody(PostStorePrivacyRequestSchema)],
+    },
+    {
       matcher: "/store/occasions",
       methods: ["POST"],
       middlewares: [validateAndTransformBody(PostStoreOccasionSchema)],
@@ -176,6 +184,40 @@ export default defineMiddlewares({
       middlewares: [
         validateAndTransformBody(PostAdminUpdateReviewsStatusSchema),
       ],
+    },
+    {
+      matcher: "/admin/privacy-requests",
+      methods: ["GET"],
+      middlewares: [
+        validateAndTransformQuery(GetAdminPrivacyRequestsSchema, {
+          isList: true,
+          defaults: [
+            "id",
+            "reference",
+            "request_type",
+            "requester_type",
+            "name",
+            "email",
+            "phone",
+            "order_reference",
+            "details",
+            "customer_id",
+            "status",
+            "identity_status",
+            "due_at",
+            "completed_at",
+            "internal_notes",
+            "privacy_notice_version",
+            "created_at",
+            "updated_at",
+          ],
+        }),
+      ],
+    },
+    {
+      matcher: "/admin/privacy-requests/:id",
+      methods: ["POST"],
+      middlewares: [validateAndTransformBody(PostAdminPrivacyRequestSchema)],
     },
   ],
 })

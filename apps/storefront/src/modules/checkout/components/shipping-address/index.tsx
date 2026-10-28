@@ -283,9 +283,9 @@ const ShippingAddress = ({
           data-testid="shipping-province-input"
         />
         <div className="sg-checkout-country-field">
-          <label htmlFor="shipping-country-select">Country *</label>
           <CountrySelect
             id="shipping-country-select"
+            label="Country"
             name="shipping_address.country_code"
             autoComplete="section-recipient shipping country"
             region={cart?.region}

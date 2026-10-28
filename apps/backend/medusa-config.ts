@@ -33,5 +33,8 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/customer-preferences",
     },
+    {
+      resolve: "./src/modules/privacy-request",
+    },
   ],
 })

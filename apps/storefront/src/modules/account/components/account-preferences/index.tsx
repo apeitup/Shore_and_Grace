@@ -6,6 +6,7 @@ import {
   downloadCustomerData,
   saveCustomerPreferences,
 } from "@lib/data/customer-preferences"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { COOKIE_CONSENT_EVENT } from "@modules/layout/components/cookie-consent"
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
@@ -384,6 +385,21 @@ export default function AccountPreferences({
                 >
                   {busy === "download" ? "Preparing…" : "Download"}
                 </button>
+              </div>
+              <div className="sg-preference-row">
+                <div>
+                  <strong>Make a privacy request</strong>
+                  <span>
+                    Ask us to access, correct, delete or restrict how we use
+                    your information.
+                  </span>
+                </div>
+                <LocalizedClientLink
+                  href="/privacy-request"
+                  className="sg-secondary-button"
+                >
+                  Request
+                </LocalizedClientLink>
               </div>
             </div>
           </div>

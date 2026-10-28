@@ -1,69 +1,92 @@
-import { clx } from "@modules/common/components/ui"
-import { NavArrowDown } from "iconoir-react"
-import {
-  SelectHTMLAttributes,
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from "react"
+import { Check, NavArrowDown, WarningTriangle } from "iconoir-react"
+import { ReactNode, SelectHTMLAttributes, forwardRef, useId } from "react"
 
 export type NativeSelectProps = {
+  label?: string
   placeholder?: string
-  errors?: Record<string, unknown>
-  touched?: Record<string, unknown>
+  error?: string
+  validated?: boolean
+  leadingIcon?: ReactNode
+  readOnly?: boolean
+  wrapperClassName?: string
 } & SelectHTMLAttributes<HTMLSelectElement>
 
 const NativeSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
   (
-    { placeholder = "Select...", defaultValue, className, children, ...props },
+    {
+      label,
+      placeholder,
+      error,
+      validated = false,
+      leadingIcon,
+      readOnly = false,
+      wrapperClassName = "",
+      className = "",
+      id,
+      children,
+      required,
+      disabled,
+      ...props
+    },
     ref
   ) => {
-    const innerRef = useRef<HTMLSelectElement>(null)
-    const [isPlaceholder, setIsPlaceholder] = useState(false)
-
-    useImperativeHandle<HTMLSelectElement | null, HTMLSelectElement | null>(
-      ref,
-      () => innerRef.current
-    )
-
-    useEffect(() => {
-      if (innerRef.current && innerRef.current.value === "") {
-        setIsPlaceholder(true)
-      } else {
-        setIsPlaceholder(false)
-      }
-    }, [innerRef.current?.value])
+    const generatedId = useId()
+    const selectId = id ?? `sg-select-${generatedId.replace(/:/g, "")}`
+    const errorId = error ? `${selectId}-error` : undefined
 
     return (
-      <div>
-        <div
-          onFocus={() => innerRef.current?.focus()}
-          onBlur={() => innerRef.current?.blur()}
-          className={clx(
-            "relative flex items-center text-base-regular border border-ui-border-base bg-ui-bg-subtle rounded-md hover:bg-ui-bg-field-hover",
-            className,
-            {
-              "text-ui-fg-muted": isPlaceholder,
-            }
+      <div
+        className={`sg-select-field ${wrapperClassName}`.trim()}
+        data-error={error ? "true" : undefined}
+        data-validated={validated && !error ? "true" : undefined}
+        data-read-only={readOnly ? "true" : undefined}
+      >
+        {label && (
+          <label className="sg-select-field__label" htmlFor={selectId}>
+            {label}
+            {required && <span aria-hidden="true">*</span>}
+          </label>
+        )}
+
+        <div className="sg-select-field__control">
+          {leadingIcon && (
+            <span className="sg-select-field__leading" aria-hidden="true">
+              {leadingIcon}
+            </span>
           )}
-        >
           <select
-            ref={innerRef}
-            defaultValue={defaultValue}
+            ref={ref}
+            id={selectId}
+            className={`sg-select-field__select ${className}`.trim()}
+            required={required}
+            disabled={disabled || readOnly}
+            aria-invalid={error ? "true" : undefined}
+            aria-describedby={errorId}
             {...props}
-            className="appearance-none flex-1 bg-transparent border-none px-4 py-2.5 transition-colors duration-150 outline-none "
           >
-            <option disabled value="">
-              {placeholder}
-            </option>
+            {placeholder !== undefined && (
+              <option disabled value="">
+                {placeholder}
+              </option>
+            )}
             {children}
           </select>
-          <span className="absolute right-4 inset-y-0 flex items-center pointer-events-none ">
-            <NavArrowDown aria-hidden="true" />
+          {validated && !error && (
+            <span className="sg-select-field__validated" aria-hidden="true">
+              <Check />
+            </span>
+          )}
+          <span className="sg-select-field__chevron" aria-hidden="true">
+            <NavArrowDown />
           </span>
         </div>
+
+        {error && (
+          <p className="sg-select-field__error" id={errorId}>
+            <WarningTriangle aria-hidden="true" />
+            {error}
+          </p>
+        )}
       </div>
     )
   }

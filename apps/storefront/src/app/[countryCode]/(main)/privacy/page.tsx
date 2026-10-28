@@ -197,6 +197,15 @@ export default function PrivacyPage() {
           account.
         </p>
         <p>
+          If you do not have an account, are a gift recipient, or need help with
+          a different right, use our{" "}
+          <LocalizedClientLink href="/privacy-request">
+            privacy request form
+          </LocalizedClientLink>
+          . We normally respond within one calendar month and may need to verify
+          your identity first.
+        </p>
+        <p>
           Marketing can be stopped using the unsubscribe link in a message or by
           contacting us. Optional cookies can be changed at any time using the
           Cookie settings control in the footer.

@@ -82,6 +82,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           onChange={handleChange}
         />
         <CountrySelect
+          label="Country"
           name="billing_address.country_code"
           autoComplete="country"
           region={cart?.region}

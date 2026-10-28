@@ -25,7 +25,11 @@ The business owner must confirm:
 
 - `data-processing-register.md` maps processing purposes and lawful bases.
 - `retention-schedule.md` lists proposed deletion and review periods.
+- `retention-audit-runbook.md` explains the count-only retention report and its
+  deliberate deletion safeguards.
 - `processor-register.md` records suppliers and contract checks.
+- `rights-request-runbook.md` defines intake, identity checks, handling and
+  completion of individual-rights requests.
 - `launch-checklist.md` is the evidence-led launch gate.
 
 Review this folder whenever a provider, cookie, form, payment method or use of

@@ -8,8 +8,18 @@ import {
   saveCustomerOccasion,
   saveSystemOccasionPreference,
 } from "@lib/data/occasions"
-import { EditPencil, Plus, Trash } from "iconoir-react"
-import { FormEvent, useState, useTransition } from "react"
+import NativeSelect from "@modules/common/components/native-select"
+import MobileCheckbox from "@modules/common/components/mobile-checkbox"
+import { EditPencil, Plus, Trash, Xmark } from "iconoir-react"
+import {
+  FormEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+} from "react"
 
 type FormValues = {
   id?: string
@@ -27,6 +37,19 @@ const emptyForm: FormValues = {
   enabled: true,
   repeats_annually: true,
 }
+
+const mobileQuery = "(max-width: 767px)"
+
+const subscribeToMobileViewport = (onChange: () => void) => {
+  const mediaQuery = window.matchMedia(mobileQuery)
+  mediaQuery.addEventListener("change", onChange)
+
+  return () => mediaQuery.removeEventListener("change", onChange)
+}
+
+const getMobileViewport = () => window.matchMedia(mobileQuery).matches
+const getServerMobileViewport = () => false
+const drawerAnimationDuration = 220
 
 const formatDate = (date?: string | null) => {
   if (!date) return "Choose a date"
@@ -46,8 +69,77 @@ export default function AccountOccasions({
     initialData.customer_occasions
   )
   const [form, setForm] = useState<FormValues | null>(null)
+  const [isEditorClosing, setIsEditorClosing] = useState(false)
   const [error, setError] = useState("")
   const [isPending, startTransition] = useTransition()
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isFormOpen = Boolean(form)
+  const isMobile = useSyncExternalStore(
+    subscribeToMobileViewport,
+    getMobileViewport,
+    getServerMobileViewport
+  )
+
+  const openEditor = (values: FormValues) => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current)
+      closeTimer.current = null
+    }
+    setIsEditorClosing(false)
+    setForm(values)
+  }
+
+  const closeEditor = useCallback(() => {
+    if (!isFormOpen || isEditorClosing || closeTimer.current) {
+      return
+    }
+
+    if (!isMobile) {
+      setForm(null)
+      return
+    }
+
+    const duration = window.matchMedia("(prefers-reduced-motion: reduce)")
+      .matches
+      ? 0
+      : drawerAnimationDuration
+
+    setIsEditorClosing(true)
+    closeTimer.current = setTimeout(() => {
+      setForm(null)
+      setIsEditorClosing(false)
+      closeTimer.current = null
+    }, duration)
+  }, [isEditorClosing, isFormOpen, isMobile])
+
+  useEffect(() => {
+    return () => {
+      if (closeTimer.current) {
+        clearTimeout(closeTimer.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isFormOpen || !isMobile) {
+      return
+    }
+
+    const previousOverflow = document.body.style.overflow
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeEditor()
+      }
+    }
+
+    document.body.style.overflow = "hidden"
+    window.addEventListener("keydown", closeOnEscape)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener("keydown", closeOnEscape)
+    }
+  }, [closeEditor, isFormOpen, isMobile])
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -62,7 +154,7 @@ export default function AccountOccasions({
             ? items.map((item) => (item.id === saved.id ? saved : item))
             : [saved, ...items]
         })
-        setForm(null)
+        closeEditor()
       } catch (caught) {
         setError(
           caught instanceof Error
@@ -132,146 +224,220 @@ export default function AccountOccasions({
         <button
           type="button"
           className="sg-brand-button"
-          onClick={() => setForm(emptyForm)}
+          onClick={() => openEditor(emptyForm)}
         >
-          <Plus /> Add a date
+          <Plus />
+          <span className="sg-occasion-add__desktop">Add a date</span>
+          <span className="sg-occasion-add__mobile">Add a memorable date</span>
         </button>
       </header>
 
       {form && (
-        <form className="sg-occasion-form" onSubmit={submit}>
-          <div className="sg-account-form-grid">
-            <label>
-              Occasion name
-              <input
-                required
-                value={form.name}
-                onChange={(event) =>
-                  setForm({ ...form, name: event.target.value })
-                }
-                autoComplete="off"
-              />
-            </label>
-            <label>
-              Date
-              <input
-                required
-                type="date"
-                value={form.occasion_date}
-                onChange={(event) =>
-                  setForm({ ...form, occasion_date: event.target.value })
-                }
-              />
-            </label>
-            <label>
-              Remind me
-              <select
-                value={form.reminder_days}
-                onChange={(event) =>
-                  setForm({ ...form, reminder_days: Number(event.target.value) })
-                }
+        <div
+          className={`sg-occasion-editor is-open${
+            isEditorClosing ? " is-closing" : ""
+          }`}
+        >
+          <button
+            type="button"
+            className="sg-occasion-editor__backdrop"
+            aria-label="Close memorable date form"
+            onClick={closeEditor}
+          />
+          <section
+            className="sg-occasion-editor__panel"
+            role={isMobile ? "dialog" : undefined}
+            aria-modal={isMobile || undefined}
+            aria-labelledby={isMobile ? "sg-occasion-editor-title" : undefined}
+          >
+            <span className="sg-occasion-editor__handle" aria-hidden="true" />
+            <header className="sg-occasion-editor__header">
+              <h2 id="sg-occasion-editor-title">
+                {form.id ? "Edit memorable date" : "Add a memorable date"}
+              </h2>
+              <button
+                type="button"
+                onClick={closeEditor}
+                aria-label="Close memorable date form"
+                autoFocus={isMobile}
               >
-                {[0, 3, 7, 14, 21, 30].map((days) => (
-                  <option key={days} value={days}>
-                    {days === 0 ? "On the day" : `${days} days before`}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="sg-occasion-form__check">
-              <input
-                type="checkbox"
-                checked={form.repeats_annually}
-                onChange={(event) =>
-                  setForm({ ...form, repeats_annually: event.target.checked })
-                }
-              />
-              Repeat annually
-            </label>
-          </div>
-          <div className="sg-occasion-form__actions">
-            <button
-              type="button"
-              className="sg-secondary-button"
-              onClick={() => setForm(null)}
-            >
-              Cancel
-            </button>
-            <button className="sg-brand-button" disabled={isPending}>
-              {isPending ? "Saving…" : "Save date"}
-            </button>
-          </div>
-        </form>
+                <Xmark aria-hidden="true" />
+              </button>
+            </header>
+            <form className="sg-occasion-form" onSubmit={submit}>
+              <div className="sg-account-form-grid">
+                <label>
+                  Occasion name
+                  <input
+                    required
+                    value={form.name}
+                    onChange={(event) =>
+                      setForm({ ...form, name: event.target.value })
+                    }
+                    autoComplete="off"
+                  />
+                </label>
+                <label>
+                  Date
+                  <input
+                    required
+                    type="date"
+                    value={form.occasion_date}
+                    onChange={(event) =>
+                      setForm({ ...form, occasion_date: event.target.value })
+                    }
+                  />
+                </label>
+                <NativeSelect
+                  label="Remind me"
+                  value={form.reminder_days}
+                  onChange={(event) =>
+                    setForm({
+                      ...form,
+                      reminder_days: Number(event.target.value),
+                    })
+                  }
+                >
+                  {[0, 3, 7, 14, 21, 30].map((days) => (
+                    <option key={days} value={days}>
+                      {days === 0 ? "On the day" : `${days} days before`}
+                    </option>
+                  ))}
+                </NativeSelect>
+                <MobileCheckbox
+                  checked={form.repeats_annually}
+                  label="Repeat annually"
+                  onChange={(event) =>
+                    setForm({
+                      ...form,
+                      repeats_annually: event.target.checked,
+                    })
+                  }
+                />
+              </div>
+              <div className="sg-occasion-form__actions">
+                {form.id && (
+                  <button
+                    type="button"
+                    className="sg-occasion-form__delete"
+                    aria-label="Delete date"
+                    title="Delete date"
+                    onClick={() => {
+                      const item = personalItems.find(
+                        (current) => current.id === form.id
+                      )
+                      if (item) {
+                        remove(item)
+                        closeEditor()
+                      }
+                    }}
+                    disabled={isPending}
+                  >
+                    <Trash aria-hidden="true" />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="sg-secondary-button"
+                  onClick={closeEditor}
+                >
+                  Cancel
+                </button>
+                <button className="sg-brand-button" disabled={isPending}>
+                  {isPending ? "Saving…" : "Save"}
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
       )}
 
       {error && <p className="sg-form-message sg-form-message--error">{error}</p>}
 
-      <div className="sg-occasions__intro">
-        <h2>Your saved dates</h2>
-        <p>
-          We will only send reminders when occasion reminders are enabled in
-          Notifications.
-        </p>
-      </div>
-      <div className="sg-preference-list">
-        {personalItems.map((item) => (
-          <div className="sg-preference-row" key={item.id}>
-            <div>
-              <strong>{item.name}</strong>
-              <span>
-                {formatDate(item.occasion_date)} · Reminder {item.reminder_days}
-                {" days before"}
-                {item.repeats_annually ? " · Repeats annually" : ""}
-              </span>
+      <div className="sg-occasion-section">
+        <div className="sg-occasions__intro">
+          <h2>Your saved dates</h2>
+          <p className="sg-occasions__intro-desktop">
+            We will only send reminders when occasion reminders are enabled in
+            Notifications.
+          </p>
+          <p className="sg-occasions__intro-mobile">
+            Turn on the occasions you want. We will send you a gentle email
+            reminder.
+          </p>
+        </div>
+        <div className="sg-preference-list sg-occasion-list">
+          {personalItems.map((item) => (
+            <div className="sg-preference-row" key={item.id}>
+              <div>
+                <strong>{item.name}</strong>
+                <span className="sg-occasion-details">
+                  <span>{formatDate(item.occasion_date)}</span>
+                  <span>Reminder {item.reminder_days} days before</span>
+                  {item.repeats_annually && <span>Repeats annually</span>}
+                </span>
+              </div>
+              <div className="sg-occasion-actions">
+                <button
+                  type="button"
+                  onClick={() =>
+                    openEditor({
+                      id: item.id,
+                      name: item.name,
+                      occasion_date: item.occasion_date ?? "",
+                      reminder_days: item.reminder_days,
+                      enabled: item.enabled,
+                      repeats_annually: item.repeats_annually,
+                    })
+                  }
+                >
+                  <EditPencil /> <span>Edit</span>
+                </button>
+                <button
+                  type="button"
+                  aria-label={`Delete ${item.name}`}
+                  onClick={() => remove(item)}
+                  disabled={isPending}
+                >
+                  <Trash />
+                </button>
+              </div>
             </div>
-            <div className="sg-occasion-actions">
+          ))}
+        </div>
+      </div>
+      <div className="sg-occasion-section sg-occasion-section--national">
+        <div className="sg-occasions__intro sg-occasions__intro--national">
+          <h2>National occasions</h2>
+          <p>
+            Turn on the occasions you want. We will send you a gentle email
+            reminder.
+          </p>
+        </div>
+        <div className="sg-preference-list sg-occasion-list">
+          {systemItems.map((item) => (
+            <div className="sg-preference-row" key={item.id}>
+              <div>
+                <strong>{item.name}</strong>
+                <span className="sg-occasion-details">
+                  <span>{formatDate(item.next_date)}</span>
+                  <span>Reminder {item.reminder_days} days before</span>
+                  <span>Repeats annually</span>
+                </span>
+              </div>
               <button
                 type="button"
-                onClick={() =>
-                  setForm({
-                    id: item.id,
-                    name: item.name,
-                    occasion_date: item.occasion_date ?? "",
-                    reminder_days: item.reminder_days,
-                    enabled: item.enabled,
-                    repeats_annually: item.repeats_annually,
-                  })
-                }
-              >
-                <EditPencil /> <span>Edit</span>
-              </button>
-              <button
-                type="button"
-                aria-label={`Delete ${item.name}`}
-                onClick={() => remove(item)}
+                role="switch"
+                aria-checked={item.enabled}
+                className="sg-switch"
+                onClick={() => toggleSystem(item)}
                 disabled={isPending}
               >
-                <Trash />
+                <span />
               </button>
             </div>
-          </div>
-        ))}
-        {systemItems.map((item) => (
-          <div className="sg-preference-row" key={item.id}>
-            <div>
-              <strong>{item.name}</strong>
-              <span>
-                {formatDate(item.next_date)} · Reminder {item.reminder_days} days
-                before · Repeats annually
-              </span>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={item.enabled}
-              className="sg-switch"
-              onClick={() => toggleSystem(item)}
-              disabled={isPending}
-            >
-              <span />
-            </button>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
       <div className="sg-occasions__note">
         <strong>A gentle reminder, never an obligation</strong>
