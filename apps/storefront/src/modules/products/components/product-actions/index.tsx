@@ -13,6 +13,8 @@ import ProductPrice from "../product-price"
 import Image from "next/image"
 import { useWishlist } from "@modules/wishlist/components/wishlist-provider"
 import WishlistHeart from "@modules/wishlist/components/wishlist-heart"
+import { captureStorefrontEvent } from "@modules/analytics/lib/posthog-client"
+import { getProductPrice } from "@lib/util/get-product-price"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -135,6 +137,19 @@ export default function ProductActions({
       countryCode,
     })
     notifyCartUpdated()
+
+    const trackedPrice = getProductPrice({
+      product,
+      variantId: selectedVariant.id,
+    }).variantPrice
+    void captureStorefrontEvent("product_added_to_cart", {
+      product_id: product.id,
+      variant_id: selectedVariant.id,
+      price: trackedPrice?.calculated_price_number,
+      currency_code: trackedPrice?.currency_code,
+      quantity,
+      country_code: countryCode,
+    })
 
     setIsAdding(false)
   }

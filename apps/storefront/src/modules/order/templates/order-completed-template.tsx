@@ -13,6 +13,7 @@ import Image from "next/image"
 import { convertToLocale } from "@lib/util/money"
 import CartRelatedProducts from "@modules/cart/components/cart-related-products"
 import { getOrderPurchaserFirstName } from "@lib/util/checkout-parties"
+import OrderCompletedTracker from "@modules/analytics/components/order-completed-tracker"
 
 type OrderCompletedTemplateProps = {
   order: HttpTypes.StoreOrder
@@ -38,6 +39,16 @@ export default async function OrderCompletedTemplate({
 
   return (
     <div className="sg-order-confirmation">
+      <OrderCompletedTracker
+        orderId={order.id}
+        orderValue={order.total}
+        currencyCode={order.currency_code}
+        itemCount={(order.items ?? []).reduce(
+          (total, item) => total + item.quantity,
+          0
+        )}
+        countryCode={order.shipping_address?.country_code}
+      />
       <ShopPageHero
         title="Order confirmed"
         trail={[

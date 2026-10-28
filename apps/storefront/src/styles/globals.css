@@ -7911,6 +7911,38 @@ body {
   letter-spacing: 1.8px;
 }
 
+.sg-policy-page__consent-back {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--sg-ink);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.sg-policy-page__consent-back svg {
+  width: 20px;
+  height: 20px;
+}
+
+.sg-policy-page__consent-back:hover {
+  color: var(--sg-sage-deep);
+}
+
+.sg-policy-page__consent-back:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid var(--sg-sage-deep);
+  outline-offset: 4px;
+}
+
 .sg-policy-page > h1 {
   margin: 0;
   font-family: var(--sg-display);
@@ -8828,6 +8860,66 @@ body {
     margin-right: -16px;
     border-right: 0;
     border-radius: 12px 0 0 12px;
+  }
+
+  .sg-policy-purpose-table {
+    margin-right: 0;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .sg-policy-purpose-table table,
+  .sg-policy-purpose-table tbody,
+  .sg-policy-purpose-table tr,
+  .sg-policy-purpose-table td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .sg-policy-purpose-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .sg-policy-purpose-table tbody {
+    display: grid;
+    gap: 12px;
+  }
+
+  .sg-policy-purpose-table tr {
+    overflow: hidden;
+    border: 1px solid #d9d8d6;
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  .sg-policy-purpose-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #e6e4e1;
+  }
+
+  .sg-policy-purpose-table td::before {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--sg-sage-deep);
+    content: attr(data-label);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .sg-policy-purpose-table tr td:last-child {
+    border-bottom: 0;
   }
 
   .sg-policy-cookie-button {

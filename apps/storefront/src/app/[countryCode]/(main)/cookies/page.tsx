@@ -56,8 +56,15 @@ const browserStorage = [
   {
     name: "sg_posthog",
     purpose:
-      "Stores an anonymous analytics identifier and pageview context after analytics consent.",
+      "Stores an anonymous analytics identifier and consented page and shopping-event context.",
     duration: "Until consent is withdrawn or browser storage is cleared",
+    category: "Analytics",
+  },
+  {
+    name: "sg_analytics_checkout_*",
+    purpose:
+      "Prevents duplicate checkout-step and order-completion analytics events within one browser tab.",
+    duration: "Browser tab session",
     category: "Analytics",
   },
   {
@@ -180,12 +187,17 @@ export default function CookiePolicyPage() {
         <h2>PostHog analytics</h2>
         <p>
           If you enable analytics, the storefront initialises PostHog to record
-          anonymous pageviews and understand how the store is used. The locally
+          anonymous pageviews and a limited set of product, basket, checkout,
+          order and wishlist events to understand how the store is used. Event
+          properties are restricted to product identifiers, prices, quantities,
+          currency, country code and checkout step. We do not send names, email
+          addresses, phone numbers, postal addresses, delivery instructions or
+          gift messages. The locally
           bundled analytics code cannot initialise, store analytics identifiers
           or transmit analytics data before consent. Its local storage is
           disabled when that consent is withdrawn. Session replay, surveys and
-          automatic interaction capture are disabled in this first
-          implementation.
+          automatic interaction capture, heatmaps and web-vitals capture are
+          disabled.
         </p>
         <p>
           Read PostHog&apos;s{" "}

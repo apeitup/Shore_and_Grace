@@ -6,6 +6,7 @@ import CartRelatedProducts from "@modules/cart/components/cart-related-products"
 import DeliveryChecker from "@modules/cart/components/delivery-checker"
 import { HttpTypes } from "@medusajs/types"
 import ShopPageHero from "@modules/brand/components/shop-page-hero"
+import CartViewTracker from "@modules/analytics/components/cart-view-tracker"
 
 const CartTemplate = ({
   cart,
@@ -27,6 +28,16 @@ const CartTemplate = ({
       <div className="content-container sg-cart-content" data-testid="cart-container">
         {cart?.items?.length ? (
           <div className="sg-cart-layout">
+            <CartViewTracker
+              cartId={cart.id}
+              cartValue={cart.total ?? 0}
+              currencyCode={cart.currency_code}
+              itemCount={cart.items.reduce(
+                (total, item) => total + item.quantity,
+                0
+              )}
+              countryCode={countryCode}
+            />
             <div className="sg-cart-items">
               <ItemsTemplate cart={cart} />
             </div>

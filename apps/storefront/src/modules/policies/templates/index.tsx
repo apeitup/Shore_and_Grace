@@ -1,5 +1,7 @@
 import { convertToLocale } from "@lib/util/money"
 import { formatDayRange, StorePolicies } from "@lib/util/store-policies"
+import CookieSettingsReturn from "@modules/policies/components/cookie-settings-return"
+import { Suspense } from "react"
 
 export const formatShippingRate = (rate: number, currencyCode: string) =>
   rate === 0
@@ -21,6 +23,9 @@ export const PolicyPage = ({
     className="content-container sg-policy-page"
     data-testid="policy-page"
   >
+    <Suspense fallback={null}>
+      <CookieSettingsReturn />
+    </Suspense>
     {eyebrow && <p className="sg-policy-page__eyebrow">{eyebrow}</p>}
     <h1>{title}</h1>
     {updated && (

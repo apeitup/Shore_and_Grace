@@ -32,6 +32,11 @@ owner, evidence and a completion date.
       and autocapture are disabled.
 - [x] Withdrawing analytics consent calls PostHog's opt-out mechanism and
       disables its persistence.
+- [x] Commerce analytics use a central event/property allowlist and exclude
+      customer and recipient identity, contact, address, instruction and gift
+      message fields.
+- [x] Product Analytics and Web Analytics are configured without autocapture,
+      heatmaps, web-vitals capture, session replay or surveys.
 - [ ] Add the PostHog project token and the correct EU or US host to the
       production environment.
 - [ ] Generate and sign the PostHog DPA, record the selected cloud region and

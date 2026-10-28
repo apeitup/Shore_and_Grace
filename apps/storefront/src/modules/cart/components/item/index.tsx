@@ -142,6 +142,13 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             className="sg-cart-mobile-item__remove"
             data-testid="product-delete-button"
             icon={<Trash aria-hidden="true" />}
+            analytics={{
+              product_id: item.product_id ?? undefined,
+              variant_id: item.variant_id ?? undefined,
+              price: item.unit_price,
+              currency_code: currencyCode,
+              quantity: item.quantity,
+            }}
           />
         </div>
 
@@ -242,6 +249,13 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             id={item.id}
             data-testid="product-delete-button"
             icon={<Trash aria-hidden="true" />}
+            analytics={{
+              product_id: item.product_id ?? undefined,
+              variant_id: item.variant_id ?? undefined,
+              price: item.unit_price,
+              currency_code: currencyCode,
+              quantity: item.quantity,
+            }}
           />
         </Table.Cell>
       )}

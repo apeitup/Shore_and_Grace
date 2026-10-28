@@ -10,6 +10,7 @@ import {
   useMemo,
   useState,
 } from "react"
+import { captureStorefrontEvent } from "@modules/analytics/lib/posthog-client"
 
 type WishlistContextValue = {
   isSaved: (productId: string) => boolean
@@ -65,6 +66,12 @@ export const WishlistProvider = ({
           })
           router.push(`/${countryCode}/account`)
           return wasSaved
+        }
+
+        if (result.saved) {
+          void captureStorefrontEvent("wishlist_item_added", {
+            product_id: productId,
+          })
         }
 
         router.refresh()

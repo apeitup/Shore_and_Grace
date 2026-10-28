@@ -2,6 +2,7 @@
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { NavArrowLeft } from "iconoir-react"
+import { usePathname } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 
 export const COOKIE_CONSENT_EVENT = "sg:open-cookie-preferences"
@@ -27,6 +28,29 @@ const optionalDefaults: OptionalConsent = {
   personalisation: false,
   analytics: false,
   marketing: false,
+}
+
+const isPolicyPath = (pathname: string) =>
+  /\/(?:cookies|privacy)\/?$/.test(pathname)
+
+function PolicyLinks({ onNavigate }: { onNavigate: () => void }) {
+  return (
+    <div className="sg-cookie-modal__policy-links">
+      <LocalizedClientLink
+        href="/cookies?from=cookie-settings"
+        onClick={onNavigate}
+      >
+        Cookie Policy
+      </LocalizedClientLink>
+      <span aria-hidden="true">·</span>
+      <LocalizedClientLink
+        href="/privacy?from=cookie-settings"
+        onClick={onNavigate}
+      >
+        Privacy Policy
+      </LocalizedClientLink>
+    </div>
+  )
 }
 
 const readConsent = (): CookieConsent | null => {
@@ -99,6 +123,7 @@ function ConsentSwitch({
 }
 
 export default function CookieConsentModal() {
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [view, setView] = useState<"first" | "preferences">("first")
   const [hasSavedConsent, setHasSavedConsent] = useState(false)
@@ -137,15 +162,17 @@ export default function CookieConsentModal() {
       )
       document.documentElement.dataset.cookieAnalytics = String(saved.analytics)
       document.documentElement.dataset.cookieMarketing = String(saved.marketing)
-    } else {
+    } else if (!isPolicyPath(pathname)) {
       timer = window.setTimeout(() => setOpen(true), 0)
+    } else {
+      timer = window.setTimeout(() => setOpen(false), 0)
     }
     window.addEventListener(COOKIE_CONSENT_EVENT, openPreferences)
     return () => {
       if (timer) window.clearTimeout(timer)
       window.removeEventListener(COOKIE_CONSENT_EVENT, openPreferences)
     }
-  }, [openPreferences])
+  }, [openPreferences, pathname])
 
   useEffect(() => {
     if (!open) return
@@ -217,15 +244,7 @@ export default function CookieConsentModal() {
             >
               Manage preferences
             </button>
-            <div className="sg-cookie-modal__policy-links">
-              <LocalizedClientLink href="/cookies">
-                Cookie Policy
-              </LocalizedClientLink>
-              <span aria-hidden="true">·</span>
-              <LocalizedClientLink href="/privacy">
-                Privacy Policy
-              </LocalizedClientLink>
-            </div>
+            <PolicyLinks onNavigate={() => setOpen(false)} />
           </>
         ) : (
           <>
@@ -312,6 +331,7 @@ export default function CookieConsentModal() {
                 Accept all
               </button>
             </div>
+            <PolicyLinks onNavigate={() => setOpen(false)} />
           </>
         )}
       </section>

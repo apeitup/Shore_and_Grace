@@ -13,6 +13,8 @@ import { HttpTypes } from "@medusajs/types"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import RecentProductTracker from "@modules/products/components/recent-product-tracker"
+import ProductViewTracker from "@modules/analytics/components/product-view-tracker"
+import { getProductPrice } from "@lib/util/get-product-price"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -29,9 +31,17 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
     return notFound()
   }
 
+  const trackedPrice = getProductPrice({ product }).cheapestPrice
   return (
     <div className="sg-product-page">
       <RecentProductTracker productId={product.id} />
+      <ProductViewTracker
+        productId={product.id}
+        categoryId={product.categories?.[0]?.id}
+        price={trackedPrice?.calculated_price_number}
+        currencyCode={trackedPrice?.currency_code}
+        countryCode={countryCode}
+      />
       <ShopPageHero
         title="Product Details"
         trail={[

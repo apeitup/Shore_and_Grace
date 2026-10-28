@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 import { useWishlist } from "@modules/wishlist/components/wishlist-provider"
 import WishlistHeart from "@modules/wishlist/components/wishlist-heart"
+import { captureStorefrontEvent } from "@modules/analytics/lib/posthog-client"
 
 type QuickAddModalProps = {
   product: HttpTypes.StoreProduct
@@ -99,6 +100,14 @@ const QuickAddModal = ({
         countryCode,
       })
       notifyCartUpdated()
+      void captureStorefrontEvent("product_added_to_cart", {
+        product_id: product.id,
+        variant_id: selectedVariant.id,
+        price: price?.calculated_price_number,
+        currency_code: price?.currency_code,
+        quantity,
+        country_code: countryCode,
+      })
       onClose()
     } catch {
       setError("This item could not be added. Please try again.")

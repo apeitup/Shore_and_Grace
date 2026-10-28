@@ -6,6 +6,8 @@ import Payment from "@modules/checkout/components/payment"
 import Review from "@modules/checkout/components/review"
 import Shipping from "@modules/checkout/components/shipping"
 import { CustomerPreferences } from "@lib/data/customer-preferences"
+import CheckoutTracker from "@modules/analytics/components/checkout-tracker"
+import { Suspense } from "react"
 
 export default async function CheckoutForm({
   cart,
@@ -29,6 +31,18 @@ export default async function CheckoutForm({
 
   return (
     <div className="sg-checkout-form">
+      <Suspense fallback={null}>
+        <CheckoutTracker
+          cartId={cart.id}
+          cartValue={cart.total ?? 0}
+          currencyCode={cart.currency_code}
+          itemCount={(cart.items ?? []).reduce(
+            (total, item) => total + item.quantity,
+            0
+          )}
+          countryCode={cart.shipping_address?.country_code}
+        />
+      </Suspense>
       <Addresses cart={cart} customer={customer} />
 
       <Shipping

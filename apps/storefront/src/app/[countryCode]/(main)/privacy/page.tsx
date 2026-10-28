@@ -90,42 +90,58 @@ export default function PrivacyPage() {
 
       <section>
         <h2>Why we use information</h2>
-        <div className="sg-policy-table-wrap">
+        <div className="sg-policy-table-wrap sg-policy-purpose-table">
           <table>
             <thead>
               <tr>
-                <th>Purpose</th>
-                <th>Lawful basis</th>
+                <th scope="col">Purpose</th>
+                <th scope="col">Lawful basis</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>
+                <td data-label="Purpose">
                   Provide accounts, baskets, checkout, orders and delivery
                 </td>
-                <td>Contract or steps requested before a contract</td>
+                <td data-label="Lawful basis">
+                  Contract or steps requested before a contract
+                </td>
               </tr>
               <tr>
-                <td>Payments, fraud prevention and website security</td>
-                <td>Contract and legitimate interests in secure trading</td>
+                <td data-label="Purpose">
+                  Payments, fraud prevention and website security
+                </td>
+                <td data-label="Lawful basis">
+                  Contract and legitimate interests in secure trading
+                </td>
               </tr>
               <tr>
-                <td>Tax, accounting and other required records</td>
-                <td>Legal obligation</td>
+                <td data-label="Purpose">
+                  Tax, accounting and other required records
+                </td>
+                <td data-label="Lawful basis">Legal obligation</td>
               </tr>
               <tr>
-                <td>Customer support, service improvement and reviews</td>
-                <td>
+                <td data-label="Purpose">
+                  Customer support, service improvement and reviews
+                </td>
+                <td data-label="Lawful basis">
                   Contract and legitimate interests in running the business
                 </td>
               </tr>
               <tr>
-                <td>Optional cookies and personalised browsing history</td>
-                <td>Consent</td>
+                <td data-label="Purpose">
+                  Optional cookies and personalised browsing history
+                </td>
+                <td data-label="Lawful basis">Consent</td>
               </tr>
               <tr>
-                <td>Newsletters and promotional email</td>
-                <td>Consent, unless a lawful customer soft opt-in applies</td>
+                <td data-label="Purpose">
+                  Newsletters and promotional email
+                </td>
+                <td data-label="Lawful basis">
+                  Consent, unless a lawful customer soft opt-in applies
+                </td>
               </tr>
             </tbody>
           </table>
@@ -140,8 +156,12 @@ export default function PrivacyPage() {
           delivery, provide customer support or meet legal and accounting
           obligations. Payment information is processed by Stripe when Stripe is
           the selected payment provider. If analytics consent is enabled,
-          PostHog processes anonymous pageview and device information for us. We
-          do not sell personal information.
+          PostHog processes anonymous pageview, device and limited shopping
+          journey information for us. Analytics events use product identifiers,
+          quantities, prices, currency, country code and checkout step only. We
+          do not send purchaser or recipient names, contact details, addresses,
+          delivery instructions or gift messages to PostHog. We do not sell
+          personal information.
         </p>
         <p>
           Some providers may process information outside the UK. Where this
