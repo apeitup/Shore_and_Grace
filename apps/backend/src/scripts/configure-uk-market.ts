@@ -1,4 +1,5 @@
 import { MedusaContainer } from "@medusajs/framework";
+import type { RuleOperatorType } from "@medusajs/framework/types";
 import {
   ContainerRegistrationKeys,
   MedusaError,
@@ -6,9 +7,25 @@ import {
 import {
   updateProductVariantsWorkflow,
   updateRegionsWorkflow,
+  updateShippingOptionsWorkflow,
   updateStoresWorkflow,
 } from "@medusajs/medusa/core-flows";
 import { DEFAULT_REGION_STORE_POLICIES } from "../lib/region-store-policies";
+
+type ShippingOptionWithPrices = {
+  id: string;
+  price_type: string;
+  prices?: {
+    id: string;
+    currency_code: string;
+    amount: number;
+    price_rules?: {
+      attribute: string;
+      operator: RuleOperatorType;
+      value: string | string[];
+    }[];
+  }[];
+};
 
 export default async function configureUkMarket({
   container,
@@ -81,7 +98,51 @@ export default async function configureUkMarket({
     });
   }
 
+  const { data: shippingOptions } = await query.graph({
+    entity: "shipping_option",
+    fields: [
+      "id",
+      "price_type",
+      "*prices",
+      "*prices.price_rules",
+    ],
+  });
+
+  const pricedShippingOptions = shippingOptions as ShippingOptionWithPrices[];
+  const flatShippingOptionsMissingGbp = pricedShippingOptions.filter(
+    (option) =>
+      option.price_type === "flat" &&
+      !option.prices?.some(
+        (price) =>
+          price.currency_code === "gbp" && !price.price_rules?.length,
+      ),
+  );
+
+  if (flatShippingOptionsMissingGbp.length) {
+    await updateShippingOptionsWorkflow(container).run({
+      input: flatShippingOptionsMissingGbp.map((option) => ({
+        id: option.id,
+        prices: [
+          ...(option.prices ?? []).map((price) => ({
+            id: price.id,
+            currency_code: price.currency_code,
+            amount: price.amount,
+            rules: (price.price_rules ?? []).map((rule) => ({
+              attribute: rule.attribute,
+              operator: rule.operator,
+              value: rule.value,
+            })),
+          })),
+          {
+            currency_code: "gbp",
+            amount: 10,
+          },
+        ],
+      })),
+    });
+  }
+
   logger.info(
-    `Configured Shore & Grace for the UK with GBP pricing on ${variants.length} demo variants.`,
+    `Configured Shore & Grace for the UK with GBP pricing on ${variants.length} demo variants and ${flatShippingOptionsMissingGbp.length} shipping options.`,
   );
 }

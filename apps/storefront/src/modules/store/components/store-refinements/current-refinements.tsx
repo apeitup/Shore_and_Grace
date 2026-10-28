@@ -1,6 +1,6 @@
 "use client"
 
-import { XMarkMini } from "@medusajs/icons"
+import Image from "next/image"
 import { useClearRefinements, useCurrentRefinements } from "react-instantsearch"
 
 import { indexedCurrency, priceAttribute } from "@lib/search-client"
@@ -76,15 +76,14 @@ const CurrentRefinements = ({ currencyCode }: { currencyCode: string }) => {
   }
 
   return (
-    <div className="flex flex-col gap-y-3" data-testid="current-refinements">
-      <div className="flex items-center justify-between gap-x-2 pr-6">
-        <span className="txt-compact-small-plus text-ui-fg-subtle">
-          Applied filters
-        </span>
+    <section className="sg-filter-section" data-testid="current-refinements">
+      <div className="sg-filter-heading sg-filter-heading--actions">
+        <h2>Applied Filters</h2>
         {canClearAll && (
           <button
+            type="button"
             onClick={clearAll}
-            className="txt-compact-small-plus text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
+            className="sg-filter-clear"
             data-testid="clear-refinements"
           >
             Clear all
@@ -92,7 +91,7 @@ const CurrentRefinements = ({ currencyCode }: { currencyCode: string }) => {
         )}
       </div>
 
-      <ul className="flex flex-wrap gap-2 pr-6">
+      <ul className="sg-filter-chips">
         {refinements.map((refinement) => {
           const label = refinementLabel(refinement, currencyCode)
 
@@ -105,17 +104,22 @@ const CurrentRefinements = ({ currencyCode }: { currencyCode: string }) => {
               <button
                 onClick={() => refine(refinement)}
                 aria-label={`Remove filter ${label}`}
-                className="border-ui-border-interactive text-ui-fg-base border text-small-regular h-8 rounded-rounded px-3 flex items-center gap-x-1.5 transition-colors duration-150 hover:bg-ui-bg-base-hover"
+                className="sg-filter-chip"
                 data-testid="remove-refinement"
               >
                 {label}
-                <XMarkMini className="text-ui-fg-muted" />
+                <Image
+                  src="/assets/shop/filter-remove.svg"
+                  alt=""
+                  width={18}
+                  height={18}
+                />
               </button>
             </li>
           )
         })}
       </ul>
-    </div>
+    </section>
   )
 }
 

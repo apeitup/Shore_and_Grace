@@ -2,17 +2,17 @@
 import { setAddresses } from "@lib/data/cart"
 import useToggleState from "@lib/hooks/use-toggle-state"
 import compareAddresses from "@lib/util/compare-addresses"
-import { CheckCircleSolid } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
+import { CheckCircleSolid, RefreshDouble } from "iconoir-react"
 import Divider from "@modules/common/components/divider"
 import { Heading, Text } from "@modules/common/components/ui"
-import Spinner from "@modules/common/icons/spinner"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useActionState } from "react"
-import BillingAddress from "../billing_address"
 import ErrorMessage from "../error-message"
 import ShippingAddress from "../shipping-address"
 import { SubmitButton } from "../submit-button"
+import CartTotals from "@modules/common/components/cart-totals"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 const Addresses = ({
   cart,
@@ -30,7 +30,7 @@ const Addresses = ({
   const { state: sameAsBilling, toggle: toggleSameAsBilling } = useToggleState(
     cart?.shipping_address && cart?.billing_address
       ? compareAddresses(cart?.shipping_address, cart?.billing_address)
-      : true
+      : false
   )
 
   const handleEdit = () => {
@@ -40,13 +40,13 @@ const Addresses = ({
   const [message, formAction] = useActionState(setAddresses, null)
 
   return (
-    <div className="bg-white">
+    <section className={`sg-checkout-section sg-checkout-section--address${isOpen ? " is-open" : ""}`}>
       <div className="flex flex-row items-center justify-between mb-6">
         <Heading
           level="h2"
           className="flex flex-row text-3xl-regular gap-x-2 items-baseline"
         >
-          Shipping Address
+          Your details
           {!isOpen && <CheckCircleSolid />}
         </Heading>
         {!isOpen && cart?.shipping_address && (
@@ -62,7 +62,7 @@ const Addresses = ({
         )}
       </div>
       {isOpen ? (
-        <form action={formAction}>
+        <form id="checkout-address-form" action={formAction} autoComplete="on">
           <div className="pb-8">
             <ShippingAddress
               customer={customer}
@@ -71,21 +71,21 @@ const Addresses = ({
               cart={cart}
             />
 
-            {!sameAsBilling && (
-              <div>
-                <Heading
-                  level="h2"
-                  className="text-3xl-regular gap-x-4 pb-6 pt-8"
-                >
-                  Billing address
-                </Heading>
-
-                <BillingAddress cart={cart} />
+            {cart && (
+              <div className="sg-checkout-mobile-totals">
+                <Heading level="h2">Order Summary</Heading>
+                <CartTotals totals={cart} />
               </div>
             )}
-            <SubmitButton className="mt-6" data-testid="submit-address-button">
-              Continue to delivery
-            </SubmitButton>
+
+            <div className="sg-checkout-address-actions">
+              <SubmitButton data-testid="submit-address-button">
+                Continue to delivery
+              </SubmitButton>
+              <LocalizedClientLink href="/cart">
+                Go back to cart
+              </LocalizedClientLink>
+            </div>
             <ErrorMessage error={message} data-testid="address-error-message" />
           </div>
         </form>
@@ -170,14 +170,14 @@ const Addresses = ({
               </div>
             ) : (
               <div>
-                <Spinner />
+                  <RefreshDouble className="animate-spin" />
               </div>
             )}
           </div>
         </div>
       )}
       <Divider className="mt-8" />
-    </div>
+    </section>
   )
 }
 

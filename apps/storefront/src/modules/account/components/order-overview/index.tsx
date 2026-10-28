@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@modules/common/components/ui"
+import { Search, SortDown } from "iconoir-react"
 
 import OrderCard from "../order-card"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -9,29 +10,32 @@ import { HttpTypes } from "@medusajs/types"
 const OrderOverview = ({ orders }: { orders: HttpTypes.StoreOrder[] }) => {
   if (orders?.length) {
     return (
-      <div className="flex flex-col gap-y-8 w-full">
-        {orders.map((o) => (
-          <div
-            key={o.id}
-            className="border-b border-gray-200 pb-6 last:pb-0 last:border-none"
-          >
-            <OrderCard order={o} />
+      <div className="sg-account-orders">
+        <header className="sg-account-panel__header">
+          <div>
+            <h1>Your orders</h1>
+            <p>{orders.length} {orders.length === 1 ? "order" : "orders"}</p>
           </div>
-        ))}
+          <div className="sg-account-panel__tools" aria-label="Order tools">
+            <button type="button"><Search /><span>Search</span></button>
+            <button type="button"><SortDown /><span>Sort</span></button>
+          </div>
+        </header>
+        <div className="sg-account-orders__list">
+          {orders.map((order) => <OrderCard key={order.id} order={order} />)}
+        </div>
       </div>
     )
   }
 
   return (
     <div
-      className="w-full flex flex-col items-center gap-y-4"
+      className="sg-account-empty"
       data-testid="no-orders-container"
     >
-      <h2 className="text-large-semi">Nothing to see here</h2>
-      <p className="text-base-regular">
-        You don&apos;t have any orders yet, let us change that {":)"}
-      </p>
-      <div className="mt-4">
+      <h2>No orders yet</h2>
+      <p>Your orders will appear here after checkout.</p>
+      <div>
         <LocalizedClientLink href="/" passHref>
           <Button data-testid="continue-shopping-button">
             Continue shopping

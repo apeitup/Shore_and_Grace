@@ -24,15 +24,11 @@ export default async function Addresses(props: {
   }
 
   return (
-    <div className="w-full" data-testid="addresses-page-wrapper">
-      <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl-semi">Shipping Addresses</h1>
-        <p className="text-base-regular">
-          View and update your shipping addresses, you can add as many as you
-          like. Saving your addresses will make them available during checkout.
-        </p>
-      </div>
+    <section className="sg-account-panel sg-account-addresses" data-testid="addresses-page-wrapper">
+      <header className="sg-account-panel__header">
+        <div><h1>Your Addresses</h1><p>{customer.addresses?.length || 0} items</p></div>
+      </header>
       <AddressBook customer={customer} region={region} />
-    </div>
+    </section>
   )
 }

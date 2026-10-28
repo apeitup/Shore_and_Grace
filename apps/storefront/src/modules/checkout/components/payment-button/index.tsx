@@ -11,11 +11,15 @@ import ErrorMessage from "../error-message"
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
+  disabled?: boolean
+  children?: React.ReactNode
   "data-testid": string
 }
 
 const PaymentButton: React.FC<PaymentButtonProps> = ({
   cart,
+  disabled = false,
+  children = "Place order",
   "data-testid": dataTestId,
 }) => {
   const notReady =
@@ -31,14 +35,21 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     case isStripeLike(paymentSession?.provider_id):
       return (
         <StripePaymentButton
-          notReady={notReady}
+          notReady={notReady || disabled}
           cart={cart}
           data-testid={dataTestId}
-        />
+        >
+          {children}
+        </StripePaymentButton>
       )
     case isManual(paymentSession?.provider_id):
       return (
-        <ManualTestPaymentButton notReady={notReady} data-testid={dataTestId} />
+        <ManualTestPaymentButton
+          notReady={notReady || disabled}
+          data-testid={dataTestId}
+        >
+          {children}
+        </ManualTestPaymentButton>
       )
     default:
       return <Button disabled>Select a payment method</Button>
@@ -49,9 +60,11 @@ const StripePaymentButton = ({
   cart,
   notReady,
   "data-testid": dataTestId,
+  children,
 }: {
   cart: HttpTypes.StoreCart
   notReady: boolean
+  children: React.ReactNode
   "data-testid"?: string
 }) => {
   const [submitting, setSubmitting] = useState(false)
@@ -146,7 +159,7 @@ const StripePaymentButton = ({
         isLoading={submitting}
         data-testid={dataTestId}
       >
-        Place order
+        {children}
       </Button>
       <ErrorMessage
         error={errorMessage}
@@ -156,7 +169,15 @@ const StripePaymentButton = ({
   )
 }
 
-const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
+const ManualTestPaymentButton = ({
+  notReady,
+  "data-testid": dataTestId,
+  children,
+}: {
+  notReady: boolean
+  children: React.ReactNode
+  "data-testid"?: string
+}) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -183,9 +204,9 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
         isLoading={submitting}
         onClick={handlePayment}
         size="large"
-        data-testid="submit-order-button"
+        data-testid={dataTestId}
       >
-        Place order
+        {children}
       </Button>
       <ErrorMessage
         error={errorMessage}

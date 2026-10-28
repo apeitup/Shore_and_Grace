@@ -3,8 +3,10 @@ import { retrieveCustomer } from "@lib/data/customer"
 import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
+import CheckoutProgress from "@modules/checkout/components/checkout-progress"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { retrieveCustomerPreferences } from "@lib/data/customer-preferences"
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -18,13 +20,23 @@ export default async function Checkout() {
   }
 
   const customer = await retrieveCustomer()
+  const customerPreferences = customer
+    ? await retrieveCustomerPreferences()
+    : undefined
 
   return (
-    <div className="grid grid-cols-1 small:grid-cols-[1fr_416px] content-container gap-x-40 py-12">
-      <PaymentWrapper cart={cart}>
-        <CheckoutForm cart={cart} customer={customer} />
-      </PaymentWrapper>
-      <CheckoutSummary cart={cart} />
+    <div className="content-container sg-checkout-shell">
+      <CheckoutProgress />
+      <div className="sg-checkout-layout">
+        <PaymentWrapper cart={cart}>
+          <CheckoutForm
+            cart={cart}
+            customer={customer}
+            customerPreferences={customerPreferences}
+          />
+        </PaymentWrapper>
+        <CheckoutSummary cart={cart} />
+      </div>
     </div>
   )
 }

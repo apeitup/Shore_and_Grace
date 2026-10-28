@@ -1,6 +1,7 @@
 "use client"
 
-import { usePagination } from "react-instantsearch"
+import { NavArrowRight } from "iconoir-react"
+import { usePagination, useStats } from "react-instantsearch"
 
 import { clx } from "@modules/common/components/ui"
 
@@ -8,6 +9,8 @@ const SearchPagination = () => {
   const { pages, currentRefinement, nbPages, refine } = usePagination({
     padding: 2,
   })
+  const { nbHits, page, hitsPerPage } = useStats()
+  const pageSize = hitsPerPage ?? 0
 
   if (nbPages <= 1) {
     return null
@@ -37,9 +40,15 @@ const SearchPagination = () => {
 
   const lastPage = nbPages - 1
 
+  const firstResult = nbHits ? page * pageSize + 1 : 0
+  const lastResult = Math.min((page + 1) * pageSize, nbHits)
+
   return (
-    <div className="flex justify-center w-full mt-12">
-      <div className="flex gap-3 items-end" data-testid="product-pagination">
+    <nav className="sg-store-pagination" aria-label="Product pages">
+      <p>
+        Showing {firstResult}-{lastResult} of {nbHits} results
+      </p>
+      <div className="sg-store-pagination__buttons" data-testid="product-pagination">
         {!pages.includes(0) && renderPage(0)}
         {!pages.includes(0) && !pages.includes(1) && renderEllipsis("start")}
         {pages.map(renderPage)}
@@ -47,8 +56,17 @@ const SearchPagination = () => {
           !pages.includes(lastPage - 1) &&
           renderEllipsis("end")}
         {!pages.includes(lastPage) && renderPage(lastPage)}
+        {currentRefinement < lastPage && (
+          <button
+            type="button"
+            className="sg-store-pagination__next"
+            onClick={() => refine(currentRefinement + 1)}
+          >
+            Next <NavArrowRight aria-hidden="true" />
+          </button>
+        )}
       </div>
-    </div>
+    </nav>
   )
 }
 

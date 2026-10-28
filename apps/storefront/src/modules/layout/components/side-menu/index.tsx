@@ -1,69 +1,281 @@
 "use client"
 
 import { Popover, PopoverPanel, Transition } from "@headlessui/react"
-import { Locale } from "@lib/data/locales"
-import { XMark } from "@medusajs/icons"
+import { signout } from "@lib/data/customer"
+import { serviceLinks } from "@lib/service-links"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import {
+  LogIn,
+  LogOut,
+  NavArrowDown,
+  NavArrowUp,
+  PageEdit,
+  Xmark,
+} from "iconoir-react"
 import Image from "next/image"
-import { Fragment } from "react"
+import { useParams } from "next/navigation"
+import { Fragment, ReactNode, useEffect, useState } from "react"
 
 type SideMenuProps = {
-  regions: HttpTypes.StoreRegion[] | null
-  locales: Locale[] | null
-  currentLocale: string | null
+  categories: HttpTypes.StoreProductCategory[]
+  customer: HttpTypes.StoreCustomer | null
 }
 
-const primaryItems = [
-  { label: "Shop", href: "/store", suffix: "−", featured: true },
-  { label: "Occasions", href: "/store", suffix: "+" },
-  { label: "Weddings", href: "/contact", suffix: "+" },
-  { label: "Funerals", href: "/contact", suffix: "+" },
-  { label: "Gifts", href: "/store", suffix: "+" },
-  { label: "Our story", href: "/contact", suffix: "↗" },
-]
+type AccordionName = "shop" | "services"
 
-const shopShortcuts = [
-  { label: "Fresh flowers", href: "/store" },
-  { label: "Faux flowers", href: "/store" },
-  { label: "Subscriptions", href: "/store" },
-  { label: "Gift cards", href: "/store" },
-]
+function PageTransform({ open }: { open: boolean }) {
+  useEffect(() => {
+    if (!open) {
+      return
+    }
 
-export default function SideMenu(_: SideMenuProps) {
+    document.documentElement.classList.add("sg-mobile-menu-open")
+
+    return () => {
+      document.documentElement.classList.remove("sg-mobile-menu-open")
+    }
+  }, [open])
+
+  return null
+}
+
+function MenuLink({
+  href,
+  label,
+  close,
+  icon,
+}: {
+  href: string
+  label: string
+  close: () => void
+  icon?: ReactNode
+}) {
+  return (
+    <LocalizedClientLink href={href} onClick={close}>
+      <span>{label}</span>
+      {icon}
+    </LocalizedClientLink>
+  )
+}
+
+function MenuContents({
+  categories,
+  customer,
+  close,
+}: SideMenuProps & { close: () => void }) {
+  const [expanded, setExpanded] = useState<AccordionName | null>(null)
+  const { countryCode = "gb" } = useParams<{ countryCode?: string }>()
+  const customerName = [customer?.first_name, customer?.last_name]
+    .filter(Boolean)
+    .join(" ")
+
+  const toggleSection = (section: AccordionName) => {
+    setExpanded((current) => (current === section ? null : section))
+  }
+
+  return (
+    <>
+      <header className="sg-mobile-menu__header">
+        <button
+          type="button"
+          className="sg-mobile-menu__close"
+          onClick={close}
+          aria-label="Close menu"
+        >
+          <Xmark aria-hidden="true" />
+        </button>
+
+        {customer && (
+          <p className="sg-mobile-menu__welcome">
+            <span>Welcome back,</span>
+            <strong>{customerName || customer.email}</strong>
+          </p>
+        )}
+      </header>
+
+      <div className="sg-mobile-menu__body">
+        <p className="sg-mobile-menu__eyebrow">Explore</p>
+        <nav aria-label="Mobile navigation">
+          <ul className="sg-mobile-menu__links">
+            <li>
+              <MenuLink href="/" label="Home" close={close} />
+            </li>
+            <li>
+              <button
+                type="button"
+                className="sg-mobile-menu__row"
+                aria-expanded={expanded === "shop"}
+                aria-controls="mobile-shop-links"
+                onClick={() => toggleSection("shop")}
+              >
+                <span>Shop</span>
+                {expanded === "shop" ? (
+                  <NavArrowUp aria-hidden="true" />
+                ) : (
+                  <NavArrowDown aria-hidden="true" />
+                )}
+              </button>
+              {expanded === "shop" && (
+                <ul id="mobile-shop-links" className="sg-mobile-menu__subnav">
+                  <li>
+                    <MenuLink
+                      href="/store"
+                      label="Our Collection"
+                      close={close}
+                    />
+                  </li>
+                  {categories.map((category) => (
+                    <li key={category.id}>
+                      <MenuLink
+                        href={`/categories/${category.handle}`}
+                        label={category.name}
+                        close={close}
+                      />
+                    </li>
+                  ))}
+                  <li>
+                    <MenuLink
+                      href="/wishlist"
+                      label="Wishlist"
+                      close={close}
+                    />
+                  </li>
+                  <li>
+                    <MenuLink href="/cart" label="Cart" close={close} />
+                  </li>
+                </ul>
+              )}
+            </li>
+            <li>
+              <button
+                type="button"
+                className="sg-mobile-menu__row"
+                aria-expanded={expanded === "services"}
+                aria-controls="mobile-service-links"
+                onClick={() => toggleSection("services")}
+              >
+                <span>Services</span>
+                {expanded === "services" ? (
+                  <NavArrowUp aria-hidden="true" />
+                ) : (
+                  <NavArrowDown aria-hidden="true" />
+                )}
+              </button>
+              {expanded === "services" && (
+                <ul
+                  id="mobile-service-links"
+                  className="sg-mobile-menu__subnav"
+                >
+                  {serviceLinks.map((service) => (
+                    <li key={service.slug}>
+                      <MenuLink
+                        href={`/services/${service.slug}`}
+                        label={service.title}
+                        close={close}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+            <li>
+              <MenuLink href="/contact" label="About" close={close} />
+            </li>
+            <li>
+              <MenuLink href="/contact" label="Contact" close={close} />
+            </li>
+          </ul>
+        </nav>
+
+        <p className="sg-mobile-menu__eyebrow sg-mobile-menu__account-heading">
+          Your account
+        </p>
+        <ul className="sg-mobile-menu__links">
+          {customer ? (
+            <>
+              <li>
+                <MenuLink href="/account" label="My Account" close={close} />
+              </li>
+              <li>
+                <MenuLink href="/account/orders" label="Orders" close={close} />
+              </li>
+              <li>
+                <MenuLink
+                  href="/account/addresses"
+                  label="Addresses"
+                  close={close}
+                />
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className="sg-mobile-menu__row"
+                  onClick={() => void signout(countryCode)}
+                >
+                  <span>Sign out</span>
+                  <LogOut aria-hidden="true" />
+                </button>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <MenuLink
+                  href="/account"
+                  label="Sign in"
+                  close={close}
+                  icon={<LogIn aria-hidden="true" />}
+                />
+              </li>
+              <li>
+                <MenuLink
+                  href="/account"
+                  label="Create account"
+                  close={close}
+                  icon={<PageEdit aria-hidden="true" />}
+                />
+              </li>
+            </>
+          )}
+        </ul>
+      </div>
+    </>
+  )
+}
+
+export default function SideMenu({ categories, customer }: SideMenuProps) {
   return (
     <Popover className="sg-mobile-menu">
       {({ open, close }) => (
         <>
+          <PageTransform open={open} />
           <Popover.Button
             data-testid="nav-menu-button"
             className="sg-nav-icon"
-            aria-label="Open menu"
+            aria-label={open ? "Close menu" : "Open menu"}
           >
-            <Image
-              className="sg-theme-asset sg-theme-asset--light"
-              src="/assets/icons/menu.svg"
-              alt=""
-              width={28}
-              height={28}
-            />
-            <Image
-              className="sg-theme-asset sg-theme-asset--dark"
-              src="/assets/icons/menu-dark.svg"
-              alt=""
-              width={28}
-              height={28}
-            />
+            {open ? (
+              <Xmark className="sg-nav-icon__close" aria-hidden="true" />
+            ) : (
+              <>
+                <Image
+                  className="sg-theme-asset sg-theme-asset--light"
+                  src="/assets/icons/menu.svg"
+                  alt=""
+                  width={28}
+                  height={28}
+                />
+                <Image
+                  className="sg-theme-asset sg-theme-asset--dark"
+                  src="/assets/icons/menu-dark.svg"
+                  alt=""
+                  width={28}
+                  height={28}
+                />
+              </>
+            )}
           </Popover.Button>
-
-          {open && (
-            <button
-              className="sg-mobile-menu__backdrop"
-              onClick={close}
-              aria-label="Close menu"
-              data-testid="side-menu-backdrop"
-            />
-          )}
 
           <Transition
             show={open}
@@ -75,58 +287,12 @@ export default function SideMenu(_: SideMenuProps) {
             leaveFrom="translate-x-0"
             leaveTo="-translate-x-full"
           >
-            <PopoverPanel className="sg-mobile-menu__panel">
-              <div className="sg-mobile-menu__header">
-                <LocalizedClientLink href="/" onClick={close}>
-                  <strong>Shore &amp; Grace</strong>
-                  <span>Floral Studio</span>
-                </LocalizedClientLink>
-                <button onClick={close} aria-label="Close menu">
-                  <XMark />
-                </button>
-              </div>
-
-              <p className="sg-mobile-menu__eyebrow">Explore</p>
-
-              <nav aria-label="Mobile navigation">
-                <ul className="sg-mobile-menu__primary">
-                  {primaryItems.map(({ label, href, suffix, featured }) => (
-                    <li key={label} data-featured={featured || undefined}>
-                      <LocalizedClientLink href={href} onClick={close}>
-                        <span>{label}</span>
-                        <span aria-hidden="true">{suffix}</span>
-                      </LocalizedClientLink>
-                    </li>
-                  ))}
-                </ul>
-
-                <ul className="sg-mobile-menu__shortcuts">
-                  {shopShortcuts.map(({ label, href }) => (
-                    <li key={label}>
-                      <LocalizedClientLink href={href} onClick={close}>
-                        {label}
-                      </LocalizedClientLink>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-
-              <div className="sg-mobile-menu__footer">
-                <div>
-                  <LocalizedClientLink href="/account" onClick={close}>
-                    Account
-                  </LocalizedClientLink>
-                  <span>·</span>
-                  <LocalizedClientLink href="/search" onClick={close}>
-                    Search
-                  </LocalizedClientLink>
-                  <span>·</span>
-                  <LocalizedClientLink href="/shipping" onClick={close}>
-                    Delivery
-                  </LocalizedClientLink>
-                </div>
-                <p>Flowers for life&apos;s beautiful moments.</p>
-              </div>
+            <PopoverPanel portal className="sg-mobile-menu__panel">
+              <MenuContents
+                categories={categories}
+                customer={customer}
+                close={close}
+              />
             </PopoverPanel>
           </Transition>
         </>

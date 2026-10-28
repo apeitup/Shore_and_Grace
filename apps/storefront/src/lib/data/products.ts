@@ -5,8 +5,57 @@ import { OptionValueIds } from "@lib/util/product-option-filters"
 import { sortProducts } from "@lib/util/sort-products"
 import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { getAuthHeaders } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
+import { StoreProductReview } from "types/global"
+
+export const getProductReviews = async ({
+  productId,
+  limit = 10,
+  offset = 0,
+}: {
+  productId: string
+  limit?: number
+  offset?: number
+}) => {
+  return sdk.client.fetch<{
+    reviews: StoreProductReview[]
+    average_rating: number
+    limit: number
+    offset: number
+    count: number
+  }>(`/store/products/${productId}/reviews`, {
+    method: "GET",
+    query: {
+      limit,
+      offset,
+      order: "-created_at",
+    },
+    cache: "no-store",
+  })
+}
+
+export const addProductReview = async (input: {
+  content: string
+  email: string
+  name: string
+  product_id: string
+  rating: number
+}) => {
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  return sdk.client.fetch<{ review: { id: string; status: "pending" } }>(
+    "/store/reviews",
+    {
+      method: "POST",
+      headers,
+      body: input,
+      cache: "no-store",
+    },
+  )
+}
 
 type ProductListQueryParams = (HttpTypes.FindParams &
   HttpTypes.StoreProductListParams) & {
@@ -56,10 +105,6 @@ export const listProducts = async ({
     ...(await getAuthHeaders()),
   }
 
-  const next = {
-    ...(await getCacheOptions("products")),
-  }
-
   return sdk.client
     .fetch<{ products: HttpTypes.StoreProduct[]; count: number }>(
       `/store/products`,
@@ -74,9 +119,8 @@ export const listProducts = async ({
           ...queryParams,
         },
         headers,
-        next,
-        cache: "force-cache",
-      }
+        cache: "no-store",
+      },
     )
     .then(({ products, count }) => {
       const nextPage = count > offset + limit ? pageParam + 1 : null
@@ -115,7 +159,7 @@ export const listProductsWithSort = async ({
 }> => {
   const limit = queryParams?.limit || 12
   const optionFilters = Array.from(
-    new Set((optionValueIds || []).filter(Boolean))
+    new Set((optionValueIds || []).filter(Boolean)),
   )
 
   const {

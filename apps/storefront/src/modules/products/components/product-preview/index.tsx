@@ -1,14 +1,11 @@
-import { Text } from "@modules/common/components/ui"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
+import ProductGridCard from "../product-grid-card"
 
 export default async function ProductPreview({
   product,
-  isFeatured,
-  region: _region,
+  region,
 }: {
   product: HttpTypes.StoreProduct
   isFeatured?: boolean
@@ -28,24 +25,15 @@ export default async function ProductPreview({
   })
 
   return (
-    <LocalizedClientLink href={`/products/${product.handle}`} className="group">
-      <div data-testid="product-wrapper">
-        <Thumbnail
-          thumbnail={product.thumbnail}
-          images={product.images}
-          alt={product.title}
-          size="full"
-          isFeatured={isFeatured}
-        />
-        <div className="flex txt-compact-medium mt-4 justify-between">
-          <Text className="text-ui-fg-subtle" data-testid="product-title">
-            {product.title}
-          </Text>
-          <div className="flex items-center gap-x-2">
-            {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
-          </div>
-        </div>
-      </div>
-    </LocalizedClientLink>
+    <ProductGridCard
+      productId={product.id}
+      title={product.title}
+      handle={product.handle}
+      thumbnail={product.thumbnail}
+      price={cheapestPrice ? <PreviewPrice price={cheapestPrice} /> : null}
+      onSale={cheapestPrice?.price_type === "sale"}
+      regionId={region.id}
+      initialProduct={product}
+    />
   )
 }

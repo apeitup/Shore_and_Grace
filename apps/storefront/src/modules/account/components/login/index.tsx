@@ -1,75 +1,95 @@
+"use client"
+
 import { login } from "@lib/data/customer"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
-import { SubmitButton } from "@modules/checkout/components/submit-button"
-import Input from "@modules/common/components/input"
 import { useActionState } from "react"
 
-type Props = {
-  setCurrentView: (view: LOGIN_VIEW) => void
-}
+import AuthInput from "../auth-input"
+import AuthSubmitButton from "../auth-submit-button"
+import SocialAuthButtons from "../social-auth-buttons"
+
+type Props = { setCurrentView: (view: LOGIN_VIEW) => void }
 
 const Login = ({ setCurrentView }: Props) => {
   const [message, formAction] = useActionState(login, null)
 
   return (
-    <div
-      className="max-w-sm w-full flex flex-col items-center"
-      data-testid="login-page"
-    >
-      <h1 className="text-large-semi uppercase mb-6">Welcome back</h1>
-      <p className="text-center text-base-regular text-ui-fg-base mb-8">
-        Sign in to access an enhanced shopping experience.
-      </p>
+    <section className="sg-auth-panel" data-testid="login-page">
+      <div className="sg-auth-panel__intro">
+        <h2>Sign in</h2>
+      </div>
+      <SocialAuthButtons />
+      <div className="sg-auth-divider" aria-hidden="true">
+        <span />
+        <p>Or continue with email</p>
+        <span />
+      </div>
+
       {message?.state === "verification_required" && (
         <div
-          className="w-full mb-6 text-center text-base-regular text-ui-fg-base bg-ui-bg-subtle border border-ui-border-base rounded-rounded p-4"
+          className="sg-auth-notice"
           data-testid="login-verification-message"
         >
           We sent a verification link to <strong>{message.email}</strong>.
           Please verify your email, then sign in.
         </div>
       )}
-      <form className="w-full" action={formAction}>
-        <div className="flex flex-col w-full gap-y-2">
-          <Input
-            label="Email"
-            name="email"
-            type="email"
-            title="Enter a valid email address."
-            autoComplete="email"
-            required
-            data-testid="email-input"
-          />
-          <Input
-            label="Password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            data-testid="password-input"
-          />
+
+      <form className="sg-auth-form" action={formAction}>
+        <AuthInput
+          label="Email address"
+          name="email"
+          type="email"
+          placeholder="Enter your email address"
+          title="Enter a valid email address."
+          autoComplete="email"
+          required
+          data-testid="email-input"
+        />
+        <AuthInput
+          label="Password"
+          name="password"
+          type="password"
+          placeholder="Enter your password"
+          autoComplete="current-password"
+          required
+          data-testid="password-input"
+        />
+
+        <div className="sg-auth-options">
+          <label className="sg-auth-checkbox">
+            <input type="checkbox" name="remember_me" value="true" />
+            <span>Remember me</span>
+          </label>
+          <button
+            className="sg-auth-forgot"
+            type="button"
+            disabled
+            title="Password recovery is not configured yet"
+          >
+            Forgot password?
+          </button>
         </div>
+
         <ErrorMessage
           error={message?.state === "error" ? message.error : null}
           data-testid="login-error-message"
         />
-        <SubmitButton data-testid="sign-in-button" className="w-full mt-6">
-          Sign in
-        </SubmitButton>
+        <AuthSubmitButton testId="sign-in-button">Sign in</AuthSubmitButton>
       </form>
-      <span className="text-center text-ui-fg-base text-small-regular mt-6">
-        Not a member?{" "}
+
+      <p className="sg-auth-switch">
+        Don&apos;t have an account?{" "}
         <button
+          type="button"
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
-          className="underline"
           data-testid="register-button"
         >
-          Join us
+          Sign up
         </button>
-        .
-      </span>
-    </div>
+      </p>
+    </section>
   )
 }
 

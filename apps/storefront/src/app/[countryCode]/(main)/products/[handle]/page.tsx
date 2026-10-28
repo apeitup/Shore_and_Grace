@@ -16,8 +16,7 @@ type Props = {
   params: Promise<{ countryCode: string; handle: string }>
 }
 
-export const dynamic = "force-static"
-export const revalidate = 60
+export const dynamic = "force-dynamic"
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
@@ -51,7 +50,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
         listCountryCodes(regions).map((code) => [
           `en-${code.toUpperCase()}`,
           `${origin}/${code}${path}`,
-        ])
+        ]),
       ),
       types: { "text/markdown": `${productUrl}.md` },
     },
@@ -79,7 +78,7 @@ const ProductMetaTags = ({
         min.calculated_price!.calculated_amount!
         ? v
         : min,
-    undefined
+    undefined,
   )
   const currency = region.currency_code.toUpperCase()
   const amount = cheapest?.calculated_price?.calculated_amount?.toFixed(2)

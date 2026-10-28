@@ -1,4 +1,4 @@
-import { CreditCard } from "@medusajs/icons"
+import { CreditCard } from "iconoir-react"
 import Bancontact from "@modules/common/icons/bancontact"
 import Ideal from "@modules/common/icons/ideal"
 import PayPal from "@modules/common/icons/paypal"

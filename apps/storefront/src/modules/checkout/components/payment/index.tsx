@@ -1,23 +1,48 @@
 "use client"
+
 import { RadioGroup } from "@headlessui/react"
-import { isStripeLike, paymentInfoMap } from "@lib/constants"
-import { initiatePaymentSession } from "@lib/data/cart"
-import { CheckCircleSolid, CreditCard } from "@medusajs/icons"
+import { isManual, isPaypal, isStripeLike, paymentInfoMap } from "@lib/constants"
+import { initiatePaymentSession, updateCart } from "@lib/data/cart"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import PaymentContainer, {
-  StripePaymentContainer,
+  StripePaymentDetails,
 } from "@modules/checkout/components/payment-container"
-import Divider from "@modules/common/components/divider"
-import {
-  Button,
-  Container,
-  Heading,
-  Text,
-  clx,
-} from "@modules/common/components/ui"
+import CartTotals from "@modules/common/components/cart-totals"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { Button, Heading } from "@modules/common/components/ui"
 import { HttpTypes } from "@medusajs/types"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
+import { ChangeEvent, FormEvent, useMemo, useState } from "react"
+
+type BillingFields = {
+  address_1: string
+  address_2: string
+  city: string
+  province: string
+  postal_code: string
+  country_code: string
+}
+
+const addressFields = (address?: HttpTypes.StoreCartAddress | null): BillingFields => ({
+  address_1: address?.address_1 || "",
+  address_2: address?.address_2 || "",
+  city: address?.city || "",
+  province: address?.province || "",
+  postal_code: address?.postal_code || "",
+  country_code: address?.country_code || "",
+})
+
+const paymentDescription = (providerId: string) => {
+  if (isPaypal(providerId)) return "Continue securely with PayPal"
+  if (providerId.toLowerCase().includes("apple")) {
+    return "Fast checkout using your saved wallet"
+  }
+  if (providerId.toLowerCase().includes("google")) {
+    return "Fast checkout using your saved wallet"
+  }
+  if (isManual(providerId)) return "For testing purposes only"
+  return "Visa, Mastercard and American Express"
+}
 
 const Payment = ({
   cart,
@@ -27,233 +52,214 @@ const Payment = ({
   availablePaymentMethods: { id: string }[]
 }) => {
   const activeSession = cart.payment_collection?.payment_sessions?.find(
-    (paymentSession) => paymentSession.status === "pending"
+    (session) => session.status === "pending"
   )
+  const shippingBilling = useMemo(
+    () => addressFields(cart.shipping_address),
+    [cart.shipping_address]
+  )
+  const initialBilling = useMemo(
+    () => addressFields(cart.billing_address),
+    [cart.billing_address]
+  )
+  const initiallySame =
+    !cart.billing_address?.address_1 ||
+    JSON.stringify(shippingBilling) === JSON.stringify(initialBilling)
 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [paymentComplete, setPaymentComplete] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
-    activeSession?.provider_id ?? ""
+    activeSession?.provider_id ?? availablePaymentMethods[0]?.id ?? ""
   )
-
+  const [sameAsDelivery, setSameAsDelivery] = useState(initiallySame)
+  const [billing, setBilling] = useState(
+    initiallySame ? shippingBilling : initialBilling
+  )
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
-
   const isOpen = searchParams.get("step") === "payment"
+  const paidByGiftcard = !!(
+    (cart as unknown as Record<string, unknown>)?.gift_cards &&
+    ((cart as unknown as Record<string, unknown>)?.gift_cards as unknown[])?.length > 0 &&
+    cart?.total === 0
+  )
+
+  const createQueryString = (name: string, value: string) => {
+    const params = new URLSearchParams(searchParams)
+    params.set(name, value)
+    return params.toString()
+  }
 
   const setPaymentMethod = async (method: string) => {
     setError(null)
     setSelectedPaymentMethod(method)
     if (isStripeLike(method)) {
-      await initiatePaymentSession(cart, {
-        provider_id: method,
-      })
+      await initiatePaymentSession(cart, { provider_id: method })
+      router.refresh()
     }
   }
 
-  const paidByGiftcard = !!(
-    (cart as unknown as Record<string, unknown>)?.gift_cards && ((cart as unknown as Record<string, unknown>)?.gift_cards as unknown[])?.length > 0 && cart?.total === 0
-  )
-
-  const paymentReady =
-    (activeSession && (cart?.shipping_methods?.length ?? 0) !== 0) || paidByGiftcard
-
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams)
-      params.set(name, value)
-
-      return params.toString()
-    },
-    [searchParams]
-  )
-
-  const handleEdit = () => {
-    router.push(pathname + "?" + createQueryString("step", "payment"), {
-      scroll: false,
-    })
+  const updateBillingField = (
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setSameAsDelivery(false)
+    setBilling((current) => ({
+      ...current,
+      [event.target.name]: event.target.value,
+    }))
   }
 
-  const handleSubmit = async () => {
+  const toggleSameAsDelivery = (checked: boolean) => {
+    setSameAsDelivery(checked)
+    if (checked) setBilling(shippingBilling)
+  }
+
+  const handleSubmit = async (event?: FormEvent<HTMLFormElement>) => {
+    event?.preventDefault()
+    setError(null)
+
+    if (!selectedPaymentMethod && !paidByGiftcard) {
+      setError("Select a payment method to continue.")
+      return
+    }
+
     setIsLoading(true)
     try {
-      const shouldInputPaymentDetails =
-        isStripeLike(selectedPaymentMethod) && !activeSession
+      const address = sameAsDelivery ? shippingBilling : billing
+      await updateCart({
+        billing_address: {
+          ...address,
+          first_name:
+            cart.billing_address?.first_name || cart.shipping_address?.first_name || "",
+          last_name:
+            cart.billing_address?.last_name || cart.shipping_address?.last_name || "",
+          phone: cart.billing_address?.phone || cart.shipping_address?.phone || "",
+        },
+      })
 
-      const checkActiveSession =
-        activeSession?.provider_id === selectedPaymentMethod
+      const hasSelectedSession = activeSession?.provider_id === selectedPaymentMethod
+      if (!paidByGiftcard && !hasSelectedSession) {
+        await initiatePaymentSession(cart, { provider_id: selectedPaymentMethod })
+      }
 
-      if (!checkActiveSession) {
-        await initiatePaymentSession(cart, {
-          provider_id: selectedPaymentMethod,
+      if (!isStripeLike(selectedPaymentMethod) || paymentComplete) {
+        router.push(pathname + "?" + createQueryString("step", "review"), {
+          scroll: false,
         })
+        router.refresh()
       }
-
-      if (!shouldInputPaymentDetails) {
-        return router.push(
-          pathname + "?" + createQueryString("step", "review"),
-          {
-            scroll: false,
-          }
-        )
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : String(caughtError))
     } finally {
       setIsLoading(false)
     }
   }
 
-  useEffect(() => {
-    setError(null)
-  }, [isOpen])
-
   return (
-    <div className="bg-white">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <Heading
-          level="h2"
-          className={clx(
-            "flex flex-row text-3xl-regular gap-x-2 items-baseline",
-            {
-              "opacity-50 pointer-events-none select-none":
-                !isOpen && !paymentReady,
-            }
-          )}
-        >
-          Payment
-          {!isOpen && paymentReady && <CheckCircleSolid />}
-        </Heading>
-        {!isOpen && paymentReady && (
-          <Text>
-            <button
-              onClick={handleEdit}
-              className="text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
-              data-testid="edit-payment-button"
-            >
-              Edit
-            </button>
-          </Text>
-        )}
+    <section className={`sg-checkout-section sg-checkout-section--payment${isOpen ? " is-open" : ""}`}>
+      <div className="sg-checkout-step-heading">
+        <Heading level="h2">Payment</Heading>
       </div>
-      <div>
-        <div className={isOpen ? "block" : "hidden"}>
-          {!paidByGiftcard && availablePaymentMethods?.length && (
-            <>
+
+      {isOpen && (
+        <form id="checkout-payment-form" className="sg-checkout-payment" onSubmit={handleSubmit}>
+          <section className="sg-checkout-payment-card">
+            <Heading level="h3">Payment method</Heading>
+            <p>Select how you would like to pay.</p>
+            {!paidByGiftcard ? (
               <RadioGroup
+                className="sg-checkout-payment-options"
                 value={selectedPaymentMethod}
-                onChange={(value: string) => setPaymentMethod(value)}
+                onChange={setPaymentMethod}
               >
-                {availablePaymentMethods.map((paymentMethod) => (
-                  <div key={paymentMethod.id}>
-                    {isStripeLike(paymentMethod.id) ? (
-                      <StripePaymentContainer
-                        paymentProviderId={paymentMethod.id}
-                        selectedPaymentOptionId={selectedPaymentMethod}
-                        paymentInfoMap={paymentInfoMap}
-                        setError={setError}
-                        setPaymentComplete={setPaymentComplete}
-                      />
-                    ) : (
-                      <PaymentContainer
-                        paymentInfoMap={paymentInfoMap}
-                        paymentProviderId={paymentMethod.id}
-                        selectedPaymentOptionId={selectedPaymentMethod}
-                      />
-                    )}
-                  </div>
+                {availablePaymentMethods.map((method) => (
+                  <PaymentContainer
+                    key={method.id}
+                    paymentInfoMap={paymentInfoMap}
+                    paymentProviderId={method.id}
+                    selectedPaymentOptionId={selectedPaymentMethod}
+                    description={paymentDescription(method.id)}
+                  />
                 ))}
               </RadioGroup>
-            </>
+            ) : (
+              <p>Gift card</p>
+            )}
+          </section>
+
+          {isStripeLike(selectedPaymentMethod) && (
+            <StripePaymentDetails
+              setError={setError}
+              setPaymentComplete={setPaymentComplete}
+            />
           )}
 
-          {paidByGiftcard && (
-            <div className="flex flex-col w-1/3">
-              <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                Payment method
-              </Text>
-              <Text
-                className="txt-medium text-ui-fg-subtle"
-                data-testid="payment-method-summary"
-              >
-                Gift card
-              </Text>
+          <section className="sg-checkout-payment-card sg-checkout-billing">
+            <Heading level="h3">Billing address</Heading>
+            <label className="sg-checkout-payment-check">
+              <span className="sg-checkout-payment-checkbox">
+                <input
+                  type="checkbox"
+                  checked={sameAsDelivery}
+                  onChange={(event) => toggleSameAsDelivery(event.target.checked)}
+                />
+                {sameAsDelivery && <span>✓</span>}
+              </span>
+              Billing address is the same as the recipient&apos;s delivery address
+            </label>
+            <div className="sg-checkout-billing-grid">
+              <label className="sg-checkout-payment-field">
+                <span>Address line 1</span>
+                <input name="address_1" autoComplete="billing address-line1" value={billing.address_1} onChange={updateBillingField} required />
+              </label>
+              <label className="sg-checkout-payment-field">
+                <span>Address line 2</span>
+                <input name="address_2" autoComplete="billing address-line2" value={billing.address_2} onChange={updateBillingField} />
+              </label>
+              <label className="sg-checkout-payment-field">
+                <span>Town or city</span>
+                <input name="city" autoComplete="billing address-level2" value={billing.city} onChange={updateBillingField} required />
+              </label>
+              <label className="sg-checkout-payment-field">
+                <span>County</span>
+                <input name="province" autoComplete="billing address-level1" value={billing.province} onChange={updateBillingField} />
+              </label>
+              <label className="sg-checkout-payment-field">
+                <span>Postcode</span>
+                <input name="postal_code" autoComplete="billing postal-code" value={billing.postal_code} onChange={updateBillingField} required />
+              </label>
+              <label className="sg-checkout-payment-field">
+                <span>Country</span>
+                <select name="country_code" autoComplete="billing country" value={billing.country_code} onChange={updateBillingField} required>
+                  {cart.region?.countries?.map((country) => (
+                    <option key={country.iso_2} value={country.iso_2}>{country.display_name}</option>
+                  ))}
+                </select>
+              </label>
             </div>
-          )}
+          </section>
 
-          <ErrorMessage
-            error={error}
-            data-testid="payment-method-error-message"
-          />
+          <ErrorMessage error={error} data-testid="payment-method-error-message" />
 
-          <Button
-            size="large"
-            className="mt-6"
-            onClick={handleSubmit}
-            isLoading={isLoading}
-            disabled={
-              (isStripeLike(selectedPaymentMethod) && !paymentComplete) ||
-              (!selectedPaymentMethod && !paidByGiftcard)
-            }
-            data-testid="submit-payment-button"
-          >
-            {!activeSession && isStripeLike(selectedPaymentMethod)
-              ? "Enter payment details"
-              : "Continue to review"}
-          </Button>
-        </div>
-
-        <div className={isOpen ? "hidden" : "block"}>
-          {cart && paymentReady && activeSession ? (
-            <div className="flex items-start gap-x-1 w-full">
-              <div className="flex flex-col w-1/3">
-                <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                  Payment method
-                </Text>
-                <Text
-                  className="txt-medium text-ui-fg-subtle"
-                  data-testid="payment-method-summary"
-                >
-                  {paymentInfoMap[activeSession?.provider_id]?.title ||
-                    activeSession?.provider_id}
-                </Text>
-              </div>
-              <div className="flex flex-col w-1/3">
-                <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                  Payment details
-                </Text>
-                <div
-                  className="flex gap-2 txt-medium text-ui-fg-subtle items-center"
-                  data-testid="payment-details-summary"
-                >
-                  <Container className="flex items-center h-7 w-fit p-2 bg-ui-button-neutral-hover">
-                    {paymentInfoMap[selectedPaymentMethod]?.icon || (
-                      <CreditCard />
-                    )}
-                  </Container>
-                  <Text>Another step will appear</Text>
-                </div>
-              </div>
-            </div>
-          ) : paidByGiftcard ? (
-            <div className="flex flex-col w-1/3">
-              <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                Payment method
-              </Text>
-              <Text
-                className="txt-medium text-ui-fg-subtle"
-                data-testid="payment-method-summary"
-              >
-                Gift card
-              </Text>
-            </div>
-          ) : null}
-        </div>
-      </div>
-      <Divider className="mt-8" />
-    </div>
+          <div className="sg-checkout-mobile-totals sg-checkout-payment-mobile-totals">
+            <Heading level="h3">Order Summary</Heading>
+            <CartTotals totals={cart} />
+            <Button
+              type="submit"
+              size="large"
+              isLoading={isLoading}
+              disabled={(isStripeLike(selectedPaymentMethod) && !paymentComplete) || (!selectedPaymentMethod && !paidByGiftcard)}
+              data-testid="submit-payment-button-mobile"
+            >
+              Continue to review
+            </Button>
+            <LocalizedClientLink href="/checkout?step=delivery">Go back to delivery</LocalizedClientLink>
+          </div>
+        </form>
+      )}
+    </section>
   )
 }
 

@@ -5,13 +5,16 @@ import Addresses from "@modules/checkout/components/addresses"
 import Payment from "@modules/checkout/components/payment"
 import Review from "@modules/checkout/components/review"
 import Shipping from "@modules/checkout/components/shipping"
+import { CustomerPreferences } from "@lib/data/customer-preferences"
 
 export default async function CheckoutForm({
   cart,
   customer,
+  customerPreferences,
 }: {
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
+  customerPreferences?: CustomerPreferences
 }) {
   if (!cart) {
     return null
@@ -25,10 +28,14 @@ export default async function CheckoutForm({
   }
 
   return (
-    <div className="w-full grid grid-cols-1 gap-y-8">
+    <div className="sg-checkout-form">
       <Addresses cart={cart} customer={customer} />
 
-      <Shipping cart={cart} availableShippingMethods={shippingMethods} />
+      <Shipping
+        cart={cart}
+        availableShippingMethods={shippingMethods}
+        customerPreferences={customerPreferences}
+      />
 
       <Payment cart={cart} availablePaymentMethods={paymentMethods} />
 

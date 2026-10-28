@@ -12,6 +12,18 @@ export const getAuthHeaders = async (): Promise<
       return {}
     }
 
+    try {
+      const payload = JSON.parse(
+        Buffer.from(token.split(".")[1], "base64url").toString("utf8"),
+      ) as { exp?: number }
+
+      if (payload.exp && payload.exp * 1000 <= Date.now()) {
+        return {}
+      }
+    } catch {
+      return {}
+    }
+
     return { authorization: `Bearer ${token}` }
   } catch {
     return {}
@@ -34,7 +46,7 @@ export const getCacheTag = async (tag: string): Promise<string> => {
 }
 
 export const getCacheOptions = async (
-  tag: string
+  tag: string,
 ): Promise<{ tags: string[] } | Record<string, never>> => {
   if (typeof window !== "undefined") {
     return {}
@@ -55,10 +67,10 @@ export const getCacheOptions = async (
 // the storefront would see a logged-out, cartless visitor and render a 404 for
 // the checkout page instead of resuming the order. "lax" is sent on top-level
 // GET navigations while still blocking cross-site subrequests.
-export const setAuthToken = async (token: string) => {
+export const setAuthToken = async (token: string, remember = false) => {
   const cookies = await nextCookies()
   cookies.set("_medusa_jwt", token, {
-    maxAge: 60 * 60 * 24 * 7,
+    ...(remember ? { maxAge: 60 * 60 * 24 * 7 } : {}),
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -77,6 +89,7 @@ export type PendingCustomer = {
   first_name?: string
   last_name?: string
   phone?: string
+  accepts_marketing?: boolean
 }
 
 // During the email verification flow the customer record isn't created until

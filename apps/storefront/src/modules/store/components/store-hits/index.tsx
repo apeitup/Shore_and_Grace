@@ -5,12 +5,14 @@ import { useEffect, useRef } from "react"
 import { useHits, useInstantSearch } from "react-instantsearch"
 
 import useSearchSettled from "@lib/hooks/use-search-settled"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Text } from "@modules/common/components/ui"
-import Thumbnail from "@modules/products/components/thumbnail"
+import ProductGridCard from "@modules/products/components/product-grid-card"
+import RelatedProductsCarousel from "@modules/products/components/related-products/carousel"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
-import SearchPagination from "./pagination"
+import Image from "next/image"
 import HitPrice, { HitPricing } from "./price"
+import { priceAttribute } from "@lib/search-client"
+import SearchPagination from "./pagination"
 
 type ProductHit = Hit<
   {
@@ -23,9 +25,10 @@ type ProductHit = Hit<
 type StoreHitsProps = {
   hitsPerPage: number
   currencyCode: string
+  regionId: string
 }
 
-const StoreHits = ({ hitsPerPage, currencyCode }: StoreHitsProps) => {
+const StoreHits = ({ hitsPerPage, currencyCode, regionId }: StoreHitsProps) => {
   const { items } = useHits<ProductHit>()
   const { status, error, indexUiState } = useInstantSearch()
   const { isSearching, hasNoResultsYet } = useSearchSettled()
@@ -72,36 +75,60 @@ const StoreHits = ({ hitsPerPage, currencyCode }: StoreHitsProps) => {
           No products matched these filters.
         </Text>
       ) : (
-        <ul
-          className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8"
-          data-testid="products-list"
-        >
+        <ul className="sg-product-grid" data-testid="products-list">
           {items.map((hit) =>
             hit.handle ? (
               <li key={hit.objectID}>
-                <LocalizedClientLink
-                  href={`/products/${hit.handle}`}
-                  className="group"
-                >
-                  <div data-testid="product-wrapper">
-                    <Thumbnail thumbnail={hit.thumbnail} size="full" />
-                    <div className="flex txt-compact-medium mt-4 justify-between">
-                      <Text
-                        className="text-ui-fg-subtle"
-                        data-testid="product-title"
-                      >
-                        {hit.title}
-                      </Text>
-                      <HitPrice hit={hit} currencyCode={currencyCode} />
-                    </div>
-                  </div>
-                </LocalizedClientLink>
+                <ProductGridCard
+                  productId={hit.objectID}
+                  title={hit.title ?? "Product"}
+                  handle={hit.handle}
+                  thumbnail={hit.thumbnail}
+                  price={<HitPrice hit={hit} currencyCode={currencyCode} />}
+                  onSale={hit[priceAttribute("on_sale", currencyCode)] === true}
+                  regionId={regionId}
+                />
               </li>
             ) : null
           )}
         </ul>
       )}
       <SearchPagination />
+      {items.length > 0 && (
+        <section
+          className="sg-related-products sg-store-popular"
+          aria-labelledby="store-popular-title"
+        >
+          <div className="sg-related-products__heading">
+            <Image
+              src="/assets/home/sections/section-foliage.svg"
+              alt=""
+              width={159}
+              height={63}
+            />
+            <h2 id="store-popular-title">Popular products</h2>
+          </div>
+          <RelatedProductsCarousel>
+            {items.slice(0, 4).map((hit) =>
+              hit.handle ? (
+                <li key={`popular-${hit.objectID}`}>
+                  <ProductGridCard
+                    productId={hit.objectID}
+                    title={hit.title ?? "Product"}
+                    handle={hit.handle}
+                    thumbnail={hit.thumbnail}
+                    price={<HitPrice hit={hit} currencyCode={currencyCode} />}
+                    onSale={
+                      hit[priceAttribute("on_sale", currencyCode)] === true
+                    }
+                    regionId={regionId}
+                  />
+                </li>
+              ) : null
+            )}
+          </RelatedProductsCarousel>
+        </section>
+      )}
     </>
   )
 }

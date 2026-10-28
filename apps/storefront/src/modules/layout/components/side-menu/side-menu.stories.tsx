@@ -6,9 +6,8 @@ const meta = {
   title: "Foundation/Mobile menu",
   component: SideMenu,
   args: {
-    regions: null,
-    locales: null,
-    currentLocale: "en-GB",
+    categories: [],
+    customer: null,
   },
   decorators: [
     (Story) => (

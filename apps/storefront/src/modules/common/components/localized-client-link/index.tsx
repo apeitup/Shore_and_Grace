@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import React from "react"
+import React, { ComponentPropsWithoutRef } from "react"
 
 /**
  * Use this component to create a Next.js `<Link />` that persists the current country code in the url,
@@ -12,14 +12,7 @@ const LocalizedClientLink = ({
   children,
   href,
   ...props
-}: {
-  children?: React.ReactNode
-  href: string
-  className?: string
-  onClick?: () => void
-  passHref?: true
-  [x: string]: unknown
-}) => {
+}: Omit<ComponentPropsWithoutRef<typeof Link>, "href"> & { href: string }) => {
   const { countryCode } = useParams<{ countryCode?: string }>()
   const activeCountryCode = countryCode ?? "gb"
 

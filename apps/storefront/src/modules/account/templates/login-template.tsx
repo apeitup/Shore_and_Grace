@@ -1,9 +1,10 @@
 "use client"
 
+import ShopPageHero from "@modules/brand/components/shop-page-hero"
 import { useState } from "react"
 
-import Register from "@modules/account/components/register"
-import Login from "@modules/account/components/login"
+import Login from "../components/login"
+import Register from "../components/register"
 
 export enum LOGIN_VIEW {
   SIGN_IN = "sign-in",
@@ -11,16 +12,26 @@ export enum LOGIN_VIEW {
 }
 
 const LoginTemplate = () => {
-  const [currentView, setCurrentView] = useState("sign-in")
+  const [currentView, setCurrentView] = useState<LOGIN_VIEW>(LOGIN_VIEW.SIGN_IN)
+  const isSignIn = currentView === LOGIN_VIEW.SIGN_IN
 
   return (
-    <div className="w-full flex justify-start px-8 py-8">
-      {currentView === "sign-in" ? (
-        <Login setCurrentView={setCurrentView} />
-      ) : (
-        <Register setCurrentView={setCurrentView} />
-      )}
-    </div>
+    <main className="sg-account-auth">
+      <ShopPageHero
+        title="My Account"
+        trail={[
+          { label: "Account", href: "/account" },
+          { label: isSignIn ? "Sign in" : "Sign up" },
+        ]}
+      />
+      <div className="sg-account-auth__content">
+        {isSignIn ? (
+          <Login setCurrentView={setCurrentView} />
+        ) : (
+          <Register setCurrentView={setCurrentView} />
+        )}
+      </div>
+    </main>
   )
 }
 

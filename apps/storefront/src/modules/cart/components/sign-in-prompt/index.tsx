@@ -3,7 +3,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 
 const SignInPrompt = () => {
   return (
-    <div className="bg-white flex items-center justify-between">
+    <div className="sg-cart-sign-in">
       <div>
         <Heading level="h2" className="txt-xlarge">
           Already have an account?

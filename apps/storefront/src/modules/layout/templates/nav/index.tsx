@@ -1,9 +1,7 @@
 import { Suspense } from "react"
 
-import { listLocales } from "@lib/data/locales"
-import { getLocale } from "@lib/data/locale-actions"
-import { listRegions } from "@lib/data/regions"
-import { StoreRegion } from "@medusajs/types"
+import { listCategories } from "@lib/data/categories"
+import { retrieveCustomer } from "@lib/data/customer"
 import SiteHeader from "@modules/brand/components/site-header"
 import ScrollHeader from "@modules/brand/components/scroll-header"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -12,10 +10,9 @@ import SideMenu from "@modules/layout/components/side-menu"
 import Image from "next/image"
 
 export default async function Nav() {
-  const [regions, locales, currentLocale] = await Promise.all([
-    listRegions().then((regions: StoreRegion[]) => regions),
-    listLocales(),
-    getLocale(),
+  const [categories, customer] = await Promise.all([
+    listCategories().catch(() => []),
+    retrieveCustomer(),
   ])
 
   return (
@@ -23,9 +20,10 @@ export default async function Nav() {
       <SiteHeader
         menu={
           <SideMenu
-            regions={regions}
-            locales={locales}
-            currentLocale={currentLocale}
+            categories={categories.filter(
+              (category) => !category.parent_category_id
+            )}
+            customer={customer}
           />
         }
         cart={

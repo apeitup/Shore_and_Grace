@@ -6,16 +6,26 @@ import React from "react"
 import { applyPromotions } from "@lib/data/cart"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
-import Trash from "@modules/common/icons/trash"
+import { Trash } from "iconoir-react"
 import ErrorMessage from "../error-message"
 import { SubmitButton } from "../submit-button"
 
 type DiscountCodeProps = {
   cart: HttpTypes.StoreCart
+  openByDefault?: boolean
+  submitLabel?: string
+  desktopSubmitLabel?: string
+  inputLabel?: string
 }
 
-const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
-  const [isOpen, setIsOpen] = React.useState(false)
+const DiscountCode: React.FC<DiscountCodeProps> = ({
+  cart,
+  openByDefault = false,
+  submitLabel = "Apply",
+  desktopSubmitLabel,
+  inputLabel,
+}) => {
+  const [isOpen, setIsOpen] = React.useState(openByDefault)
   const [errorMessage, setErrorMessage] = React.useState("")
 
   const { promotions = [] } = cart
@@ -57,29 +67,42 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
     <div className="w-full bg-white flex flex-col">
       <div className="txt-medium">
         <form action={(a) => addPromotionCode(a)} className="w-full mb-5">
-          <Label className="flex gap-x-1 my-2 items-center">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              type="button"
-              className="txt-medium text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
-              data-testid="add-discount-button"
-            >
-              Add Promotion Code(s)
-            </button>
+          {!openByDefault && (
+            <Label className="flex gap-x-1 my-2 items-center">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                type="button"
+                className="txt-medium text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
+                data-testid="add-discount-button"
+              >
+                <span>Have a discount or gift card?</span>
+                <span>Add code</span>
+              </button>
 
             {/* <Tooltip content="You can add multiple promotion codes">
               <InformationCircleSolid color="var(--fg-muted)" />
             </Tooltip> */}
-          </Label>
+            </Label>
+          )}
 
           {isOpen && (
             <>
               <div className="flex w-full gap-x-2">
+                {inputLabel && (
+                  <label
+                    className="sg-discount-code__label"
+                    htmlFor="promotion-input"
+                  >
+                    {inputLabel}<span aria-hidden="true">*</span>
+                  </label>
+                )}
                 <Input
                   className="size-full"
                   id="promotion-input"
                   name="code"
                   type="text"
+                  placeholder="Enter your coupon code"
+                  aria-label={inputLabel ?? "Coupon code"}
                   autoFocus={false}
                   data-testid="discount-input"
                 />
@@ -87,7 +110,18 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                   variant="secondary"
                   data-testid="discount-apply-button"
                 >
-                  Apply
+                  {desktopSubmitLabel ? (
+                    <>
+                      <span className="sg-discount-submit__desktop">
+                        {desktopSubmitLabel}
+                      </span>
+                      <span className="sg-discount-submit__mobile">
+                        {submitLabel}
+                      </span>
+                    </>
+                  ) : (
+                    submitLabel
+                  )}
                 </SubmitButton>
               </div>
 
@@ -156,7 +190,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                         }}
                         data-testid="remove-discount-button"
                       >
-                        <Trash size={14} />
+                        <Trash width={14} height={14} aria-hidden="true" />
                         <span className="sr-only">
                           Remove discount code from order
                         </span>

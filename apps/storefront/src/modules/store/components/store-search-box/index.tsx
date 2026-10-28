@@ -1,6 +1,7 @@
 "use client"
 
-import { MagnifyingGlass, XMarkMini } from "@medusajs/icons"
+import { XMarkMini } from "@medusajs/icons"
+import Image from "next/image"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useSearchBox } from "react-instantsearch"
 
@@ -40,8 +41,13 @@ const StoreSearchBox = () => {
   }
 
   return (
-    <div className="mb-6 flex items-center gap-x-3 border-b border-ui-border-base">
-      <MagnifyingGlass className="shrink-0 text-ui-fg-muted" />
+    <div className="sg-store-search">
+      <Image
+        src="/assets/shop/search.svg"
+        alt=""
+        width={20}
+        height={20}
+      />
       <input
         type="search"
         value={inputValue}
@@ -49,9 +55,9 @@ const StoreSearchBox = () => {
           setInputValue(event.target.value)
           refine(event.target.value)
         }}
-        placeholder="Search products"
+        placeholder="Search by name or style"
         aria-label="Search products"
-        className="txt-medium w-full bg-transparent py-3 text-ui-fg-base outline-none placeholder:text-ui-fg-muted [&::-webkit-search-cancel-button]:hidden"
+        className="sg-store-search__input [&::-webkit-search-cancel-button]:hidden"
         data-testid="store-search-input"
       />
       {inputValue && (

@@ -68,6 +68,35 @@ async function productIdsInSalesChannels(
 }
 
 /**
+ * Price-list configuration can affect every product it applies to, including
+ * when a list is activated, expires, or is deleted. Re-read every indexed
+ * product for these relatively infrequent merchant operations so calculated
+ * sale prices never remain stale.
+ */
+async function allIndexedProductIds(
+  query: RemoteQueryFunction,
+): Promise<string[]> {
+  const ids: string[] = [];
+  let skip = 0;
+
+  while (true) {
+    const { search_result: result } = await query.search({
+      entity: "product",
+      fields: ["id"],
+      pagination: { skip, take: RESOLVE_BATCH_SIZE },
+    });
+
+    ids.push(...result.hits.map((hit) => hit.id));
+
+    if (result.hits.length < RESOLVE_BATCH_SIZE) {
+      return ids;
+    }
+
+    skip += RESOLVE_BATCH_SIZE;
+  }
+}
+
+/**
  * The products an event affects. A product event carries them directly; an
  * event about a variant, option, tag, category or sales channel is mapped to
  * the products behind it.
@@ -135,6 +164,8 @@ export async function resolveProductIds(
       );
     case "sales-channel":
       return productIdsInSalesChannels(query, ids);
+    case "price-list":
+      return allIndexedProductIds(query);
     default:
       return [];
   }

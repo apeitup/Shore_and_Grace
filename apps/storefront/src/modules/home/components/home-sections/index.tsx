@@ -1,5 +1,6 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
+import { serviceLinks as services } from "@lib/service-links"
 
 const assetRoot = "/assets/home/sections"
 
@@ -9,36 +10,6 @@ type ResponsiveImageProps = {
   mobile: string
   className?: string
 }
-
-const services = [
-  {
-    title: "Funeral Flowers",
-    slug: "funeral-flowers",
-    image: "service-funeral",
-  },
-  {
-    title: "Private Events",
-    slug: "private-events",
-    image: "service-private",
-  },
-  {
-    title: "Office Flower Service",
-    slug: "office-flowers",
-    image: "service-office",
-  },
-  { title: "Workshops", slug: "workshops", image: "service-workshops" },
-  { title: "Weddings", slug: "weddings", image: "service-weddings" },
-  {
-    title: "Corporate Events",
-    slug: "corporate-events",
-    image: "service-corporate",
-  },
-  {
-    title: "Flower Subscriptions",
-    slug: "flower-subscriptions",
-    image: "service-subscription",
-  },
-]
 
 const occasions = [
   { title: "Christmas", slug: "christmas", image: "occasion-christmas" },
@@ -220,9 +191,7 @@ export default function HomeSections() {
         className="sg-home-section sg-home-follow"
         aria-labelledby="home-follow-heading"
       >
-        <SectionHeading id="home-follow-heading">
-          Follow us
-        </SectionHeading>
+        <SectionHeading id="home-follow-heading">Follow us</SectionHeading>
         <div className="sg-home-follow__grid">
           {followImages.map(({ desktop, mobile, desktopOnly }, index) => (
             <a

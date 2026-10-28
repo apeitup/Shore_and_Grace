@@ -1,9 +1,19 @@
 "use client"
 
+import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
-import { useSearchParams } from "next/navigation"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useSyncExternalStore } from "react"
 import ImageGallery from "."
+
+const subscribeToVariantChanges = (onStoreChange: () => void) => {
+  window.addEventListener("sg:variant-change", onStoreChange)
+  return () => window.removeEventListener("sg:variant-change", onStoreChange)
+}
+
+const getSelectedVariantId = () =>
+  new URLSearchParams(window.location.search).get("v_id") ?? undefined
+
+const getServerVariantId = () => undefined
 
 const getImagesForVariant = (
   product: HttpTypes.StoreProduct,
@@ -31,18 +41,32 @@ const VariantImageGallery = ({
 }: {
   product: HttpTypes.StoreProduct
 }) => {
-  const searchParams = useSearchParams()
-  const [isMounted, setIsMounted] = useState(false)
+  const variantId = useSyncExternalStore(
+    subscribeToVariantChanges,
+    getSelectedVariantId,
+    getServerVariantId
+  )
 
-  useEffect(() => setIsMounted(true), [])
-
-  const variantId = isMounted ? searchParams.get("v_id") ?? undefined : undefined
   const images = useMemo(
     () => getImagesForVariant(product, variantId) ?? [],
     [product, variantId]
   )
 
-  return <ImageGallery images={images} />
+  const selectedPrice = useMemo(() => {
+    const { cheapestPrice, variantPrice } = getProductPrice({
+      product,
+      variantId,
+    })
+
+    return variantPrice ?? cheapestPrice
+  }, [product, variantId])
+
+  return (
+    <ImageGallery
+      images={images}
+      onSale={selectedPrice?.price_type === "sale"}
+    />
+  )
 }
 
 export default VariantImageGallery

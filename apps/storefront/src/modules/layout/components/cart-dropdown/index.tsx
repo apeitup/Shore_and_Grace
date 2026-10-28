@@ -10,6 +10,7 @@ import { retrieveCart } from "@lib/data/cart"
 import { CART_UPDATED_EVENT } from "@lib/util/cart-events"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
+import BrandButton from "@modules/brand/components/button"
 import { Button } from "@modules/common/components/ui"
 import DeleteButton from "@modules/common/components/delete-button"
 import LineItemOptions from "@modules/common/components/line-item-options"
@@ -23,6 +24,18 @@ import Image from "next/image"
 const countItems = (cart?: HttpTypes.StoreCart | null) =>
   cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0
 
+const getCheckoutStep = (cart: HttpTypes.StoreCart) => {
+  if (!cart.shipping_address?.address_1 || !cart.email) {
+    return "address"
+  }
+
+  if (!cart.shipping_methods?.length) {
+    return "delivery"
+  }
+
+  return "payment"
+}
+
 const CartDropdown = ({
   cart: serverCart,
 }: {
@@ -31,9 +44,9 @@ const CartDropdown = ({
   // Statically rendered pages can't read the cart cookie, so the cart is loaded in the browser.
   const [clientCart, setClientCart] = useState<HttpTypes.StoreCart | null>(null)
   const cartState = serverCart ?? clientCart
-  const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(
-    undefined,
-  )
+  const [activeTimer, setActiveTimer] = useState<
+    ReturnType<typeof setTimeout> | undefined
+  >(undefined)
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
 
   const open = () => setCartDropdownOpen(true)
@@ -147,15 +160,12 @@ const CartDropdown = ({
         >
           <PopoverPanel
             static
-            className="hidden small:block absolute top-[calc(100%+1px)] right-0 bg-white border-x border-b border-gray-200 w-[420px] text-ui-fg-base"
+            className="sg-cart-dropdown hidden small:block"
             data-testid="nav-cart-dropdown"
           >
-            <div className="p-4 flex items-center justify-center">
-              <h3 className="text-large-semi">Cart</h3>
-            </div>
             {cartState && cartState.items?.length ? (
               <>
-                <div className="overflow-y-scroll max-h-[402px] px-4 grid grid-cols-1 gap-y-8 no-scrollbar p-px">
+                <div className="sg-cart-dropdown__items no-scrollbar">
                   {cartState.items
                     .sort((a, b) => {
                       return (a.created_at ?? "") > (b.created_at ?? "")
@@ -164,13 +174,13 @@ const CartDropdown = ({
                     })
                     .map((item) => (
                       <div
-                        className="grid grid-cols-[122px_1fr] gap-x-4"
+                        className="sg-cart-dropdown__item"
                         key={item.id}
                         data-testid="cart-item"
                       >
                         <LocalizedClientLink
                           href={`/products/${item.product_handle}`}
-                          className="w-24"
+                          className="sg-cart-dropdown__image"
                         >
                           <Thumbnail
                             thumbnail={item.thumbnail}
@@ -178,76 +188,84 @@ const CartDropdown = ({
                             size="square"
                           />
                         </LocalizedClientLink>
-                        <div className="flex flex-col justify-between flex-1">
-                          <div className="flex flex-col flex-1">
-                            <div className="flex items-start justify-between">
-                              <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
-                                <h3 className="text-base-regular overflow-hidden text-ellipsis">
-                                  <LocalizedClientLink
-                                    href={`/products/${item.product_handle}`}
-                                    data-testid="product-link"
-                                  >
-                                    {item.title}
-                                  </LocalizedClientLink>
-                                </h3>
-                                <LineItemOptions
-                                  variant={item.variant}
-                                  data-testid="cart-item-variant"
-                                  data-value={item.variant}
-                                />
-                                <span
-                                  data-testid="cart-item-quantity"
-                                  data-value={item.quantity}
-                                >
-                                  Quantity: {item.quantity}
-                                </span>
-                              </div>
-                              <div className="flex justify-end">
-                                <LineItemPrice
-                                  item={item}
-                                  style="tight"
-                                  currencyCode={cartState.currency_code}
-                                />
-                              </div>
-                            </div>
+                        <div className="sg-cart-dropdown__item-details">
+                          <div className="sg-cart-dropdown__copy">
+                            <h3>
+                              <LocalizedClientLink
+                                href={`/products/${item.product_handle}`}
+                                data-testid="product-link"
+                              >
+                                {item.title}
+                              </LocalizedClientLink>
+                            </h3>
+                            <LineItemOptions
+                              variant={item.variant}
+                              data-testid="cart-item-variant"
+                              data-value={item.variant}
+                            />
+                            <span
+                              data-testid="cart-item-quantity"
+                              data-value={item.quantity}
+                            >
+                              Quantity: {item.quantity}
+                            </span>
                           </div>
-                          <DeleteButton
-                            id={item.id}
-                            className="mt-1"
-                            data-testid="cart-item-remove-button"
-                          >
-                            Remove
-                          </DeleteButton>
+                          <div className="sg-cart-dropdown__item-actions">
+                            <LineItemPrice
+                              item={item}
+                              style="tight"
+                              currencyCode={cartState.currency_code}
+                            />
+                            <DeleteButton
+                              id={item.id}
+                              className="sg-cart-dropdown__remove"
+                              icon={
+                                <span
+                                  className="sg-cart-dropdown__remove-icon"
+                                  aria-hidden="true"
+                                />
+                              }
+                              data-testid="cart-item-remove-button"
+                            >
+                              Remove
+                            </DeleteButton>
+                          </div>
                         </div>
                       </div>
                     ))}
                 </div>
-                <div className="p-4 flex flex-col gap-y-4 text-small-regular">
-                  <div className="flex items-center justify-between">
-                    <span className="text-ui-fg-base font-semibold">
+                <div className="sg-cart-dropdown__subtotal">
+                  <span>
                       Subtotal{" "}
-                      <span className="font-normal">(excl. taxes)</span>
-                    </span>
-                    <span
-                      className="text-large-semi"
-                      data-testid="cart-subtotal"
-                      data-value={subtotal}
-                    >
-                      {convertToLocale({
-                        amount: subtotal,
-                        currency_code: cartState.currency_code,
-                      })}
-                    </span>
-                  </div>
-                  <LocalizedClientLink href="/cart" passHref>
-                    <Button
-                      className="w-full"
-                      size="large"
-                      data-testid="go-to-cart-button"
-                    >
-                      Go to cart
-                    </Button>
-                  </LocalizedClientLink>
+                    <small>(excl. taxes)</small>
+                  </span>
+                  <strong
+                    data-testid="cart-subtotal"
+                    data-value={subtotal}
+                  >
+                    {convertToLocale({
+                      amount: subtotal,
+                      currency_code: cartState.currency_code,
+                    })}
+                  </strong>
+                </div>
+                <div className="sg-cart-dropdown__actions">
+                  <BrandButton
+                    href="/cart"
+                    tone="outline"
+                    className="sg-cart-dropdown__cart-link"
+                    data-testid="go-to-cart-button"
+                  >
+                    Go to cart
+                  </BrandButton>
+                  <BrandButton
+                    href={`/checkout?step=${getCheckoutStep(cartState)}`}
+                    tone="ink"
+                    className="sg-cart-dropdown__checkout-link"
+                    data-testid="dropdown-checkout-button"
+                  >
+                    Checkout
+                  </BrandButton>
                 </div>
               </>
             ) : (

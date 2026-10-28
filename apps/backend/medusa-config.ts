@@ -13,5 +13,25 @@ module.exports = defineConfig({
       jwtSecret: process.env.JWT_SECRET,
       cookieSecret: process.env.COOKIE_SECRET,
     }
-  }
+  },
+  modules: [
+    {
+      resolve: "./src/modules/product-review",
+    },
+    {
+      resolve: "./src/modules/wishlist",
+    },
+    {
+      resolve: "./src/modules/florist-delivery",
+    },
+    {
+      resolve: "./src/modules/gift-order",
+    },
+    {
+      resolve: "./src/modules/special-occasion",
+    },
+    {
+      resolve: "./src/modules/customer-preferences",
+    },
+  ],
 })

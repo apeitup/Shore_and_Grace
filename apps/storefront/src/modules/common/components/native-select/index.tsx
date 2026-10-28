@@ -1,5 +1,5 @@
-import { ChevronUpDown } from "@medusajs/icons"
 import { clx } from "@modules/common/components/ui"
+import { NavArrowDown } from "iconoir-react"
 import {
   SelectHTMLAttributes,
   forwardRef,
@@ -61,7 +61,7 @@ const NativeSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
             {children}
           </select>
           <span className="absolute right-4 inset-y-0 flex items-center pointer-events-none ">
-            <ChevronUpDown />
+            <NavArrowDown aria-hidden="true" />
           </span>
         </div>
       </div>

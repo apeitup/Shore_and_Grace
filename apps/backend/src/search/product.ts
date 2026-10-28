@@ -122,7 +122,6 @@ const source = {
  * products it touches. Only `product.deleted` removes documents: a deleted
  * variant, option, tag or category means the product has to be re-read.
  *
- * TODO: price lists emit no events (create, update, delete, batch prices).
  * TODO: price lists crossing their start or end date change prices silently.
  * TODO: linkProductsToSalesChannelWorkflow emits nothing.
  * TODO: batchLinkProductsToCategoryWorkflow emits nothing.
@@ -145,6 +144,12 @@ const PRODUCT_EVENTS = [
   "product-category.updated",
   "product-category.deleted",
   "sales-channel.deleted",
+  "price-list.created",
+  "price-list.updated",
+  "price-list.deleted",
+  "price-list.prices_added",
+  "price-list.prices_updated",
+  "price-list.prices_removed",
 ];
 
 export default defineSearchIndex({

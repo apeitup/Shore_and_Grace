@@ -1,5 +1,5 @@
 import { Listbox, Transition } from "@headlessui/react"
-import { ChevronUpDown } from "@medusajs/icons"
+import { NavArrowDown } from "iconoir-react"
 import { clx } from "@modules/common/components/ui"
 import { Fragment, useMemo } from "react"
 
@@ -46,7 +46,7 @@ const AddressSelect = ({
                   ? selectedAddress.address_1
                   : "Choose an address"}
               </span>
-              <ChevronUpDown
+              <NavArrowDown
                 className={clx("transition-rotate duration-200", {
                   "transform rotate-180": open,
                 })}

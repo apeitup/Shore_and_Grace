@@ -10,7 +10,7 @@ import {
   useState,
 } from "react"
 
-import ChevronDown from "@modules/common/icons/chevron-down"
+import { NavArrowDown } from "iconoir-react"
 
 type NativeSelectProps = {
   placeholder?: string
@@ -60,7 +60,7 @@ const CartItemSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
             {children}
           </select>
           <span className="absolute flex pointer-events-none justify-end w-8 group-hover:animate-pulse">
-            <ChevronDown />
+            <NavArrowDown aria-hidden="true" />
           </span>
         </IconBadge>
       </div>

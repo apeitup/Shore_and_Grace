@@ -1,7 +1,7 @@
 "use client"
 
 import * as Slider from "@radix-ui/react-slider"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useRange } from "react-instantsearch"
 
 import { indexedCurrency, priceAttribute } from "@lib/search-client"
@@ -38,60 +38,98 @@ const PriceRange = ({ currencyCode }: { currencyCode: string }) => {
   const from = Number.isFinite(start[0]) ? (start[0] as number) : min
   const to = Number.isFinite(start[1]) ? (start[1] as number) : max
 
-  const [value, setValue] = useState<number[]>([from, to])
+  const refinementKey = `${from}:${to}`
+  const [draft, setDraft] = useState({
+    refinementKey,
+    value: [from, to],
+  })
+  const value =
+    draft.refinementKey === refinementKey ? draft.value : [from, to]
+  const setValue = (nextValue: number[]) =>
+    setDraft({ refinementKey, value: nextValue })
 
-  // Follow the refinement when it changes elsewhere — clearing all filters, or
-  // a bound arriving from the URL on load.
-  useEffect(() => {
-    setValue([from, to])
-  }, [from, to])
-
-  // No stats yet, or every product costs the same: nothing to slide between.
-  if (!canRefine || min >= max) {
-    return null
-  }
+  const rangeUnavailable = !canRefine || min >= max
+  const sliderMax = min >= max ? min + 1 : max
 
   return (
-    <div className="flex flex-col gap-y-4">
-      <span className="txt-compact-small-plus text-ui-fg-subtle">Price</span>
+    <section className="sg-filter-section">
+      <div className="sg-filter-heading">
+        <h2>Price filter</h2>
+      </div>
 
-      <div className="flex flex-col gap-y-3 pr-6">
+      <div className="sg-filter-price">
         <Slider.Root
-          className="relative flex h-5 w-full touch-none select-none items-center"
+          className="sg-filter-price__slider"
           value={value}
           min={min}
-          max={max}
+          max={sliderMax}
           step={1}
           minStepsBetweenThumbs={0}
           onValueChange={setValue}
-          // Only refine when the thumb is released, so dragging doesn't fire a
-          // search per pixel.
-          onValueCommit={(committed) => refine([committed[0], committed[1]])}
+          disabled={rangeUnavailable}
           aria-label="Price range"
           data-testid="price-range"
         >
-          <Slider.Track className="relative h-0.5 w-full grow rounded-full bg-ui-border-base">
-            <Slider.Range className="absolute h-full rounded-full bg-ui-fg-interactive" />
+          <Slider.Track className="sg-filter-price__track">
+            <Slider.Range className="sg-filter-price__range" />
           </Slider.Track>
           {value.map((_, index) => (
             <Slider.Thumb
               key={index}
-              className="block h-4 w-4 rounded-full border border-ui-border-interactive bg-ui-bg-base shadow-elevation-card-rest outline-none focus-visible:ring-2 focus-visible:ring-ui-fg-interactive"
+              className="sg-filter-price__thumb"
               aria-label={index === 0 ? "Minimum price" : "Maximum price"}
             />
           ))}
         </Slider.Root>
 
-        <div className="flex items-center justify-between">
-          <span className="text-small-regular text-ui-fg-subtle">
-            {format(value[0])}
-          </span>
-          <span className="text-small-regular text-ui-fg-subtle">
-            {format(value[1])}
-          </span>
+        <div className="sg-filter-price__actions">
+          <button
+            type="button"
+            disabled={rangeUnavailable}
+            onClick={() => refine([value[0], value[1]])}
+          >
+            Apply
+          </button>
+          <span>{format(value[0])} - {format(value[1])}</span>
+        </div>
+
+        <div className="sg-filter-price__mobile-actions">
+          <label>
+            <span>From</span>
+            <input
+              type="number"
+              min={min}
+              max={value[1]}
+              value={value[0]}
+              onChange={(event) =>
+                setValue([Number(event.target.value), value[1]])
+              }
+              aria-label="Minimum price"
+            />
+          </label>
+          <label>
+            <span>Too</span>
+            <input
+              type="number"
+              min={value[0]}
+              max={max}
+              value={value[1]}
+              onChange={(event) =>
+                setValue([value[0], Number(event.target.value)])
+              }
+              aria-label="Maximum price"
+            />
+          </label>
+          <button
+            type="button"
+            disabled={rangeUnavailable}
+            onClick={() => refine([value[0], value[1]])}
+          >
+            Filter
+          </button>
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 

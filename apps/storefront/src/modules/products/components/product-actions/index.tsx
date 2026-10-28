@@ -1,19 +1,18 @@
 "use client"
 
 import { addToCart } from "@lib/data/cart"
-import { useIntersection } from "@lib/hooks/use-in-view"
 import { notifyCartUpdated } from "@lib/util/cart-events"
 import { isVariantInStock } from "@lib/util/inventory"
 import { HttpTypes } from "@medusajs/types"
-import { Button } from "@modules/common/components/ui"
-import Divider from "@modules/common/components/divider"
+import BrandButton from "@modules/brand/components/button"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
 import { isEqual } from "lodash"
 import { useParams, usePathname } from "next/navigation"
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react"
+import { FormEvent, useEffect, useMemo, useState } from "react"
 import ProductPrice from "../product-price"
-import MobileActions from "./mobile-actions"
-import { useRouter } from "next/navigation"
+import Image from "next/image"
+import { useWishlist } from "@modules/wishlist/components/wishlist-provider"
+import WishlistHeart from "@modules/wishlist/components/wishlist-heart"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -37,7 +36,6 @@ export default function ProductActions({
   product,
   disabled,
 }: ProductActionsProps) {
-  const router = useRouter()
   const pathname = usePathname()
   // Preselected on the server so the form posts a valid variant without JavaScript.
   // The page is statically rendered, so `?v_id=` is applied after hydration.
@@ -46,6 +44,9 @@ export default function ProductActions({
   )
   const [isUrlVariantApplied, setIsUrlVariantApplied] = useState(false)
   const [isAdding, setIsAdding] = useState(false)
+  const [quantity, setQuantity] = useState(1)
+  const { isSaved: productIsSaved, pendingProductIds, toggle } = useWishlist()
+  const isSaved = productIsSaved(product.id)
   const countryCode = useParams().countryCode as string
 
   const selectedVariant = useMemo(() => {
@@ -102,17 +103,25 @@ export default function ProductActions({
       params.delete("v_id")
     }
 
-    router.replace(pathname + "?" + params.toString())
-  }, [selectedVariant, isValidVariant, isUrlVariantApplied])
+    const nextUrl = pathname + "?" + params.toString()
+
+    History.prototype.replaceState.call(
+      window.history,
+      window.history.state,
+      "",
+      nextUrl
+    )
+    window.dispatchEvent(
+      new CustomEvent("sg:variant-change", {
+        detail: value ?? undefined,
+      })
+    )
+  }, [selectedVariant, isValidVariant, isUrlVariantApplied, pathname])
 
   const inStock = useMemo(
     () => isVariantInStock(selectedVariant),
     [selectedVariant]
   )
-
-  const actionsRef = useRef<HTMLDivElement>(null)
-
-  const inView = useIntersection(actionsRef, "0px")
 
   // add the selected variant to the cart
   const handleAddToCart = async () => {
@@ -122,7 +131,7 @@ export default function ProductActions({
 
     await addToCart({
       variantId: selectedVariant.id,
-      quantity: 1,
+      quantity,
       countryCode,
     })
     notifyCartUpdated()
@@ -135,9 +144,24 @@ export default function ProductActions({
     handleAddToCart()
   }
 
+  const copyProductLink = () =>
+    navigator.clipboard?.writeText(window.location.href)
+
+  const shareProduct = async () => {
+    if (navigator.share) {
+      await navigator.share({
+        title: product.title,
+        url: window.location.href,
+      })
+      return
+    }
+
+    await copyProductLink()
+  }
+
   return (
     <>
-      <div className="flex flex-col gap-y-2" ref={actionsRef}>
+      <div className="flex flex-col gap-y-2">
         <form
           method="post"
           action={`/${countryCode}/cart/add`}
@@ -155,7 +179,24 @@ export default function ProductActions({
             name="variant_id"
             value={isValidVariant ? selectedVariant?.id ?? "" : ""}
           />
-          <input type="hidden" name="quantity" value="1" />
+          <input type="hidden" name="quantity" value={quantity} />
+
+          <ProductPrice product={product} variant={selectedVariant} />
+
+          <div className="sg-product-actions__meta">
+            <span>SKU:</span>
+            <strong>{selectedVariant?.sku || "—"}</strong>
+          </div>
+
+          {product.description && (
+            <p
+              className="sg-product-info__description whitespace-pre-line"
+              data-testid="product-description"
+            >
+              {product.description}
+            </p>
+          )}
+
           <div>
             {(product.variants?.length ?? 0) > 1 && (
               <div className="flex flex-col gap-y-4">
@@ -174,12 +215,9 @@ export default function ProductActions({
                     </div>
                   )
                 })}
-                <Divider />
               </div>
             )}
           </div>
-
-          <ProductPrice product={product} variant={selectedVariant} />
 
           {selectedVariant && isValidVariant && (
             <p
@@ -190,38 +228,149 @@ export default function ProductActions({
             </p>
           )}
 
-          <Button
-            type="submit"
-            disabled={
-              !inStock ||
-              !selectedVariant ||
-              !!disabled ||
-              isAdding ||
-              !isValidVariant
-            }
-            variant="primary"
-            className="w-full h-10"
-            isLoading={isAdding}
-            data-testid="add-product-button"
-          >
-            {!selectedVariant
-              ? "Select variant"
-              : !inStock || !isValidVariant
-              ? "Out of stock"
-              : "Add to cart"}
-          </Button>
+          <div className="sg-product-actions__row">
+            <div className="sg-product-actions__quantity" aria-label="Quantity">
+              <button
+                type="button"
+                onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+                aria-label="Decrease quantity"
+              >
+                <Image
+                  src="/assets/shop/quick-add-minus.svg"
+                  alt=""
+                  width={16}
+                  height={16}
+                />
+              </button>
+              <span>{quantity}</span>
+              <button
+                type="button"
+                onClick={() => setQuantity((value) => Math.min(10, value + 1))}
+                aria-label="Increase quantity"
+              >
+                <Image
+                  src="/assets/shop/quick-add-plus.svg"
+                  alt=""
+                  width={16}
+                  height={16}
+                />
+              </button>
+            </div>
+            <BrandButton
+              type="submit"
+              disabled={
+                !inStock ||
+                !selectedVariant ||
+                !!disabled ||
+                isAdding ||
+                !isValidVariant
+              }
+              variant="primary"
+              className="sg-product-actions__cart"
+              data-testid="add-product-button"
+            >
+              {isAdding
+                ? "Adding..."
+                : !selectedVariant
+                ? "Select variant"
+                : !inStock || !isValidVariant
+                ? "Out of stock"
+                : "Add to cart"}
+            </BrandButton>
+            <BrandButton
+              type="button"
+              variant="secondary"
+              selected={isSaved}
+              className="sg-product-actions__save"
+              leadingIcon={<WishlistHeart saved={isSaved} />}
+              onClick={() => toggle(product.id)}
+              disabled={pendingProductIds.has(product.id)}
+              aria-pressed={isSaved}
+              aria-label={isSaved ? "Remove from wishlist" : "Add to wishlist"}
+            >
+              {isSaved ? "Added to wishlist" : "Add to wishlist"}
+            </BrandButton>
+          </div>
         </form>
-        <MobileActions
-          product={product}
-          variant={selectedVariant}
-          options={options}
-          updateOptions={setOptionValue}
-          inStock={inStock}
-          handleAddToCart={handleAddToCart}
-          isAdding={isAdding}
-          show={!inView}
-          optionsDisabled={!!disabled || isAdding}
-        />
+        <div className="sg-product-actions__share">
+          <span>Share:</span>
+          <BrandButton
+            type="button"
+            variant="social"
+            size="small"
+            leadingIcon={
+              <Image
+                src="/assets/shop/product-instagram.svg"
+                alt=""
+                width={20.16}
+                height={20.16}
+              />
+            }
+            aria-label="Share on Instagram"
+            onClick={copyProductLink}
+          />
+          <BrandButton
+            type="button"
+            variant="social"
+            size="small"
+            leadingIcon={
+              <Image
+                src="/assets/shop/product-facebook.svg"
+                alt=""
+                width={20.16}
+                height={20.16}
+              />
+            }
+            aria-label="Share on Facebook"
+            onClick={() =>
+              window.open(
+                `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                  window.location.href
+                )}`,
+                "_blank",
+                "noopener,noreferrer"
+              )
+            }
+          />
+          <BrandButton
+            type="button"
+            variant="social"
+            size="small"
+            leadingIcon={
+              <Image
+                src="/assets/shop/product-x.svg"
+                alt=""
+                width={20.16}
+                height={20.16}
+              />
+            }
+            aria-label="Share on X"
+            onClick={() =>
+              window.open(
+                `https://twitter.com/intent/tweet?url=${encodeURIComponent(
+                  window.location.href
+                )}&text=${encodeURIComponent(product.title || "")}`,
+                "_blank",
+                "noopener,noreferrer"
+              )
+            }
+          />
+          <BrandButton
+            type="button"
+            variant="social"
+            size="small"
+            leadingIcon={
+              <Image
+                src="/assets/shop/product-share.svg"
+                alt=""
+                width={20.16}
+                height={20.16}
+              />
+            }
+            aria-label="Share product"
+            onClick={shareProduct}
+          />
+        </div>
       </div>
     </>
   )
