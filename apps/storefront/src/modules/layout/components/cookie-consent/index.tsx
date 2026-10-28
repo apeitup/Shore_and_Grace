@@ -5,8 +5,9 @@ import { NavArrowLeft } from "iconoir-react"
 import { useCallback, useEffect, useState } from "react"
 
 export const COOKIE_CONSENT_EVENT = "sg:open-cookie-preferences"
+export const COOKIE_CONSENT_CHANGED_EVENT = "sg:cookie-consent-changed"
 const COOKIE_NAME = "sg_cookie_consent"
-const CONSENT_VERSION = 1
+const CONSENT_VERSION = 2
 
 export type CookieConsent = {
   version: number
@@ -45,6 +46,8 @@ const readConsent = (): CookieConsent | null => {
 export const hasPersonalisationConsent = () =>
   readConsent()?.personalisation === true
 
+export const hasAnalyticsConsent = () => readConsent()?.analytics === true
+
 const writeConsent = (optional: OptionalConsent) => {
   const consent: CookieConsent = {
     version: CONSENT_VERSION,
@@ -54,10 +57,10 @@ const writeConsent = (optional: OptionalConsent) => {
   }
   const secure = window.location.protocol === "https:" ? "; Secure" : ""
   document.cookie = `${COOKIE_NAME}=${encodeURIComponent(
-    JSON.stringify(consent)
+    JSON.stringify(consent),
   )}; Path=/; Max-Age=15552000; SameSite=Lax${secure}`
   document.documentElement.dataset.cookiePersonalisation = String(
-    consent.personalisation
+    consent.personalisation,
   )
   document.documentElement.dataset.cookieAnalytics = String(consent.analytics)
   document.documentElement.dataset.cookieMarketing = String(consent.marketing)
@@ -65,7 +68,7 @@ const writeConsent = (optional: OptionalConsent) => {
     window.localStorage.removeItem("sg-recently-viewed-products")
   }
   window.dispatchEvent(
-    new CustomEvent("sg:cookie-consent-changed", { detail: consent })
+    new CustomEvent(COOKIE_CONSENT_CHANGED_EVENT, { detail: consent }),
   )
 }
 
@@ -111,7 +114,7 @@ export default function CookieConsentModal() {
             analytics: saved.analytics,
             marketing: saved.marketing,
           }
-        : optionalDefaults
+        : optionalDefaults,
     )
     setView("preferences")
     setOpen(true)
@@ -130,7 +133,7 @@ export default function CookieConsentModal() {
         })
       }, 0)
       document.documentElement.dataset.cookiePersonalisation = String(
-        saved.personalisation
+        saved.personalisation,
       )
       document.documentElement.dataset.cookieAnalytics = String(saved.analytics)
       document.documentElement.dataset.cookieMarketing = String(saved.marketing)
@@ -215,9 +218,13 @@ export default function CookieConsentModal() {
               Manage preferences
             </button>
             <div className="sg-cookie-modal__policy-links">
-              <LocalizedClientLink href="/privacy">Cookie Policy</LocalizedClientLink>
+              <LocalizedClientLink href="/cookies">
+                Cookie Policy
+              </LocalizedClientLink>
               <span aria-hidden="true">·</span>
-              <LocalizedClientLink href="/privacy">Privacy Policy</LocalizedClientLink>
+              <LocalizedClientLink href="/privacy">
+                Privacy Policy
+              </LocalizedClientLink>
             </div>
           </>
         ) : (
@@ -243,7 +250,11 @@ export default function CookieConsentModal() {
                   <strong>Essential cookies</strong>
                   <span>Required for baskets, checkout and security.</span>
                 </div>
-                <ConsentSwitch checked disabled label="Essential cookies always on" />
+                <ConsentSwitch
+                  checked
+                  disabled
+                  label="Essential cookies always on"
+                />
               </div>
               {(
                 [

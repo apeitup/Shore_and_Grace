@@ -9,6 +9,7 @@ import "@fontsource/montserrat/latin-600.css"
 import "@fontsource/montserrat/latin-700.css"
 import "@fontsource/montserrat/latin-900.css"
 import "styles/globals.css"
+import PostHogConsent from "@modules/analytics/components/posthog-consent"
 import CookieConsentModal from "@modules/layout/components/cookie-consent"
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
       <body className="bg-white text-sg-ink">
         <main className="relative">{props.children}</main>
         <CookieConsentModal />
+        <PostHogConsent />
       </body>
     </html>
   )

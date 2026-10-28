@@ -2,6 +2,7 @@ import BrandButton from "@modules/brand/components/button"
 import BrandSignature from "@modules/brand/components/brand-signature"
 import BrandTextInput from "@modules/brand/components/text-input"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import CookieSettingsButton from "@modules/layout/components/cookie-settings-button"
 import Image from "next/image"
 
 const socialLinks = [
@@ -137,9 +138,10 @@ export default function Footer() {
             <LocalizedClientLink href="/privacy">
               Privacy Policy
             </LocalizedClientLink>
-            <LocalizedClientLink href="/privacy">
+            <LocalizedClientLink href="/cookies">
               Cookie Policy
             </LocalizedClientLink>
+            <CookieSettingsButton className="sg-footer__cookie-settings" />
           </div>
         </div>
       </div>

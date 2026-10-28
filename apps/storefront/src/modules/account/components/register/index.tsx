@@ -98,11 +98,11 @@ const Register = ({ setCurrentView }: Props) => {
         </AuthSubmitButton>
         <p className="sg-auth-terms">
           By creating an account, you agree to our{" "}
-          <LocalizedClientLink href="/content/terms-of-use">
+          <LocalizedClientLink href="/terms">
             Terms &amp; Conditions
           </LocalizedClientLink>{" "}
           and{" "}
-          <LocalizedClientLink href="/content/privacy-policy">
+          <LocalizedClientLink href="/privacy">
             Privacy Policy
           </LocalizedClientLink>
           .

@@ -2,21 +2,32 @@ import { convertToLocale } from "@lib/util/money"
 import { formatDayRange, StorePolicies } from "@lib/util/store-policies"
 
 export const formatShippingRate = (rate: number, currencyCode: string) =>
-  rate === 0 ? "Free" : convertToLocale({ amount: rate, currency_code: currencyCode })
+  rate === 0
+    ? "Free"
+    : convertToLocale({ amount: rate, currency_code: currencyCode })
 
 export const PolicyPage = ({
   title,
+  eyebrow,
+  updated,
   children,
 }: {
   title: string
+  eyebrow?: string
+  updated?: string
   children: React.ReactNode
 }) => (
-  <div className="content-container py-12 max-w-3xl" data-testid="policy-page">
-    <h1 className="text-2xl-semi mb-8">{title}</h1>
-    <div className="flex flex-col gap-6 text-base-regular text-ui-fg-base">
-      {children}
-    </div>
-  </div>
+  <article
+    className="content-container sg-policy-page"
+    data-testid="policy-page"
+  >
+    {eyebrow && <p className="sg-policy-page__eyebrow">{eyebrow}</p>}
+    <h1>{title}</h1>
+    {updated && (
+      <p className="sg-policy-page__updated">Last updated {updated}</p>
+    )}
+    <div className="sg-policy-page__content">{children}</div>
+  </article>
 )
 
 export const PoliciesUnavailable = () => (

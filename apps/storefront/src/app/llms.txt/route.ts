@@ -54,6 +54,7 @@ ${links.join("\n")}
 - [Return policy](${base}/returns)
 - [Terms of service](${base}/terms)
 - [Privacy policy](${base}/privacy)
+- [Cookie policy](${base}/cookies)
 - [Contact](${base}/contact)
 
 ## For agents
