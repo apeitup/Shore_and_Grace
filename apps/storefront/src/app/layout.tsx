@@ -22,7 +22,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
       <head>
         <link rel="ucp" href="/.well-known/ucp" />
       </head>
-      <body className="bg-white text-sg-ink">
+      <body suppressHydrationWarning className="bg-white text-sg-ink">
         <main className="relative">{props.children}</main>
         <CookieConsentModal />
         <PostHogConsent />

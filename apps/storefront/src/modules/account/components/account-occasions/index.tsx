@@ -10,7 +10,8 @@ import {
 } from "@lib/data/occasions"
 import NativeSelect from "@modules/common/components/native-select"
 import MobileCheckbox from "@modules/common/components/mobile-checkbox"
-import { EditPencil, Plus, Trash, Xmark } from "iconoir-react"
+import BrandButton from "@modules/brand/components/button"
+import { Plus, Trash, Xmark } from "iconoir-react"
 import {
   FormEvent,
   useCallback,
@@ -227,7 +228,7 @@ export default function AccountOccasions({
           onClick={() => openEditor(emptyForm)}
         >
           <Plus />
-          <span className="sg-occasion-add__desktop">Add a date</span>
+          <span className="sg-occasion-add__desktop">Add</span>
           <span className="sg-occasion-add__mobile">Add a memorable date</span>
         </button>
       </header>
@@ -378,8 +379,8 @@ export default function AccountOccasions({
                 </span>
               </div>
               <div className="sg-occasion-actions">
-                <button
-                  type="button"
+                <BrandButton
+                  variant="tertiary"
                   onClick={() =>
                     openEditor({
                       id: item.id,
@@ -391,8 +392,8 @@ export default function AccountOccasions({
                     })
                   }
                 >
-                  <EditPencil /> <span>Edit</span>
-                </button>
+                  Edit
+                </BrandButton>
                 <button
                   type="button"
                   aria-label={`Delete ${item.name}`}

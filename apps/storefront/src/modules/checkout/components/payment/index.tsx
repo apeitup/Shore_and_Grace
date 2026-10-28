@@ -8,6 +8,7 @@ import PaymentContainer, {
   StripePaymentDetails,
 } from "@modules/checkout/components/payment-container"
 import CartTotals from "@modules/common/components/cart-totals"
+import Input from "@modules/common/components/input"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import NativeSelect from "@modules/common/components/native-select"
 import { Button, Heading } from "@modules/common/components/ui"
@@ -211,26 +212,49 @@ const Payment = ({
               Billing address is the same as the recipient&apos;s delivery address
             </label>
             <div className="sg-checkout-billing-grid">
-              <label className="sg-checkout-payment-field">
-                <span>Address line 1</span>
-                <input name="address_1" autoComplete="billing address-line1" value={billing.address_1} onChange={updateBillingField} required />
-              </label>
-              <label className="sg-checkout-payment-field">
-                <span>Address line 2</span>
-                <input name="address_2" autoComplete="billing address-line2" value={billing.address_2} onChange={updateBillingField} />
-              </label>
-              <label className="sg-checkout-payment-field">
-                <span>Town or city</span>
-                <input name="city" autoComplete="billing address-level2" value={billing.city} onChange={updateBillingField} required />
-              </label>
-              <label className="sg-checkout-payment-field">
-                <span>County</span>
-                <input name="province" autoComplete="billing address-level1" value={billing.province} onChange={updateBillingField} />
-              </label>
-              <label className="sg-checkout-payment-field">
-                <span>Postcode</span>
-                <input name="postal_code" autoComplete="billing postal-code" value={billing.postal_code} onChange={updateBillingField} required />
-              </label>
+              <Input
+                label="Address line 1"
+                wrapperClassName="sg-checkout-payment-field"
+                name="address_1"
+                autoComplete="billing address-line1"
+                value={billing.address_1}
+                onChange={updateBillingField}
+                required
+              />
+              <Input
+                label="Address line 2"
+                wrapperClassName="sg-checkout-payment-field"
+                name="address_2"
+                autoComplete="billing address-line2"
+                value={billing.address_2}
+                onChange={updateBillingField}
+              />
+              <Input
+                label="Town or city"
+                wrapperClassName="sg-checkout-payment-field"
+                name="city"
+                autoComplete="billing address-level2"
+                value={billing.city}
+                onChange={updateBillingField}
+                required
+              />
+              <Input
+                label="County"
+                wrapperClassName="sg-checkout-payment-field"
+                name="province"
+                autoComplete="billing address-level1"
+                value={billing.province}
+                onChange={updateBillingField}
+              />
+              <Input
+                label="Postcode"
+                wrapperClassName="sg-checkout-payment-field"
+                name="postal_code"
+                autoComplete="billing postal-code"
+                value={billing.postal_code}
+                onChange={updateBillingField}
+                required
+              />
               <NativeSelect
                 label="Country"
                 wrapperClassName="sg-checkout-payment-field"

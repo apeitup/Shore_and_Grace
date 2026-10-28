@@ -2,6 +2,7 @@
 
 import { updateCustomer } from "@lib/data/customer"
 import { HttpTypes } from "@medusajs/types"
+import Input from "@modules/common/components/input"
 import NativeSelect from "@modules/common/components/native-select"
 import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
@@ -43,10 +44,33 @@ export default function AccountDetailsForm({ customer }: { customer: HttpTypes.S
         <SaveButton />
       </header>
       <div className="sg-account-form-grid">
-        <label><span>First name *</span><input name="first_name" defaultValue={customer.first_name || ""} required autoComplete="given-name" /></label>
-        <label><span>Last name *</span><input name="last_name" defaultValue={customer.last_name || ""} required autoComplete="family-name" /></label>
-        <label><span>Email address</span><input value={customer.email} readOnly autoComplete="email" /></label>
-        <label><span>Phone number</span><input name="phone" defaultValue={customer.phone || ""} autoComplete="tel" /></label>
+        <Input
+          label="First name"
+          name="first_name"
+          defaultValue={customer.first_name || ""}
+          required
+          autoComplete="given-name"
+        />
+        <Input
+          label="Last name"
+          name="last_name"
+          defaultValue={customer.last_name || ""}
+          required
+          autoComplete="family-name"
+        />
+        <Input
+          label="Email address"
+          name="email"
+          value={customer.email}
+          readOnly
+          autoComplete="email"
+        />
+        <Input
+          label="Phone number"
+          name="phone"
+          defaultValue={customer.phone || ""}
+          autoComplete="tel"
+        />
         <NativeSelect
           label="Billing address"
           wrapperClassName="sg-account-form-grid__wide"

@@ -1,4 +1,6 @@
-import React from "react"
+"use client"
+
+import React, { useState } from "react"
 
 import AddAddress from "../address-card/add-address"
 import EditAddress from "../address-card/edit-address-modal"
@@ -11,13 +13,30 @@ type AddressBookProps = {
 
 const AddressBook: React.FC<AddressBookProps> = ({ customer, region }) => {
   const { addresses } = customer
+  const [activeEditor, setActiveEditor] = useState<string | null>(null)
+
   return (
     <div className="sg-address-book">
+      <AddAddress
+        region={region}
+        count={addresses.length}
+        isOpen={activeEditor === "add"}
+        editorActive={activeEditor !== null}
+        onOpen={() => setActiveEditor("add")}
+        onClose={() => setActiveEditor(null)}
+      />
       <div className="sg-address-book__grid">
-        <AddAddress region={region} addresses={addresses} />
         {addresses.map((address) => {
           return (
-            <EditAddress region={region} address={address} key={address.id} />
+            <EditAddress
+              region={region}
+              address={address}
+              key={address.id}
+              isOpen={activeEditor === address.id}
+              editorActive={activeEditor !== null}
+              onOpen={() => setActiveEditor(address.id)}
+              onClose={() => setActiveEditor(null)}
+            />
           )
         })}
       </div>

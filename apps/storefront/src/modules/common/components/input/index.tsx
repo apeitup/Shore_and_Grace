@@ -1,82 +1,141 @@
-import { Label } from "@modules/common/components/ui"
-import React, { useEffect, useImperativeHandle, useState } from "react"
+"use client"
 
-import Eye from "@modules/common/icons/eye"
-import EyeOff from "@modules/common/icons/eye-off"
+import {
+  Check,
+  Eye,
+  EyeClosed,
+  InfoCircle,
+  WarningTriangle,
+} from "iconoir-react"
+import React, {
+  ReactNode,
+  useId,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react"
 
 type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> & {
   label: string
+  name: string
   errors?: Record<string, unknown>
   touched?: Record<string, unknown>
-  name: string
+  error?: string
+  helperText?: string
+  validated?: boolean
+  leadingIcon?: ReactNode
+  trailingIcon?: ReactNode
+  wrapperClassName?: string
   topLabel?: string
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     {
-      type,
+      type = "text",
       id,
       name,
       label,
-      touched: _touched,
-      required,
+      errors,
+      touched,
+      error,
+      helperText,
+      validated = false,
+      leadingIcon,
+      trailingIcon,
+      wrapperClassName = "",
       topLabel,
+      required,
+      disabled,
+      readOnly,
+      className = "",
+      "aria-describedby": ariaDescribedBy,
       ...props
     },
     ref
   ) => {
-    const inputRef = React.useRef<HTMLInputElement>(null)
-    const inputId = id ?? name
+    const generatedId = useId()
+    const inputRef = useRef<HTMLInputElement>(null)
     const [showPassword, setShowPassword] = useState(false)
-    const [inputType, setInputType] = useState(type)
-
-    useEffect(() => {
-      if (type === "password" && showPassword) {
-        setInputType("text")
-      }
-
-      if (type === "password" && !showPassword) {
-        setInputType("password")
-      }
-    }, [type, showPassword])
+    const inputId = id ?? `sg-input-${generatedId.replace(/:/g, "")}`
+    const labelText = topLabel ?? label
+    const fieldError = errors?.[name]
+    const wasTouched = touched ? Boolean(touched[name]) : true
+    const resolvedError =
+      error ?? (wasTouched && typeof fieldError === "string" ? fieldError : undefined)
+    const errorId = resolvedError ? `${inputId}-error` : undefined
+    const helperId = helperText && !resolvedError ? `${inputId}-helper` : undefined
+    const describedBy =
+      [ariaDescribedBy, errorId, helperId].filter(Boolean).join(" ") || undefined
+    const inputType = type === "password" && showPassword ? "text" : type
 
     useImperativeHandle(ref, () => inputRef.current!)
 
     return (
-      <div className="flex flex-col w-full">
-        {topLabel && (
-          <Label className="mb-2 txt-compact-medium-plus">{topLabel}</Label>
-        )}
-        <div className="flex relative z-0 w-full txt-compact-medium">
+      <div
+        className={`sg-input-field ${wrapperClassName}`.trim()}
+        data-error={resolvedError ? "true" : undefined}
+        data-validated={validated && !resolvedError ? "true" : undefined}
+        data-read-only={readOnly ? "true" : undefined}
+      >
+        <label className="sg-input-field__label" htmlFor={inputId}>
+          {labelText}
+          {required && <span aria-hidden="true">*</span>}
+        </label>
+
+        <div className="sg-input-field__control">
+          {leadingIcon && (
+            <span className="sg-input-field__leading" aria-hidden="true">
+              {leadingIcon}
+            </span>
+          )}
           <input
-            id={inputId}
-            type={inputType}
-            name={name}
-            placeholder=" "
-            required={required}
-            className="pt-4 pb-1 block w-full h-11 px-4 mt-0 bg-ui-bg-field border rounded-md appearance-none focus:outline-none focus:ring-0 focus:shadow-borders-interactive-with-active border-ui-border-base hover:bg-ui-bg-field-hover"
             {...props}
             ref={inputRef}
+            id={inputId}
+            name={name}
+            type={inputType}
+            required={required}
+            disabled={disabled}
+            readOnly={readOnly}
+            className={`sg-input-field__input ${className}`.trim()}
+            aria-invalid={resolvedError ? "true" : undefined}
+            aria-describedby={describedBy}
           />
-          <label
-            htmlFor={inputId}
-            onClick={() => inputRef.current?.focus()}
-            className="flex items-center justify-center mx-3 px-1 transition-all absolute duration-300 top-3 -z-1 origin-0 text-ui-fg-subtle"
-          >
-            {label}
-            {required && <span className="text-rose-500">*</span>}
-          </label>
+          {validated && !resolvedError && (
+            <span className="sg-input-field__validated" aria-hidden="true">
+              <Check />
+            </span>
+          )}
+          {trailingIcon && !validated && (
+            <span className="sg-input-field__trailing" aria-hidden="true">
+              {trailingIcon}
+            </span>
+          )}
           {type === "password" && (
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="text-ui-fg-subtle px-4 focus:outline-none transition-all duration-150 outline-none focus:text-ui-fg-base absolute right-0 top-3"
+              className="sg-input-field__action"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              onClick={() => setShowPassword((visible) => !visible)}
             >
-              {showPassword ? <Eye /> : <EyeOff />}
+              {showPassword ? <EyeClosed /> : <Eye />}
             </button>
           )}
         </div>
+
+        {resolvedError && (
+          <p className="sg-input-field__error" id={errorId}>
+            <WarningTriangle aria-hidden="true" />
+            {resolvedError}
+          </p>
+        )}
+        {helperText && !resolvedError && (
+          <p className="sg-input-field__helper" id={helperId}>
+            <InfoCircle aria-hidden="true" />
+            {helperText}
+          </p>
+        )}
       </div>
     )
   }

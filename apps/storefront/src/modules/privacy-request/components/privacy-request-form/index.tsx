@@ -6,6 +6,7 @@ import {
   submitPrivacyRequest,
 } from "@lib/data/privacy-requests"
 import BrandButton from "@modules/brand/components/button"
+import Input from "@modules/common/components/input"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import NativeSelect from "@modules/common/components/native-select"
 import { FormEvent, useState } from "react"
@@ -124,41 +125,36 @@ export default function PrivacyRequestForm({
             </option>
           ))}
         </NativeSelect>
-        <label>
-          <span>Full name *</span>
-          <input
-            name="name"
-            autoComplete="name"
-            required
-            maxLength={160}
-            defaultValue={initialValues?.name}
-          />
-        </label>
-        <label>
-          <span>Email address *</span>
-          <input
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            maxLength={320}
-            defaultValue={initialValues?.email}
-          />
-        </label>
-        <label>
-          <span>Phone number</span>
-          <input
-            name="phone"
-            type="tel"
-            autoComplete="tel"
-            maxLength={50}
-            defaultValue={initialValues?.phone}
-          />
-        </label>
-        <label>
-          <span>Order number or reference</span>
-          <input name="order_reference" maxLength={120} />
-        </label>
+        <Input
+          label="Full name"
+          name="name"
+          autoComplete="name"
+          required
+          maxLength={160}
+          defaultValue={initialValues?.name}
+        />
+        <Input
+          label="Email address"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          maxLength={320}
+          defaultValue={initialValues?.email}
+        />
+        <Input
+          label="Phone number"
+          name="phone"
+          type="tel"
+          autoComplete="tel"
+          maxLength={50}
+          defaultValue={initialValues?.phone}
+        />
+        <Input
+          label="Order number or reference"
+          name="order_reference"
+          maxLength={120}
+        />
         <label className="sg-privacy-request__wide">
           <span>Tell us what information or action your request relates to</span>
           <textarea name="details" rows={6} maxLength={5000} />

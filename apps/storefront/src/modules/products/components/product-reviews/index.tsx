@@ -2,6 +2,7 @@
 
 import BrandButton from "@modules/brand/components/button"
 import { addProductReview, getProductReviews } from "@lib/data/products"
+import Input from "@modules/common/components/input"
 import Image from "next/image"
 import { FormEvent, useEffect, useState } from "react"
 import { StoreProductReview } from "types/global"
@@ -162,30 +163,26 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
           </fieldset>
 
           <div className="sg-product-review-form__fields">
-            <label>
-              <span>Name *</span>
-              <input
-                type="text"
-                name="name"
-                autoComplete="name"
-                maxLength={120}
-                required
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-              />
-            </label>
-            <label>
-              <span>Email *</span>
-              <input
-                type="email"
-                name="email"
-                autoComplete="email"
-                maxLength={320}
-                required
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-            </label>
+            <Input
+              label="Name"
+              type="text"
+              name="name"
+              autoComplete="name"
+              maxLength={120}
+              required
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+            />
+            <Input
+              label="Email"
+              type="email"
+              name="email"
+              autoComplete="email"
+              maxLength={320}
+              required
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
           </div>
 
           <label>

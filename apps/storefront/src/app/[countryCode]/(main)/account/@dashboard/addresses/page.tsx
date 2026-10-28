@@ -25,9 +25,6 @@ export default async function Addresses(props: {
 
   return (
     <section className="sg-account-panel sg-account-addresses" data-testid="addresses-page-wrapper">
-      <header className="sg-account-panel__header">
-        <div><h1>Your Addresses</h1><p>{customer.addresses?.length || 0} items</p></div>
-      </header>
       <AddressBook customer={customer} region={region} />
     </section>
   )
