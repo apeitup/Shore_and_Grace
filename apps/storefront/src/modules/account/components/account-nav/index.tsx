@@ -17,7 +17,7 @@ const accountLinks = [
   { href: "/account/settings", label: "Settings", testId: "settings-link", desktopOnly: false },
 ]
 
-const AccountNav = () => {
+const AccountNav = ({ onNavigate }: { onNavigate: (href: string) => void }) => {
   const route = usePathname()
   const { countryCode } = useParams() as { countryCode: string }
 
@@ -36,7 +36,12 @@ const AccountNav = () => {
       <ul>
         {accountLinks.map((link) => (
           <li key={link.href} className={clx({ "sg-account-nav__desktop-only": link.desktopOnly })}>
-            <AccountNavLink href={link.href} route={route!} data-testid={link.testId}>
+            <AccountNavLink
+              href={link.href}
+              route={route!}
+              onNavigate={onNavigate}
+              data-testid={link.testId}
+            >
               {link.label}
             </AccountNavLink>
           </li>
@@ -53,6 +58,7 @@ type AccountNavLinkProps = {
   href: string
   route: string
   children: React.ReactNode
+  onNavigate: (href: string) => void
   "data-testid"?: string
 }
 
@@ -60,6 +66,7 @@ const AccountNavLink = ({
   href,
   route,
   children,
+  onNavigate,
   "data-testid": dataTestId,
 }: AccountNavLinkProps) => {
   const { countryCode }: { countryCode: string } = useParams()
@@ -68,10 +75,33 @@ const AccountNavLink = ({
   const active = href === "/account"
     ? localRoute === href
     : localRoute === href || localRoute.startsWith(`${href}/`)
+
+  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return
+    }
+
+    event.preventDefault()
+
+    if (active) {
+      return
+    }
+
+    onNavigate(`/${countryCode}${href}`)
+  }
+
   return (
     <LocalizedClientLink
       href={href}
       className={clx({ "is-active": active })}
+      onClick={handleClick}
       data-testid={dataTestId}
     >
       {children}

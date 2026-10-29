@@ -100,6 +100,15 @@ const WishlistItem = ({ product }: WishlistItemProps) => {
         {inStock ? "In stock" : "Out of stock"}
       </p>
 
+      <div className="sg-wishlist-item__view">
+        <BrandButton
+          href={`/products/${product.handle}`}
+          variant="secondary"
+        >
+          VIEW
+        </BrandButton>
+      </div>
+
       <div className="sg-wishlist-item__add">
         <BrandButton
           className="sg-wishlist-item__add-button"

@@ -36,5 +36,36 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/privacy-request",
     },
+    {
+      resolve: "./src/modules/contact-enquiry",
+    },
+    {
+      resolve: "@medusajs/medusa/notification",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/medusa/notification-local",
+            id: "local",
+            options: {
+              channels: ["feed"],
+            },
+          },
+          {
+            resolve: "./src/modules/smtp-notification",
+            id: "smtp",
+            options: {
+              channels: ["email"],
+              host: process.env.SMTP_HOST,
+              port: process.env.SMTP_PORT || "465",
+              secure: process.env.SMTP_SECURE || "true",
+              user: process.env.SMTP_USER,
+              password: process.env.SMTP_PASSWORD,
+              from: process.env.NOTIFICATION_FROM_EMAIL,
+              from_name: "Shore & Grace",
+            },
+          },
+        ],
+      },
+    },
   ],
 })

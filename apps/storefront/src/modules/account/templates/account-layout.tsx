@@ -1,4 +1,7 @@
-import React from "react"
+"use client"
+
+import React, { useTransition } from "react"
+import { useRouter } from "next/navigation"
 
 import AccountNav from "../components/account-nav"
 import { HttpTypes } from "@medusajs/types"
@@ -13,8 +16,15 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
   customer,
   children,
 }) => {
+  const router = useRouter()
+  const [isNavigating, startNavigation] = useTransition()
+
   if (!customer) {
     return <>{children}</>
+  }
+
+  const navigate = (href: string) => {
+    startNavigation(() => router.push(href))
   }
 
   return (
@@ -26,8 +36,26 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
           <p>Manage your orders, saved flowers and account details.</p>
         </header>
         <div className="sg-account-layout">
-          <AccountNav />
-          <div className="sg-account-main">{children}</div>
+          <AccountNav onNavigate={navigate} />
+          <div className="sg-account-main" aria-busy={isNavigating}>
+            <div
+              className={`sg-account-main__content${
+                isNavigating ? " is-navigating" : ""
+              }`}
+            >
+              {children}
+            </div>
+            {isNavigating && (
+              <div
+                className="sg-account-navigation-status"
+                role="status"
+                aria-live="polite"
+              >
+                <span className="sg-account-navigation-status__spinner" />
+                <span>Loading…</span>
+              </div>
+            )}
+          </div>
         </div>
       </section>
     </main>

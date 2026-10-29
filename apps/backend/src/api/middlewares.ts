@@ -24,6 +24,10 @@ import { PostCustomerPreferencesSchema } from "./store/customer-preferences/rout
 import { PostStorePrivacyRequestSchema } from "./store/privacy-requests/route"
 import { GetAdminPrivacyRequestsSchema } from "./admin/privacy-requests/route"
 import { PostAdminPrivacyRequestSchema } from "./admin/privacy-requests/[id]/route"
+import { GetAdminContactEnquiriesSchema } from "./admin/contact-enquiries/route"
+import { PostAdminContactEnquirySchema } from "./admin/contact-enquiries/[id]/route"
+import { PostStoreContactEnquirySchema } from "./store/contact-enquiries/route"
+import { contactRateLimit } from "./utils/contact-rate-limit"
 
 // The product index declares filterable `status` and `sales_channel_ids`, so
 // the route narrows it to published products in the key's sales channels.
@@ -110,6 +114,14 @@ export default defineMiddlewares({
       matcher: "/store/privacy-requests",
       methods: ["POST"],
       middlewares: [validateAndTransformBody(PostStorePrivacyRequestSchema)],
+    },
+    {
+      matcher: "/store/contact-enquiries",
+      methods: ["POST"],
+      middlewares: [
+        validateAndTransformBody(PostStoreContactEnquirySchema),
+        contactRateLimit,
+      ],
     },
     {
       matcher: "/store/occasions",
@@ -218,6 +230,37 @@ export default defineMiddlewares({
       matcher: "/admin/privacy-requests/:id",
       methods: ["POST"],
       middlewares: [validateAndTransformBody(PostAdminPrivacyRequestSchema)],
+    },
+    {
+      matcher: "/admin/contact-enquiries",
+      methods: ["GET"],
+      middlewares: [
+        validateAndTransformQuery(GetAdminContactEnquiriesSchema, {
+          isList: true,
+          defaults: [
+            "id",
+            "reference",
+            "name",
+            "email",
+            "phone",
+            "order_reference",
+            "category",
+            "message",
+            "status",
+            "internal_notes",
+            "resolved_at",
+            "retained_until",
+            "privacy_notice_version",
+            "created_at",
+            "updated_at",
+          ],
+        }),
+      ],
+    },
+    {
+      matcher: "/admin/contact-enquiries/:id",
+      methods: ["POST"],
+      middlewares: [validateAndTransformBody(PostAdminContactEnquirySchema)],
     },
   ],
 })
