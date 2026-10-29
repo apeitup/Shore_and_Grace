@@ -6,6 +6,7 @@ import { HttpTypes } from "@medusajs/types"
 import { FetchError } from "@medusajs/js-sdk"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
+import { cache } from "react"
 import {
   getAuthHeaders,
   getCacheOptions,
@@ -40,7 +41,7 @@ async function requestVerificationEmail(email: string, token: string) {
   )
 }
 
-export const retrieveCustomer =
+const retrieveCustomerCached = cache(
   async (): Promise<HttpTypes.StoreCustomer | null> => {
     const authHeaders = await getAuthHeaders()
 
@@ -66,7 +67,10 @@ export const retrieveCustomer =
       })
       .then(({ customer }) => customer)
       .catch(() => null)
-  }
+  },
+)
+
+export const retrieveCustomer = async () => retrieveCustomerCached()
 
 export const updateCustomer = async (body: HttpTypes.StoreUpdateCustomer) => {
   const headers = {
@@ -288,11 +292,14 @@ export const addCustomerAddress = async (
   currentState: Record<string, unknown>,
   formData: FormData,
 ): Promise<{ success: boolean; error: string | null }> => {
-  const setAsDefault = formData.get("set_as_default") === "on"
   const isDefaultBilling =
-    setAsDefault || (currentState.isDefaultBilling as boolean) || false
+    formData.get("set_as_default_billing") === "on" ||
+    (currentState.isDefaultBilling as boolean) ||
+    false
   const isDefaultShipping =
-    setAsDefault || (currentState.isDefaultShipping as boolean) || false
+    formData.get("set_as_default_shipping") === "on" ||
+    (currentState.isDefaultShipping as boolean) ||
+    false
 
   const address = {
     first_name: formData.get("first_name") as string,
@@ -365,8 +372,8 @@ export const updateCustomerAddress = async (
     postal_code: formData.get("postal_code") as string,
     province: formData.get("province") as string,
     country_code: formData.get("country_code") as string,
-    is_default_billing: formData.get("set_as_default") === "on",
-    is_default_shipping: formData.get("set_as_default") === "on",
+    is_default_billing: formData.get("set_as_default_billing") === "on",
+    is_default_shipping: formData.get("set_as_default_shipping") === "on",
   } as HttpTypes.StoreUpdateCustomerAddress
 
   const phone = formData.get("phone") as string

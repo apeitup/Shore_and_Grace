@@ -23,7 +23,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <link rel="ucp" href="/.well-known/ucp" />
       </head>
       <body suppressHydrationWarning className="bg-white text-sg-ink">
-        <main className="relative">{props.children}</main>
+        <main className="relative sg-site-shell">{props.children}</main>
         <CookieConsentModal />
         <PostHogConsent />
       </body>

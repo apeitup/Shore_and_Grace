@@ -9,11 +9,18 @@ import { HttpTypes } from "@medusajs/types"
 type AddressBookProps = {
   customer: HttpTypes.StoreCustomer
   region: HttpTypes.StoreRegion
+  startAdding?: boolean
 }
 
-const AddressBook: React.FC<AddressBookProps> = ({ customer, region }) => {
+const AddressBook: React.FC<AddressBookProps> = ({
+  customer,
+  region,
+  startAdding = false,
+}) => {
   const { addresses } = customer
-  const [activeEditor, setActiveEditor] = useState<string | null>(null)
+  const [activeEditor, setActiveEditor] = useState<string | null>(
+    startAdding ? "add" : null
+  )
 
   return (
     <div className="sg-address-book">

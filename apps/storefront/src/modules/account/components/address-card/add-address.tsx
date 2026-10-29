@@ -29,7 +29,8 @@ const AddAddress = ({
   onOpen,
 }: AddAddressProps) => {
   const [successState, setSuccessState] = useState(false)
-  const [setAsDefault, setSetAsDefault] = useState(false)
+  const [setAsDefaultBilling, setSetAsDefaultBilling] = useState(false)
+  const [setAsDefaultShipping, setSetAsDefaultShipping] = useState(false)
   const isMobile = useMobileViewport()
   const [formState, formAction] = useActionState(addCustomerAddress, {
     success: false,
@@ -38,7 +39,8 @@ const AddAddress = ({
 
   const close = () => {
     setSuccessState(false)
-    setSetAsDefault(false)
+    setSetAsDefaultBilling(false)
+    setSetAsDefaultShipping(false)
     onClose()
   }
 
@@ -54,20 +56,20 @@ const AddAddress = ({
   const form = (
     <form action={formAction} className="sg-address-form">
       <AddressFormFields region={region} />
-      {isMobile ? (
+      <div className="sg-address-form__defaults">
         <MobileCheckbox
-          checked={setAsDefault}
-          label="Set as default"
-          name="set_as_default"
-          onChange={(event) => setSetAsDefault(event.target.checked)}
+          checked={setAsDefaultBilling}
+          label="Use as default billing address"
+          name="set_as_default_billing"
+          onChange={(event) => setSetAsDefaultBilling(event.target.checked)}
         />
-      ) : (
-        <label className="sg-address-form__default">
-          <input type="checkbox" name="set_as_default" />
-          <span aria-hidden="true" />
-          Set as default
-        </label>
-      )}
+        <MobileCheckbox
+          checked={setAsDefaultShipping}
+          label="Use as default delivery address"
+          name="set_as_default_shipping"
+          onChange={(event) => setSetAsDefaultShipping(event.target.checked)}
+        />
+      </div>
       {formState.error && (
         <div className="text-rose-500 text-small-regular py-2" data-testid="address-error">
           {formState.error}

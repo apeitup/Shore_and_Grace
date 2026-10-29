@@ -7,9 +7,11 @@ import { notFound } from "next/navigation"
 
 export default async function WishlistPage({ params }: { params: Promise<{ countryCode: string }> }) {
   const { countryCode } = await params
-  const customer = await retrieveCustomer()
+  const [customer, items] = await Promise.all([
+    retrieveCustomer(),
+    listWishlist(),
+  ])
   if (!customer) notFound()
-  const items = await listWishlist()
   const productIds = items.map((item) => item.product_id)
   const products = productIds.length
     ? await listProducts({ countryCode, queryParams: { id: productIds, limit: productIds.length } }).then(({ response }) => response.products)

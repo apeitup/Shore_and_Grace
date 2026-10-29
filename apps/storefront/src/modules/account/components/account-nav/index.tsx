@@ -7,13 +7,14 @@ import { signout } from "@lib/data/customer"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 const accountLinks = [
-  { href: "/account/orders", label: "Orders", testId: "orders-link" },
-  { href: "/account/wishlist", label: "Wishlist", testId: "wishlist-link" },
-  { href: "/account/addresses", label: "Addresses", testId: "addresses-link" },
-  { href: "/account/occasions", label: "Dates & occasions", testId: "occasions-link" },
-  { href: "/account/profile", label: "Account details", testId: "profile-link" },
-  { href: "/account/notifications", label: "Notifications", testId: "notifications-link" },
-  { href: "/account/settings", label: "Settings", testId: "settings-link" },
+  { href: "/account", label: "Overview", testId: "overview-link", desktopOnly: true },
+  { href: "/account/orders", label: "Orders", testId: "orders-link", desktopOnly: false },
+  { href: "/account/wishlist", label: "Wishlist", testId: "wishlist-link", desktopOnly: false },
+  { href: "/account/addresses", label: "Addresses", testId: "addresses-link", desktopOnly: false },
+  { href: "/account/occasions", label: "Dates & occasions", testId: "occasions-link", desktopOnly: false },
+  { href: "/account/profile", label: "Account details", testId: "profile-link", desktopOnly: false },
+  { href: "/account/notifications", label: "Notifications", testId: "notifications-link", desktopOnly: false },
+  { href: "/account/settings", label: "Settings", testId: "settings-link", desktopOnly: false },
 ]
 
 const AccountNav = () => {
@@ -34,7 +35,7 @@ const AccountNav = () => {
     >
       <ul>
         {accountLinks.map((link) => (
-          <li key={link.href}>
+          <li key={link.href} className={clx({ "sg-account-nav__desktop-only": link.desktopOnly })}>
             <AccountNavLink href={link.href} route={route!} data-testid={link.testId}>
               {link.label}
             </AccountNavLink>
@@ -64,7 +65,9 @@ const AccountNavLink = ({
   const { countryCode }: { countryCode: string } = useParams()
 
   const localRoute = route.split(countryCode)[1]
-  const active = localRoute === href || localRoute.startsWith(`${href}/`)
+  const active = href === "/account"
+    ? localRoute === href
+    : localRoute === href || localRoute.startsWith(`${href}/`)
   return (
     <LocalizedClientLink
       href={href}

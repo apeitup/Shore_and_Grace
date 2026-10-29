@@ -32,8 +32,11 @@ const EditAddress = ({
 }: EditAddressProps) => {
   const [removing, setRemoving] = useState(false)
   const [successState, setSuccessState] = useState(false)
-  const [setAsDefault, setSetAsDefault] = useState(
-    Boolean(address.is_default_billing || address.is_default_shipping)
+  const [setAsDefaultBilling, setSetAsDefaultBilling] = useState(
+    Boolean(address.is_default_billing)
+  )
+  const [setAsDefaultShipping, setSetAsDefaultShipping] = useState(
+    Boolean(address.is_default_shipping)
   )
   const isMobile = useMobileViewport()
   const [formState, formAction] = useActionState(updateCustomerAddress, {
@@ -43,7 +46,8 @@ const EditAddress = ({
 
   const close = () => {
     setSuccessState(false)
-    setSetAsDefault(Boolean(address.is_default_billing || address.is_default_shipping))
+    setSetAsDefaultBilling(Boolean(address.is_default_billing))
+    setSetAsDefaultShipping(Boolean(address.is_default_shipping))
     onClose()
   }
 
@@ -62,14 +66,15 @@ const EditAddress = ({
     setRemoving(false)
   }
 
-  const addressTitle = address.is_default_billing
-    ? "Billing address"
-    : address.is_default_shipping
-      ? "Delivery address"
-      : address.company
-        ? `${address.company} address`
-        : "Saved address"
-  const isDefaultAddress = address.is_default_billing || address.is_default_shipping
+  const addressTitle = address.is_default_billing && address.is_default_shipping
+    ? "Billing & delivery address"
+    : address.is_default_billing
+      ? "Billing address"
+      : address.is_default_shipping
+        ? "Delivery address"
+        : address.company
+          ? `${address.company} address`
+          : "Saved address"
   const countryName = region.countries?.find(
     (country) => country.iso_2 === address.country_code?.toLowerCase()
   )?.display_name || address.country_code?.toUpperCase()
@@ -81,20 +86,20 @@ const EditAddress = ({
     <form action={formAction} className="sg-address-form">
       <input type="hidden" name="addressId" value={address.id} />
       <AddressFormFields region={region} address={address} />
-      {isMobile ? (
+      <div className="sg-address-form__defaults">
         <MobileCheckbox
-          checked={setAsDefault}
-          label="Set as default"
-          name="set_as_default"
-          onChange={(event) => setSetAsDefault(event.target.checked)}
+          checked={setAsDefaultBilling}
+          label="Use as default billing address"
+          name="set_as_default_billing"
+          onChange={(event) => setSetAsDefaultBilling(event.target.checked)}
         />
-      ) : (
-        <label className="sg-address-form__default">
-          <input type="checkbox" name="set_as_default" defaultChecked={Boolean(isDefaultAddress)} />
-          <span aria-hidden="true" />
-          Set as default
-        </label>
-      )}
+        <MobileCheckbox
+          checked={setAsDefaultShipping}
+          label="Use as default delivery address"
+          name="set_as_default_shipping"
+          onChange={(event) => setSetAsDefaultShipping(event.target.checked)}
+        />
+      </div>
       {formState.error && <div className="text-rose-500 text-small-regular py-2">{formState.error}</div>}
       <div className="sg-address-form__actions">
         <Button type="reset" variant="transparent" onClick={close} data-testid="cancel-button">Cancel</Button>
@@ -118,11 +123,14 @@ const EditAddress = ({
         <header className="sg-address-card__header sg-address-card__desktop-header">
           <div>
             <h3>{addressTitle}</h3>
-            <label className="sg-address-card__default-control">
-              <input type="checkbox" checked={Boolean(isDefaultAddress)} readOnly />
-              <span aria-hidden="true">{isDefaultAddress && <Check />}</span>
-              Set as default
-            </label>
+            <div className="sg-address-card__defaults">
+              {address.is_default_billing && (
+                <p><Check />Default billing</p>
+              )}
+              {address.is_default_shipping && (
+                <p><Check />Default delivery</p>
+              )}
+            </div>
           </div>
           <div className="sg-address-card__header-actions">
             <button
@@ -142,9 +150,14 @@ const EditAddress = ({
           <h3>{addressTitle}</h3>
           <button type="button" disabled={editorActive} onClick={onOpen}>Edit</button>
         </header>
-        {isDefaultAddress && (
-          <p className="sg-address-card__mobile-default"><Check />Default address</p>
-        )}
+        <div className="sg-address-card__mobile-defaults">
+          {address.is_default_billing && (
+            <p><Check />Default billing</p>
+          )}
+          {address.is_default_shipping && (
+            <p><Check />Default delivery</p>
+          )}
+        </div>
         <div className="sg-address-card__divider" />
         <p className="sg-address-card__name">{address.first_name} {address.last_name}</p>
         {address.phone && <p className="sg-address-card__contact">{address.phone}</p>}

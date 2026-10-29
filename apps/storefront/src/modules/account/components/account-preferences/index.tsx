@@ -29,7 +29,7 @@ const notifications: Group[] = [
         id: "receipts",
         title: "Order confirmations and receipts",
         description:
-          "Essential account emails about purchases and payments — always on.",
+          "Essential purchase and payment emails — always on.",
         enabled: true,
         locked: true,
       },
@@ -42,8 +42,7 @@ const notifications: Group[] = [
       {
         id: "reminders",
         title: "Gift and occasion reminders",
-        description:
-          "Receive reminders for dates and occasions you choose to save.",
+        description: "Receive reminders for saved dates and national occasions.",
         enabled: true,
       },
     ],
@@ -85,7 +84,7 @@ const settings: Group[] = [
         id: "recommendations",
         title: "Personalised recommendations",
         description:
-          "Use your browsing and purchase history to suggest suitable flowers and gifts.",
+          "Use browsing and purchase history to suggest suitable flowers.",
         enabled: false,
       },
       {
@@ -98,8 +97,7 @@ const settings: Group[] = [
       {
         id: "recently-viewed",
         title: "Recently viewed flowers",
-        description:
-          "Keep a short history of products you viewed on this device.",
+        description: "Keep a short history of products viewed on this device.",
         enabled: false,
       },
     ],
@@ -305,7 +303,9 @@ export default function AccountPreferences({
   }
 
   return (
-    <section className="sg-account-panel sg-account-preferences">
+    <section
+      className={`sg-account-panel sg-account-preferences sg-account-preferences--${type}`}
+    >
       <header className="sg-account-panel__header">
         <div>
           <h1>{type === "notifications" ? "Notifications" : "Settings"}</h1>
@@ -403,7 +403,7 @@ export default function AccountPreferences({
               </div>
             </div>
           </div>
-          <div className="sg-preference-group">
+          <div className="sg-preference-group sg-preference-group--closure">
             <h2>Account closure</h2>
             <p>Closing your Shore and Grace account.</p>
             <div className="sg-preference-row sg-preference-row--danger">
