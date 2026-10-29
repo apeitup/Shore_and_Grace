@@ -65,8 +65,8 @@ export default function ContactPage() {
               <Mail />
             </span>
             <h2>Email us</h2>
-            <a href="mailto:contact@shoreandgrace.co.uk">
-              contact@shoreandgrace.co.uk
+            <a href="mailto:contact@shoreandgrace.com">
+              contact@shoreandgrace.com
             </a>
           </article>
         </section>

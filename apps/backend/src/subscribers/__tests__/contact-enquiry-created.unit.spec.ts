@@ -53,6 +53,25 @@ describe("contact enquiry created subscriber", () => {
 
     expect(retrieveContactEnquiry).toHaveBeenCalledWith(enquiry.id);
     expect(createNotifications).toHaveBeenCalledTimes(2);
+    expect(createNotifications).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        idempotency_key: `${enquiry.id}:internal:v2`,
+        content: expect.objectContaining({
+          html: expect.stringContaining("New contact enquiry"),
+        }),
+      }),
+    );
+    expect(createNotifications).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        idempotency_key: `${enquiry.id}:ack:v2`,
+        content: expect.objectContaining({
+          html: expect.stringContaining("Thank you for getting in touch"),
+          text: expect.stringContaining("within two working days"),
+        }),
+      }),
+    );
     expect(logger.error).toHaveBeenCalledWith(
       expect.stringContaining("the internal notification failed"),
     );

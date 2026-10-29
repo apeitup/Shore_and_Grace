@@ -55,8 +55,8 @@ export default function ContactForm() {
       <div className="sg-contact-form__receipt" role="status">
         <h2>Thank you for getting in touch</h2>
         <p>
-          Your message reference is <strong>{receipt.reference}</strong>. We
-          have also sent an acknowledgement to your email address.
+          Your message reference is <strong>{receipt.reference}</strong>.
+          Please keep it in case you need to follow up.
         </p>
         <p>We aim to reply within two working days.</p>
       </div>
