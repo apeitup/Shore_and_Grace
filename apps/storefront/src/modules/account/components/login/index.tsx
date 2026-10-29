@@ -8,6 +8,7 @@ import { useActionState } from "react"
 import AuthInput from "../auth-input"
 import AuthSubmitButton from "../auth-submit-button"
 import SocialAuthButtons from "../social-auth-buttons"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 type Props = { setCurrentView: (view: LOGIN_VIEW) => void }
 
@@ -62,14 +63,12 @@ const Login = ({ setCurrentView }: Props) => {
             <input type="checkbox" name="remember_me" value="true" />
             <span>Remember me</span>
           </label>
-          <button
+          <LocalizedClientLink
             className="sg-auth-forgot"
-            type="button"
-            disabled
-            title="Password recovery is not configured yet"
+            href="/reset-password"
           >
             Forgot password?
-          </button>
+          </LocalizedClientLink>
         </div>
 
         <ErrorMessage

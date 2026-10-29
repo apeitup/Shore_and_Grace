@@ -9,6 +9,7 @@ import {
   retrieveOrderIdFromFulfillment,
   sendOrderConfirmationEmail,
   sendOrderLifecycleEmail,
+  sendRefundConfirmationEmail,
 } from "../order-email"
 
 describe("order emails", () => {
@@ -70,6 +71,24 @@ describe("order emails", () => {
         }
         if (entity === "fulfillment") {
           return Promise.resolve({ data: [{ id: "ful_01", order }] })
+        }
+        if (entity === "payment") {
+          return Promise.resolve({
+            data: [
+              {
+                id: "pay_01",
+                currency_code: "gbp",
+                payment_collection: { order: { id: order.id } },
+                refunds: [
+                  {
+                    id: "ref_01",
+                    amount: 2500,
+                    created_at: "2026-10-29T13:00:00.000Z",
+                  },
+                ],
+              },
+            ],
+          })
         }
         return Promise.resolve({ data: [] })
       }),
@@ -190,5 +209,25 @@ describe("order emails", () => {
     )
 
     expect(createNotifications).not.toHaveBeenCalled()
+  })
+
+  it("sends a refund confirmation for the linked order", async () => {
+    process.env.NOTIFICATION_FROM_EMAIL = "notifications@shoreandgrace.com"
+    process.env.STOREFRONT_URL = "https://shoreandgrace.com"
+    const { container, createNotifications } = createContainer()
+
+    await sendRefundConfirmationEmail(container as never, "pay_01")
+
+    expect(createNotifications).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "troy@example.com",
+        template: "refund-confirmation",
+        trigger_type: "payment.refunded",
+        idempotency_key: "order_01:refund:ref_01:v1",
+        content: expect.objectContaining({
+          text: expect.stringContaining("Refund: £25.00"),
+        }),
+      }),
+    )
   })
 })

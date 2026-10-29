@@ -10,6 +10,7 @@ import {
   renderOrderDeliveredEmail,
   renderOrderDispatchedEmail,
   renderOrderPreparedEmail,
+  renderRefundConfirmationEmail,
 } from "../emails"
 import type {
   EmailAddress,
@@ -59,6 +60,19 @@ type OrderRecord = {
   billing_address?: OrderAddress | null
   shipping_methods?: Array<{
     name?: string | null
+  }> | null
+}
+
+type PaymentRecord = {
+  id: string
+  currency_code?: string | null
+  payment_collection?: {
+    order?: { id?: string | null } | null
+  } | null
+  refunds?: Array<{
+    id: string
+    amount?: number | null
+    created_at?: string | Date | null
   }> | null
 }
 
@@ -370,4 +384,61 @@ export const sendOrderLifecycleEmail = async (
     renderers[lifecycle](baseData),
     `${order.id}:${lifecycle}:${eventId}:v1`,
   )
+}
+
+export const sendRefundConfirmationEmail = async (
+  container: MedusaContainer,
+  paymentId: string,
+) => {
+  const query = container.resolve(ContainerRegistrationKeys.QUERY)
+  const { data } = await query.graph({
+    entity: "payment",
+    fields: [
+      "id",
+      "currency_code",
+      "refunds.id",
+      "refunds.amount",
+      "refunds.created_at",
+      "payment_collection.order.id",
+    ],
+    filters: { id: paymentId },
+  })
+  const payment = data[0] as PaymentRecord | undefined
+  const orderId = payment?.payment_collection?.order?.id
+
+  if (!payment || !orderId) {
+    return false
+  }
+
+  const refund = [...(payment.refunds || [])].sort((left, right) => {
+    return new Date(right.created_at || 0).getTime() -
+      new Date(left.created_at || 0).getTime()
+  })[0]
+  const order = await retrieveOrderForEmail(container, orderId)
+
+  if (!refund || !order) {
+    return false
+  }
+
+  const recipientName = personName(
+    order.billing_address?.first_name,
+    order.billing_address?.last_name,
+  )
+  const reference = `#SG-${order.display_id || order.id}`
+
+  await sendEmail(
+    container,
+    order,
+    "refund-confirmation",
+    "payment.refunded",
+    renderRefundConfirmationEmail({
+      recipientName,
+      actionUrl: orderUrl(order.id),
+      orderReference: reference,
+      refundAmount: money(refund.amount, payment.currency_code),
+    }),
+    `${order.id}:refund:${refund.id}:v1`,
+  )
+
+  return true
 }

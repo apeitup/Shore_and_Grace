@@ -94,4 +94,81 @@ describe("customer email subscriber", () => {
       }),
     )
   })
+
+  it("uses the reset token in a customer password reset link", async () => {
+    process.env.NOTIFICATION_FROM_EMAIL = "notifications@shoreandgrace.com"
+    process.env.STOREFRONT_URL = "https://shoreandgrace.com"
+    const { container, createNotifications } = createContainer()
+
+    await customerEmailHandler({
+      event: {
+        name: "auth.password_reset",
+        data: {
+          entity_id: "troy@example.com",
+          actor_type: "customer",
+          token: "reset-token",
+        },
+      },
+      container,
+    } as never)
+
+    expect(createNotifications).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "troy@example.com",
+        template: "password-reset",
+        content: expect.objectContaining({
+          html: expect.stringContaining(
+            "https://shoreandgrace.com/gb/reset-password?token=reset-token",
+          ),
+        }),
+      }),
+    )
+  })
+
+  it("ignores password reset events for other actor types", async () => {
+    process.env.NOTIFICATION_FROM_EMAIL = "notifications@shoreandgrace.com"
+    const { container, createNotifications } = createContainer()
+
+    await customerEmailHandler({
+      event: {
+        name: "auth.password_reset",
+        data: {
+          entity_id: "admin@example.com",
+          actor_type: "user",
+          token: "reset-token",
+        },
+      },
+      container,
+    } as never)
+
+    expect(createNotifications).not.toHaveBeenCalled()
+  })
+
+  it("uses the captured address after a customer account is deleted", async () => {
+    process.env.NOTIFICATION_FROM_EMAIL = "notifications@shoreandgrace.com"
+    const { container, createNotifications } = createContainer()
+
+    await customerEmailHandler({
+      event: {
+        name: "customer.account_deleted",
+        data: {
+          id: "cus_01",
+          email: "troy@example.com",
+          first_name: "Troy",
+        },
+      },
+      container,
+    } as never)
+
+    expect(createNotifications).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "troy@example.com",
+        template: "account-deleted",
+        trigger_type: "customer.account_deleted",
+        content: expect.objectContaining({
+          text: expect.stringContaining("Hello Troy"),
+        }),
+      }),
+    )
+  })
 })

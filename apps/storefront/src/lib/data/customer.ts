@@ -26,6 +26,11 @@ export type CustomerAuthState =
   | { state: "success" }
   | null
 
+export type PasswordResetState = {
+  state: "error" | "requested" | "success"
+  error?: string
+} | null
+
 // Requests a verification email for the given customer. The request must be
 // authenticated with a token tied to the auth identity (the token returned by
 // register or by a login that requires verification).
@@ -138,6 +143,70 @@ export async function login(
   const remember = formData.get("remember_me") === "true"
 
   return completeLogin(email, password, remember)
+}
+
+export async function requestPasswordReset(
+  _currentState: PasswordResetState,
+  formData: FormData,
+): Promise<PasswordResetState> {
+  const email = String(formData.get("email") || "").trim()
+
+  if (!email) {
+    return { state: "error", error: "Enter your email address." }
+  }
+
+  try {
+    await sdk.auth.resetPassword("customer", "emailpass", {
+      identifier: email,
+    })
+  } catch {
+    // Return the same response whether or not the account exists so this form
+    // cannot be used to discover customer email addresses.
+  }
+
+  return { state: "requested" }
+}
+
+export async function completePasswordReset(
+  _currentState: PasswordResetState,
+  formData: FormData,
+): Promise<PasswordResetState> {
+  const token = String(formData.get("token") || "")
+  const password = String(formData.get("password") || "")
+  const passwordConfirmation = String(
+    formData.get("password_confirmation") || "",
+  )
+
+  if (!token) {
+    return { state: "error", error: "This password reset link is invalid." }
+  }
+
+  if (password.length < 8) {
+    return {
+      state: "error",
+      error: "Use at least 8 characters for your new password.",
+    }
+  }
+
+  if (password !== passwordConfirmation) {
+    return { state: "error", error: "The passwords do not match." }
+  }
+
+  try {
+    await sdk.auth.updateProvider(
+      "customer",
+      "emailpass",
+      { password },
+      token,
+    )
+  } catch {
+    return {
+      state: "error",
+      error: "This password reset link is invalid or has expired.",
+    }
+  }
+
+  return { state: "success" }
 }
 
 // Logs the customer in and reconciles the customer record. The behavior is

@@ -2287,8 +2287,7 @@ body {
   background: var(--sg-linen);
 }
 
-.sg-auth-social__button:disabled,
-.sg-auth-forgot:disabled {
+.sg-auth-social__button:disabled {
   cursor: not-allowed;
   opacity: 1;
 }
@@ -2459,12 +2458,19 @@ body {
 }
 
 .sg-auth-forgot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
   background: transparent;
   color: var(--sg-ink);
   font-size: 14px;
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.sg-auth-forgot:hover {
+  color: var(--sg-sage-deep);
 }
 
 .sg-auth-submit.sg-brand-button {

@@ -1,12 +1,15 @@
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
 import type { INotificationModuleService } from "@medusajs/framework/types"
+import { createHash } from "node:crypto"
 import {
   ContainerRegistrationKeys,
   Modules,
 } from "@medusajs/framework/utils"
 import {
+  renderAccountDeletedEmail,
   renderAccountWelcomeEmail,
   renderEmailVerificationEmail,
+  renderPasswordResetEmail,
 } from "../emails"
 
 type CustomerRecord = {
@@ -22,8 +25,23 @@ type VerificationEvent = {
   code: string
 }
 
+type PasswordResetEvent = {
+  entity_id: string
+  actor_type?: string
+  token: string
+}
+
+type AccountDeletedEvent = {
+  id: string
+  email: string
+  first_name?: string | null
+}
+
 const storefrontUrl = () =>
   (process.env.STOREFRONT_URL || "http://localhost:8000").replace(/\/$/, "")
+
+const eventAttemptKey = (value: string) =>
+  createHash("sha256").update(value).digest("hex").slice(0, 16)
 
 const send = async (
   container: SubscriberArgs<unknown>["container"],
@@ -33,6 +51,7 @@ const send = async (
     triggerType: string
     resourceId: string
     content: ReturnType<typeof renderAccountWelcomeEmail>
+    idempotencyKey?: string
   },
 ) => {
   const notificationService: INotificationModuleService = container.resolve(
@@ -55,7 +74,8 @@ const send = async (
     trigger_type: input.triggerType,
     resource_id: input.resourceId,
     resource_type: "customer",
-    idempotency_key: `${input.resourceId}:${input.template}:v1`,
+    idempotency_key:
+      input.idempotencyKey || `${input.resourceId}:${input.template}:v1`,
   })
 
   return true
@@ -64,10 +84,59 @@ const send = async (
 export default async function customerEmailHandler({
   event,
   container,
-}: SubscriberArgs<{ id: string } | VerificationEvent>) {
+}: SubscriberArgs<
+  { id: string } | VerificationEvent | PasswordResetEvent | AccountDeletedEvent
+>) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
 
   try {
+    if (event.name === "customer.account_deleted") {
+      const data = event.data as AccountDeletedEvent
+      const sent = await send(container, {
+        to: data.email,
+        template: "account-deleted",
+        triggerType: event.name,
+        resourceId: data.id,
+        content: renderAccountDeletedEmail({
+          recipientName: data.first_name || "there",
+        }),
+      })
+
+      if (!sent) {
+        logger.error(
+          `Customer ${data.id} was deleted, but the confirmation email sender is missing.`,
+        )
+      }
+      return
+    }
+
+    if (event.name === "auth.password_reset") {
+      const data = event.data as PasswordResetEvent
+
+      if (data.actor_type && data.actor_type !== "customer") {
+        return
+      }
+
+      const sent = await send(container, {
+        to: data.entity_id,
+        template: "password-reset",
+        triggerType: event.name,
+        resourceId: data.entity_id,
+        idempotencyKey: `${data.entity_id}:password-reset:${eventAttemptKey(data.token)}:v1`,
+        content: renderPasswordResetEmail({
+          recipientName: "there",
+          actionUrl: `${storefrontUrl()}/gb/reset-password?token=${encodeURIComponent(data.token)}`,
+        }),
+      })
+
+      if (!sent) {
+        logger.error(
+          "A password reset was requested, but the sender email is missing.",
+        )
+      }
+      return
+    }
+
     if (event.name === "auth.verification_requested") {
       const data = event.data as VerificationEvent
 
@@ -80,6 +149,7 @@ export default async function customerEmailHandler({
         template: "email-verification",
         triggerType: event.name,
         resourceId: data.entity_id,
+        idempotencyKey: `${data.entity_id}:email-verification:${eventAttemptKey(data.code)}:v1`,
         content: renderEmailVerificationEmail({
           recipientName: "there",
           actionUrl: `${storefrontUrl()}/gb/verify-account?token=${encodeURIComponent(data.code)}`,
@@ -87,7 +157,9 @@ export default async function customerEmailHandler({
       })
 
       if (!sent) {
-        logger.error("Email verification was requested, but the sender email is missing.")
+        logger.error(
+          "Email verification was requested, but the sender email is missing.",
+        )
       }
       return
     }
@@ -131,5 +203,10 @@ export default async function customerEmailHandler({
 }
 
 export const config: SubscriberConfig = {
-  event: ["customer.created", "auth.verification_requested"],
+  event: [
+    "customer.created",
+    "auth.verification_requested",
+    "auth.password_reset",
+    "customer.account_deleted",
+  ],
 }
