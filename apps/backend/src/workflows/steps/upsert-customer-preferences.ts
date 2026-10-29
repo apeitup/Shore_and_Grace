@@ -9,6 +9,11 @@ export type UpsertCustomerPreferencesInput = {
   customer_id: string
   personalised_recommendations?: boolean
   remember_delivery_preferences?: boolean
+  delivery_updates?: boolean
+  occasion_reminders?: boolean
+  marketing_collections?: boolean
+  marketing_offers?: boolean
+  marketing_stories?: boolean
   default_delivery_instructions?: string | null
   leave_in_safe_place?: boolean
   hide_prices?: boolean

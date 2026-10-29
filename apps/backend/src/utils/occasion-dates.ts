@@ -4,6 +4,13 @@ type OccasionDateInput = {
   day?: number | null
 }
 
+const utcDate = (value: string | Date) => {
+  const date = typeof value === "string" ? new Date(`${value}T00:00:00Z`) : value
+  return new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+  )
+}
+
 const easterSunday = (year: number) => {
   const a = year % 19
   const b = Math.floor(year / 100)
@@ -53,4 +60,46 @@ export const resolveNextOccasionDate = (
     occurrence = occurrenceForYear(occasion, today.getUTCFullYear() + 1)
   }
   return occurrence.toISOString().slice(0, 10)
+}
+
+export const resolveNextPersonalOccasionDate = (
+  occasionDate: string,
+  repeatsAnnually: boolean,
+  from = new Date()
+) => {
+  const original = utcDate(occasionDate)
+  const today = utcDate(from)
+
+  if (!repeatsAnnually) {
+    return original.toISOString().slice(0, 10)
+  }
+
+  let occurrence = new Date(
+    Date.UTC(
+      today.getUTCFullYear(),
+      original.getUTCMonth(),
+      original.getUTCDate()
+    )
+  )
+  if (occurrence < today) {
+    occurrence = new Date(
+      Date.UTC(
+        today.getUTCFullYear() + 1,
+        original.getUTCMonth(),
+        original.getUTCDate()
+      )
+    )
+  }
+
+  return occurrence.toISOString().slice(0, 10)
+}
+
+export const isOccasionReminderDue = (
+  occurrenceDate: string,
+  reminderDays: number,
+  from = new Date()
+) => {
+  const reminderDate = utcDate(occurrenceDate)
+  reminderDate.setUTCDate(reminderDate.getUTCDate() - reminderDays)
+  return reminderDate.getTime() === utcDate(from).getTime()
 }

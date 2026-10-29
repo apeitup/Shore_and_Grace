@@ -10,7 +10,17 @@ import { upsertCustomerPreferencesWorkflow } from "../../../workflows/upsert-cus
 export const PostCustomerPreferencesSchema = z.object({
   personalised_recommendations: z.boolean().optional(),
   remember_delivery_preferences: z.boolean().optional(),
-  default_delivery_instructions: z.string().trim().max(1000).nullable().optional(),
+  delivery_updates: z.boolean().optional(),
+  occasion_reminders: z.boolean().optional(),
+  marketing_collections: z.boolean().optional(),
+  marketing_offers: z.boolean().optional(),
+  marketing_stories: z.boolean().optional(),
+  default_delivery_instructions: z
+    .string()
+    .trim()
+    .max(1000)
+    .nullable()
+    .optional(),
   leave_in_safe_place: z.boolean().optional(),
   hide_prices: z.boolean().optional(),
 })
@@ -23,6 +33,11 @@ const defaults = (customerId: string) => ({
   customer_id: customerId,
   personalised_recommendations: false,
   remember_delivery_preferences: false,
+  delivery_updates: true,
+  occasion_reminders: true,
+  marketing_collections: false,
+  marketing_offers: true,
+  marketing_stories: false,
   default_delivery_instructions: null,
   leave_in_safe_place: false,
   hide_prices: true,

@@ -138,7 +138,6 @@ export default function AccountPreferences({
   initialPreferences?: CustomerPreferences
 }) {
   const groups = type === "notifications" ? notifications : settings
-  const storageKey = `sg-account-${type}`
   const defaults = useMemo(
     () =>
       Object.fromEntries(
@@ -150,12 +149,20 @@ export default function AccountPreferences({
   )
   const [values, setValues] = useState<Record<string, boolean>>(() => ({
     ...defaults,
-    ...(type === "settings" && initialPreferences
-      ? {
-          recommendations: initialPreferences.personalised_recommendations,
-          "delivery-preferences":
-            initialPreferences.remember_delivery_preferences,
-        }
+    ...(initialPreferences
+      ? type === "settings"
+        ? {
+            recommendations: initialPreferences.personalised_recommendations,
+            "delivery-preferences":
+              initialPreferences.remember_delivery_preferences,
+          }
+        : {
+            delivery: initialPreferences.delivery_updates,
+            reminders: initialPreferences.occasion_reminders,
+            collections: initialPreferences.marketing_collections,
+            offers: initialPreferences.marketing_offers,
+            stories: initialPreferences.marketing_stories,
+          }
       : {}),
   }))
   const [busy, setBusy] = useState<string | null>(null)
@@ -171,16 +178,7 @@ export default function AccountPreferences({
   useEffect(() => {
     let timer: number | undefined
     try {
-      if (type === "notifications") {
-        const stored = window.localStorage.getItem(storageKey)
-        if (stored) {
-          timer = window.setTimeout(
-            () =>
-              setValues((current) => ({ ...current, ...JSON.parse(stored) })),
-            0
-          )
-        }
-      } else {
+      if (type === "settings") {
         const recentlyViewed =
           window.localStorage.getItem("sg-recently-viewed-enabled") === "true"
         timer = window.setTimeout(
@@ -196,7 +194,7 @@ export default function AccountPreferences({
     return () => {
       if (timer) window.clearTimeout(timer)
     }
-  }, [storageKey, type])
+  }, [type])
 
   const toggle = async (id: string) => {
     const previous = values[id]
@@ -206,8 +204,21 @@ export default function AccountPreferences({
 
     try {
       if (type === "notifications") {
-        const next = { ...values, [id]: nextValue }
-        window.localStorage.setItem(storageKey, JSON.stringify(next))
+        if (id === "receipts") {
+          return
+        }
+        setBusy(id)
+        const fields = {
+          delivery: "delivery_updates",
+          reminders: "occasion_reminders",
+          collections: "marketing_collections",
+          offers: "marketing_offers",
+          stories: "marketing_stories",
+        } as const
+        await saveCustomerPreferences({
+          [fields[id as keyof typeof fields]]: nextValue,
+        })
+        setMessage({ type: "success", text: "Your preference has been saved." })
         return
       }
       if (id === "recently-viewed") {

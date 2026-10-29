@@ -13,6 +13,11 @@ export type CustomerPreferences = {
   customer_id?: string
   personalised_recommendations: boolean
   remember_delivery_preferences: boolean
+  delivery_updates: boolean
+  occasion_reminders: boolean
+  marketing_collections: boolean
+  marketing_offers: boolean
+  marketing_stories: boolean
   default_delivery_instructions: string | null
   leave_in_safe_place: boolean
   hide_prices: boolean
@@ -25,6 +30,11 @@ export type CustomerPreferencesUpdate = Partial<
 const defaultCustomerPreferences: CustomerPreferences = {
   personalised_recommendations: false,
   remember_delivery_preferences: false,
+  delivery_updates: true,
+  occasion_reminders: true,
+  marketing_collections: false,
+  marketing_offers: true,
+  marketing_stories: false,
   default_delivery_instructions: null,
   leave_in_safe_place: false,
   hide_prices: true,
