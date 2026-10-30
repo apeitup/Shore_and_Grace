@@ -134,6 +134,22 @@ describe("Shore & Grace email templates", () => {
     })
   })
 
+  it("uses the approved newsletter confirmation wording and preheader", () => {
+    const email = renderNewsletterConfirmationEmail({
+      recipientName: "there",
+      actionUrl: "https://shoreandgrace.com/gb/newsletter/confirm?token=test",
+    })
+
+    expect(email.subject).toBe("Please confirm you’d like to hear from us")
+    expect(email.html).toContain("One quick step to join the Shore &amp; Grace community.")
+    expect(email.html).toContain("Would you like to hear from us?")
+    expect(email.text).toContain("We care about our customers and community")
+    expect(email.text).toContain("We’ll never overwhelm your inbox")
+    expect(email.text).toContain("Yes, I’d love to hear from you")
+    expect(email.text).toContain("If you didn’t request this email, you can simply ignore it.")
+    expect(email.text).toContain("Warmest regards,\nAmanda\nShore & Grace\nFloral & Gift Studio")
+  })
+
   it("uses the approved dispatched and delivered wording", () => {
     const dispatched = renderOrderDispatchedEmail({
       recipientName: "Amanda",

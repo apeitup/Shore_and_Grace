@@ -53,10 +53,13 @@ export type SimpleActionEmailData = {
   eyebrow: string
   title: string
   intro: string
+  paragraphs?: string[]
+  footerNote?: string
   detailTitle?: string
   detailLines?: string[]
   actionLabel?: string
   actionUrl?: string
   signature: EmailSignatureVariant
   subject: string
+  preheader?: string
 }

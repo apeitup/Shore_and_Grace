@@ -21,27 +21,37 @@ export const renderSimpleActionEmail = (
   const action = data.actionLabel && data.actionUrl
     ? `<div style="padding-top:24px">${emailButton(data.actionLabel, data.actionUrl)}</div>`
     : ""
+  const paragraphs = (data.paragraphs || [])
+    .map((paragraph) => `<div class="sg-copy" style="padding-top:16px;font-family:Montserrat,Arial,sans-serif;font-size:15px;line-height:24px;color:${colors.ink}">${escapeHtml(paragraph)}</div>`)
+    .join("")
+  const footerNote = data.footerNote
+    ? `<div class="sg-copy sg-secondary" style="padding-top:16px;font-family:Montserrat,Arial,sans-serif;font-size:14px;line-height:22px;color:${colors.secondary}">${escapeHtml(data.footerNote)}</div>`
+    : ""
   const html = `
     <div class="sg-eyebrow" style="font-family:Montserrat,Arial,sans-serif;font-size:11px;line-height:16px;font-weight:600;letter-spacing:1.4px;color:${colors.sage};text-transform:uppercase">${escapeHtml(data.eyebrow)}</div>
     <h1 class="sg-title" style="padding-top:24px;font-family:'Cormorant Garamond',Georgia,serif;font-size:36px;line-height:42px;font-weight:400;color:${colors.ink};margin:0">${escapeHtml(data.title)}</h1>
     <div class="sg-copy" style="padding-top:24px;font-family:Montserrat,Arial,sans-serif;font-size:16px;line-height:24px;font-weight:600;color:${colors.ink}">Hello ${escapeHtml(data.recipientName)},</div>
     <div class="sg-copy" style="padding-top:16px;font-family:Montserrat,Arial,sans-serif;font-size:15px;line-height:24px;color:${colors.ink}">${escapeHtml(data.intro)}</div>
+    ${paragraphs}
     ${detail}
     ${action}
+    ${footerNote}
     <div style="height:1px;background:${colors.border};margin-top:24px"></div>
     <div style="padding-top:24px">${emailSignature(data.signature)}</div>`
   const text = [
     `Hello ${data.recipientName},`,
     "",
     data.intro,
+    ...(data.paragraphs || []).flatMap((paragraph) => ["", paragraph]),
     "",
     data.detailTitle || "",
     ...(data.detailLines || []),
     data.actionUrl ? `\n${data.actionLabel}: ${data.actionUrl}` : "",
+    data.footerNote ? `\n${data.footerNote}` : "",
     "",
     emailSignatureText(data.signature),
   ].filter((line, index, lines) => line || lines[index - 1]).join("\n")
-  return contentResult(data.subject, text, html, data.intro)
+  return contentResult(data.subject, text, html, data.preheader || data.intro)
 }
 
 type NamedEmailInput = {
@@ -314,11 +324,16 @@ export const renderNewsletterConfirmationEmail = ({
   actionUrl,
 }: NamedEmailInput) => renderSimpleActionEmail({
   recipientName,
-  eyebrow: "Stay inspired",
-  title: "Confirm your email preferences",
-  intro: "Confirm that you would like to receive new collections, seasonal flowers and occasional studio news from Shore & Grace.",
-  actionLabel: "Confirm subscription",
+  eyebrow: "Stay inspired,",
+  title: "Would you like to hear from us?",
+  intro: "We care about our customers and community, so we just want to make sure you’re happy to hear from us.",
+  paragraphs: [
+    "Confirm below if you’d like to receive occasional emails about new collections, seasonal flowers and news from the Shore & Grace studio. We’ll never overwhelm your inbox, and you can unsubscribe at any time.",
+  ],
+  actionLabel: "Yes, I’d love to hear from you",
   actionUrl,
+  footerNote: "If you didn’t request this email, you can simply ignore it.",
   signature: "formal",
-  subject: "Confirm your Shore & Grace subscription",
+  subject: "Please confirm you’d like to hear from us",
+  preheader: "One quick step to join the Shore & Grace community.",
 })

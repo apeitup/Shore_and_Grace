@@ -30,6 +30,9 @@ import { PostStoreContactEnquirySchema } from "./store/contact-enquiries/route"
 import { contactRateLimit } from "./utils/contact-rate-limit"
 import { PostStoreNewsletterSchema } from "./store/newsletter/route"
 import { PostStoreNewsletterConfirmSchema } from "./store/newsletter/confirm/route"
+import { PostStoreNewsletterUnsubscribeSchema } from "./store/newsletter/unsubscribe/route"
+import { GetAdminNewsletterSubscriptionsSchema } from "./admin/newsletter-subscriptions/route"
+import { GetAdminNewsletterExportSchema } from "./admin/newsletter-subscriptions/export/route"
 
 // The product index declares filterable `status` and `sales_channel_ids`, so
 // the route narrows it to published products in the key's sales channels.
@@ -135,6 +138,13 @@ export default defineMiddlewares({
       methods: ["POST"],
       middlewares: [
         validateAndTransformBody(PostStoreNewsletterConfirmSchema),
+      ],
+    },
+    {
+      matcher: "/store/newsletter/unsubscribe",
+      methods: ["POST"],
+      middlewares: [
+        validateAndTransformBody(PostStoreNewsletterUnsubscribeSchema),
       ],
     },
     {
@@ -275,6 +285,33 @@ export default defineMiddlewares({
       matcher: "/admin/contact-enquiries/:id",
       methods: ["POST"],
       middlewares: [validateAndTransformBody(PostAdminContactEnquirySchema)],
+    },
+    {
+      matcher: "/admin/newsletter-subscriptions",
+      methods: ["GET"],
+      middlewares: [
+        validateAndTransformQuery(GetAdminNewsletterSubscriptionsSchema, {
+          isList: true,
+          defaults: [
+            "id",
+            "email",
+            "status",
+            "consent_source",
+            "consented_at",
+            "confirmed_at",
+            "unsubscribed_at",
+            "created_at",
+            "updated_at",
+          ],
+        }),
+      ],
+    },
+    {
+      matcher: "/admin/newsletter-subscriptions/export",
+      methods: ["GET"],
+      middlewares: [
+        validateAndTransformQuery(GetAdminNewsletterExportSchema, {}),
+      ],
     },
   ],
 })
