@@ -1,5 +1,5 @@
 import type {
-  AuthenticatedMedusaRequest,
+  MedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework/http"
 import { z } from "@medusajs/framework/zod"
@@ -18,16 +18,28 @@ export const GetAdminNewsletterExportSchema = createFindParams().extend({
   status: NewsletterStatusSchema.optional(),
 })
 
-export const GET = async (
-  req: AuthenticatedMedusaRequest,
+export const PostAdminNewsletterExportSchema = z.object({
+  ids: z.array(z.string().trim().min(1)).min(1).max(500),
+})
+
+type NewsletterExportQuery = Record<string, unknown> & {
+  ids?: string[]
+}
+
+const exportNewsletterSubscriptions = async (
+  req: MedusaRequest,
   res: MedusaResponse,
+  query: NewsletterExportQuery,
 ) => {
   const newsletterService = req.scope.resolve<NewsletterModuleService>(
     NEWSLETTER_MODULE,
   )
-  const filter = buildNewsletterFilter(
-    req.validatedQuery as Record<string, unknown>,
-  )
+  const filter = buildNewsletterFilter(query)
+
+  if (query.ids?.length) {
+    filter.id = [...new Set(query.ids)]
+  }
+
   const subscriptions: ReturnType<typeof toAdminNewsletterSubscription>[] = []
   const batchSize = 500
   let offset = 0
@@ -54,3 +66,22 @@ export const GET = async (
     count,
   })
 }
+
+export const GET = async (
+  req: MedusaRequest,
+  res: MedusaResponse,
+) => {
+  await exportNewsletterSubscriptions(
+    req,
+    res,
+    req.validatedQuery as Record<string, unknown>,
+  )
+}
+
+export const POST = async (
+  req: MedusaRequest<z.infer<typeof PostAdminNewsletterExportSchema>>,
+  res: MedusaResponse,
+) =>
+  exportNewsletterSubscriptions(req, res, {
+    ids: req.validatedBody.ids,
+  })

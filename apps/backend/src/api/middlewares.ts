@@ -32,7 +32,11 @@ import { PostStoreNewsletterSchema } from "./store/newsletter/route"
 import { PostStoreNewsletterConfirmSchema } from "./store/newsletter/confirm/route"
 import { PostStoreNewsletterUnsubscribeSchema } from "./store/newsletter/unsubscribe/route"
 import { GetAdminNewsletterSubscriptionsSchema } from "./admin/newsletter-subscriptions/route"
-import { GetAdminNewsletterExportSchema } from "./admin/newsletter-subscriptions/export/route"
+import {
+  GetAdminNewsletterExportSchema,
+  PostAdminNewsletterExportSchema,
+} from "./admin/newsletter-subscriptions/export/route"
+import { PostAdminNewsletterBatchSchema } from "./admin/newsletter-subscriptions/batch/route"
 
 // The product index declares filterable `status` and `sales_channel_ids`, so
 // the route narrows it to published products in the key's sales channels.
@@ -311,6 +315,20 @@ export default defineMiddlewares({
       methods: ["GET"],
       middlewares: [
         validateAndTransformQuery(GetAdminNewsletterExportSchema, {}),
+      ],
+    },
+    {
+      matcher: "/admin/newsletter-subscriptions/export",
+      methods: ["POST"],
+      middlewares: [
+        validateAndTransformBody(PostAdminNewsletterExportSchema),
+      ],
+    },
+    {
+      matcher: "/admin/newsletter-subscriptions/batch",
+      methods: ["POST"],
+      middlewares: [
+        validateAndTransformBody(PostAdminNewsletterBatchSchema),
       ],
     },
   ],

@@ -33,6 +33,7 @@ type NewsletterSubscription = {
 }
 
 type NewsletterFilter = {
+  id?: string[]
   status?: NewsletterStatus
   email?: { $ilike: string }
 }

@@ -1,11 +1,12 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk"
-import { ArrowDownTray, Envelope } from "@medusajs/icons"
+import { ArrowDownTray, Envelope, Trash } from "@medusajs/icons"
 import {
   Button,
   Container,
   createDataTableColumnHelper,
   DataTable,
   DataTablePaginationState,
+  DataTableRowSelectionState,
   Heading,
   Input,
   Select,
@@ -13,8 +14,9 @@ import {
   Text,
   toast,
   useDataTable,
+  usePrompt,
 } from "@medusajs/ui"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useEffect, useMemo, useState } from "react"
 import { sdk } from "../../lib/sdk"
 
@@ -88,11 +90,19 @@ const NewsletterPage = () => {
     pageIndex: 0,
     pageSize,
   })
+  const [rowSelection, setRowSelection] =
+    useState<DataTableRowSelectionState>({})
+  const queryClient = useQueryClient()
+  const prompt = usePrompt()
   const offset = pagination.pageIndex * pagination.pageSize
+  const selectedIds = Object.entries(rowSelection)
+    .filter(([, selected]) => selected)
+    .map(([id]) => id)
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       setSearch(searchInput.trim())
+      setRowSelection({})
       setPagination((current) => ({ ...current, pageIndex: 0 }))
     }, 300)
 
@@ -119,15 +129,18 @@ const NewsletterPage = () => {
   })
 
   const exportSubscriptions = useMutation({
-    mutationFn: () =>
+    mutationFn: (ids?: string[]) =>
       sdk.client.fetch<NewsletterExportResponse>(
         "/admin/newsletter-subscriptions/export",
-        {
-          query: {
-            q: search || undefined,
-            status: statusFilter === "all" ? undefined : statusFilter,
-          },
-        },
+        ids?.length
+          ? { method: "POST", body: { ids } }
+          : {
+              query: {
+                q: search || undefined,
+                status:
+                  statusFilter === "all" ? undefined : statusFilter,
+              },
+            },
       ),
     onSuccess: ({ csv, filename, count }) => {
       const url = URL.createObjectURL(
@@ -147,8 +160,51 @@ const NewsletterPage = () => {
       toast.error(error.message || "Unable to export newsletter records"),
   })
 
+  const deleteSubscriptions = useMutation({
+    mutationFn: (ids: string[]) =>
+      sdk.client.fetch<{ deleted_ids: string[]; count: number }>(
+        "/admin/newsletter-subscriptions/batch",
+        {
+          method: "POST",
+          body: { action: "delete", ids },
+        },
+      ),
+    onSuccess: ({ count }) => {
+      setRowSelection({})
+      queryClient.invalidateQueries({
+        queryKey: ["newsletter-subscriptions"],
+      })
+      toast.success(
+        `${count} newsletter ${count === 1 ? "record" : "records"} removed`,
+      )
+    },
+    onError: (error: Error) =>
+      toast.error(error.message || "Unable to remove newsletter records"),
+  })
+
+  const handleDeleteSelected = async () => {
+    if (!selectedIds.length) {
+      return
+    }
+
+    const confirmed = await prompt({
+      title: `Remove ${selectedIds.length} newsletter ${
+        selectedIds.length === 1 ? "record" : "records"
+      }?`,
+      description:
+        "The selected records will be removed from newsletter lists and future mailings.",
+      confirmText: "Remove",
+      cancelText: "Cancel",
+    })
+
+    if (confirmed) {
+      deleteSubscriptions.mutate(selectedIds)
+    }
+  }
+
   const columns = useMemo(
     () => [
+      columnHelper.select(),
       columnHelper.accessor("email", {
         header: "Email",
         cell: ({ row }) => (
@@ -198,6 +254,10 @@ const NewsletterPage = () => {
       state: pagination,
       onPaginationChange: setPagination,
     },
+    rowSelection: {
+      state: rowSelection,
+      onRowSelectionChange: setRowSelection,
+    },
     getRowId: (row) => row.id,
   })
 
@@ -241,13 +301,42 @@ const NewsletterPage = () => {
             <Button
               variant="secondary"
               size="small"
-              onClick={() => exportSubscriptions.mutate()}
+              onClick={() => exportSubscriptions.mutate(undefined)}
               isLoading={exportSubscriptions.isPending}
             >
               <ArrowDownTray />
-              Export CSV
+              Export filtered
             </Button>
           </DataTable.Toolbar>
+          {selectedIds.length > 0 && (
+            <DataTable.Toolbar className="flex flex-wrap items-center justify-between gap-3 border-t px-6 py-3">
+              <Text size="small" weight="plus">
+                {selectedIds.length} selected
+              </Text>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="secondary"
+                  size="small"
+                  onClick={() => exportSubscriptions.mutate(selectedIds)}
+                  isLoading={exportSubscriptions.isPending}
+                  disabled={deleteSubscriptions.isPending}
+                >
+                  <ArrowDownTray />
+                  Export selected
+                </Button>
+                <Button
+                  variant="danger"
+                  size="small"
+                  onClick={handleDeleteSelected}
+                  isLoading={deleteSubscriptions.isPending}
+                  disabled={exportSubscriptions.isPending}
+                >
+                  <Trash />
+                  Delete selected
+                </Button>
+              </div>
+            </DataTable.Toolbar>
+          )}
           <DataTable.Toolbar className="flex flex-wrap items-center gap-2 border-t px-6 py-3">
             <Input
               aria-label="Search newsletter subscriptions"
@@ -260,6 +349,7 @@ const NewsletterPage = () => {
               value={statusFilter}
               onValueChange={(value) => {
                 setStatusFilter(value)
+                setRowSelection({})
                 setPagination((current) => ({ ...current, pageIndex: 0 }))
               }}
             >
