@@ -75,7 +75,7 @@ export default function ContactPage() {
           <div className="sg-contact-page__message-copy">
             <h2>Send us a message</h2>
             <p>
-              Complete the form and we’ll reply within one working day. Include
+              Complete the form and we’ll reply within two working days. Include
               your order number in the subject if you need order support.
             </p>
           </div>

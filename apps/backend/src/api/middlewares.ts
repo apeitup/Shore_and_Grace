@@ -28,6 +28,8 @@ import { GetAdminContactEnquiriesSchema } from "./admin/contact-enquiries/route"
 import { PostAdminContactEnquirySchema } from "./admin/contact-enquiries/[id]/route"
 import { PostStoreContactEnquirySchema } from "./store/contact-enquiries/route"
 import { contactRateLimit } from "./utils/contact-rate-limit"
+import { PostStoreNewsletterSchema } from "./store/newsletter/route"
+import { PostStoreNewsletterConfirmSchema } from "./store/newsletter/confirm/route"
 
 // The product index declares filterable `status` and `sales_channel_ids`, so
 // the route narrows it to published products in the key's sales channels.
@@ -121,6 +123,18 @@ export default defineMiddlewares({
       middlewares: [
         validateAndTransformBody(PostStoreContactEnquirySchema),
         contactRateLimit,
+      ],
+    },
+    {
+      matcher: "/store/newsletter",
+      methods: ["POST"],
+      middlewares: [validateAndTransformBody(PostStoreNewsletterSchema)],
+    },
+    {
+      matcher: "/store/newsletter/confirm",
+      methods: ["POST"],
+      middlewares: [
+        validateAndTransformBody(PostStoreNewsletterConfirmSchema),
       ],
     },
     {

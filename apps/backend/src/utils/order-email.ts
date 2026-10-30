@@ -37,6 +37,8 @@ type OrderAddress = {
 }
 
 type OrderItem = {
+  product_id?: string | null
+  product_handle?: string | null
   title?: string | null
   variant_title?: string | null
   quantity?: number | null
@@ -154,6 +156,8 @@ export const retrieveOrderForEmail = async (
       "shipping_total",
       "total",
       "items.title",
+      "items.product_id",
+      "items.product_handle",
       "items.variant_title",
       "items.quantity",
       "items.unit_price",

@@ -1,8 +1,7 @@
-import BrandButton from "@modules/brand/components/button"
 import BrandSignature from "@modules/brand/components/brand-signature"
-import BrandTextInput from "@modules/brand/components/text-input"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CookieSettingsButton from "@modules/layout/components/cookie-settings-button"
+import NewsletterSignup from "@modules/layout/components/newsletter-signup"
 import Image from "next/image"
 
 const socialLinks = [
@@ -119,18 +118,7 @@ export default function Footer() {
           <p>
             Subscribe to receive updates, access to exclusive deals, and more.
           </p>
-          <form>
-            <BrandTextInput
-              label="Email address"
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="Enter your email address"
-            />
-            <BrandButton type="submit" tone="ink">
-              Subscribe
-            </BrandButton>
-          </form>
+          <NewsletterSignup />
         </div>
       </div>
 

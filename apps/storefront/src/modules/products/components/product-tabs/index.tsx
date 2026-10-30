@@ -7,7 +7,7 @@ import ProductReviews from "@modules/products/components/product-reviews"
 
 import Accordion from "./accordion"
 import { HttpTypes } from "@medusajs/types"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 type ProductTabsProps = {
   product: HttpTypes.StoreProduct
@@ -15,6 +15,20 @@ type ProductTabsProps = {
 
 const ProductTabs = ({ product }: ProductTabsProps) => {
   const [activeTab, setActiveTab] = useState("Description")
+  const [openMobileTabs, setOpenMobileTabs] = useState(["Description"])
+
+  useEffect(() => {
+    if (window.location.hash !== "#reviews") {
+      return
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      setActiveTab("Reviews")
+      setOpenMobileTabs(["Reviews"])
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [])
   const tabs = [
     {
       label: "Description",
@@ -35,7 +49,7 @@ const ProductTabs = ({ product }: ProductTabsProps) => {
   ]
 
   return (
-    <div className="w-full">
+    <div className="w-full" id="reviews">
       <div className="sg-product-tabs__desktop">
         <div className="sg-product-tabs__list" role="tablist" aria-label="Product information">
           {tabs.map((tab) => (
@@ -57,7 +71,8 @@ const ProductTabs = ({ product }: ProductTabsProps) => {
       </div>
       <Accordion
         type="multiple"
-        defaultValue={["Description"]}
+        value={openMobileTabs}
+        onValueChange={setOpenMobileTabs}
         className="sg-product-tabs__mobile"
       >
         {tabs.map((tab, i) => (

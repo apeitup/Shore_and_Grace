@@ -40,6 +40,9 @@ module.exports = defineConfig({
       resolve: "./src/modules/contact-enquiry",
     },
     {
+      resolve: "./src/modules/newsletter",
+    },
+    {
       resolve: "@medusajs/medusa/notification",
       options: {
         providers: [
