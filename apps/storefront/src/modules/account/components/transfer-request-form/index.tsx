@@ -2,13 +2,12 @@
 import { createTransferRequest } from "@lib/data/orders"
 import { CheckCircleMiniSolid, XCircleSolid } from "@medusajs/icons"
 import { Heading, IconButton, Input, Text } from "@modules/common/components/ui"
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 // TODO: Re-add Toaster component when needed
 import { SubmitButton } from "@modules/checkout/components/submit-button"
-import { useEffect, useState } from "react"
 
 export default function TransferRequestForm() {
-  const [showSuccess, setShowSuccess] = useState(false)
+  const [successDismissed, setSuccessDismissed] = useState(false)
 
   const [state, formAction] = useActionState(createTransferRequest, {
     success: false,
@@ -16,17 +15,16 @@ export default function TransferRequestForm() {
     order: null,
   })
 
-  useEffect(() => {
-    if (state.success && state.order) {
-      setShowSuccess(true)
-    }
-  }, [state.success, state.order])
+  const showSuccess = Boolean(state.success && state.order && !successDismissed)
 
   return (
     <div className="flex flex-col gap-y-4 w-full">
       <div className="grid sm:grid-cols-2 items-center gap-x-8 gap-y-4 w-full">
         <div className="flex flex-col gap-y-1">
-          <Heading level="h3" className="!text-sm font-semibold text-neutral-950">
+          <Heading
+            level="h3"
+            className="!text-sm font-semibold text-neutral-950"
+          >
             Order transfers
           </Heading>
           <p className="text-small-regular text-neutral-500">
@@ -36,6 +34,7 @@ export default function TransferRequestForm() {
         </div>
         <form
           action={formAction}
+          onSubmit={() => setSuccessDismissed(false)}
           className="flex flex-col gap-y-1 sm:items-end"
         >
           <div className="flex flex-col gap-y-2 w-full">
@@ -70,7 +69,7 @@ export default function TransferRequestForm() {
           </div>
           <IconButton
             className="h-fit"
-            onClick={() => setShowSuccess(false)}
+            onClick={() => setSuccessDismissed(true)}
           >
             <XCircleSolid className="w-4 h-4 text-neutral-500" />
           </IconButton>

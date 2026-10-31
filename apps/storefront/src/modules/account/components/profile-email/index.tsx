@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useActionState } from "react";
+import React, { useActionState } from "react"
 
 import Input from "@modules/common/components/input"
 
@@ -28,7 +28,16 @@ const ProfileEmail: React.FC<MyInformationProps> = ({ customer }) => {
     }
   }
 
-  const [state, formAction] = useActionState(updateCustomerEmail, {
+  const updateEmail = async (
+    currentState: { error: string | null; success: boolean },
+    formData: FormData
+  ) => {
+    const result = await updateCustomerEmail(currentState, formData)
+    setSuccessState(result.success)
+    return result
+  }
+
+  const [state, formAction] = useActionState(updateEmail, {
     error: null as string | null,
     success: false,
   })
@@ -36,10 +45,6 @@ const ProfileEmail: React.FC<MyInformationProps> = ({ customer }) => {
   const clearState = () => {
     setSuccessState(false)
   }
-
-  useEffect(() => {
-    setSuccessState(state.success)
-  }, [state])
 
   return (
     <form action={formAction} className="w-full">

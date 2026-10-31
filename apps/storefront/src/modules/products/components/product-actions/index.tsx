@@ -7,7 +7,7 @@ import { HttpTypes } from "@medusajs/types"
 import BrandButton from "@modules/brand/components/button"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
 import { isEqual } from "lodash"
-import { useParams, usePathname } from "next/navigation"
+import { useParams, usePathname, useSearchParams } from "next/navigation"
 import { FormEvent, useEffect, useMemo, useState } from "react"
 import ProductPrice from "../product-price"
 import Image from "next/image"
@@ -39,12 +39,18 @@ export default function ProductActions({
   disabled,
 }: ProductActionsProps) {
   const pathname = usePathname()
-  // Preselected on the server so the form posts a valid variant without JavaScript.
-  // The page is statically rendered, so `?v_id=` is applied after hydration.
-  const [options, setOptions] = useState<Record<string, string | undefined>>(
-    () => optionsAsKeymap(getDefaultVariant(product)?.options ?? null) ?? {}
+  const searchParams = useSearchParams()
+  const urlVariant = product.variants?.find(
+    (variant) => variant.id === searchParams.get("v_id")
   )
-  const [isUrlVariantApplied, setIsUrlVariantApplied] = useState(false)
+  // Preselected on the server so the form posts a valid variant without JavaScript.
+  // The URL variant takes precedence when the page is opened from a variant link.
+  const [options, setOptions] = useState<Record<string, string | undefined>>(
+    () =>
+      optionsAsKeymap(
+        urlVariant?.options ?? getDefaultVariant(product)?.options ?? null
+      ) ?? {}
+  )
   const [isAdding, setIsAdding] = useState(false)
   const [quantity, setQuantity] = useState(1)
   const { isSaved: productIsSaved, pendingProductIds, toggle } = useWishlist()
@@ -79,19 +85,6 @@ export default function ProductActions({
   }, [product.variants, options])
 
   useEffect(() => {
-    const variantId = new URLSearchParams(window.location.search).get("v_id")
-    const variant = product.variants?.find((v) => v.id === variantId)
-    if (variant) {
-      setOptions(optionsAsKeymap(variant.options) ?? {})
-    }
-    setIsUrlVariantApplied(true)
-  }, [product.variants])
-
-  useEffect(() => {
-    if (!isUrlVariantApplied) {
-      return
-    }
-
     const params = new URLSearchParams(window.location.search)
     const value = isValidVariant ? selectedVariant?.id : null
 
@@ -118,7 +111,7 @@ export default function ProductActions({
         detail: value ?? undefined,
       })
     )
-  }, [selectedVariant, isValidVariant, isUrlVariantApplied, pathname])
+  }, [selectedVariant, isValidVariant, pathname])
 
   const inStock = useMemo(
     () => isVariantInStock(selectedVariant),

@@ -6,7 +6,7 @@ import { SubmitButton } from "@modules/checkout/components/submit-button"
 import MobileCheckbox from "@modules/common/components/mobile-checkbox"
 import Modal from "@modules/common/components/modal"
 import { Button, Heading } from "@modules/common/components/ui"
-import { useActionState, useEffect, useState } from "react"
+import { useActionState, useCallback, useState } from "react"
 
 import AddressFormFields from "./address-form-fields"
 import useMobileViewport from "./use-mobile-viewport"
@@ -28,30 +28,36 @@ const AddAddress = ({
   onClose,
   onOpen,
 }: AddAddressProps) => {
-  const [successState, setSuccessState] = useState(false)
   const [setAsDefaultBilling, setSetAsDefaultBilling] = useState(false)
   const [setAsDefaultShipping, setSetAsDefaultShipping] = useState(false)
   const isMobile = useMobileViewport()
-  const [formState, formAction] = useActionState(addCustomerAddress, {
-    success: false,
-    error: null,
-  } as { success: boolean; error: string | null })
 
-  const close = () => {
-    setSuccessState(false)
+  const close = useCallback(() => {
     setSetAsDefaultBilling(false)
     setSetAsDefaultShipping(false)
     onClose()
-  }
+  }, [onClose])
 
-  useEffect(() => {
-    if (successState) close()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [successState])
+  const submitAddress = useCallback(
+    async (
+      previousState: { success: boolean; error: string | null },
+      formData: FormData
+    ) => {
+      const result = await addCustomerAddress(previousState, formData)
 
-  useEffect(() => {
-    if (formState.success) setSuccessState(true)
-  }, [formState])
+      if (result.success) {
+        close()
+      }
+
+      return result
+    },
+    [close]
+  )
+
+  const [formState, formAction] = useActionState(submitAddress, {
+    success: false,
+    error: null,
+  } as { success: boolean; error: string | null })
 
   const form = (
     <form action={formAction} className="sg-address-form">
@@ -71,12 +77,20 @@ const AddAddress = ({
         />
       </div>
       {formState.error && (
-        <div className="text-rose-500 text-small-regular py-2" data-testid="address-error">
+        <div
+          className="text-rose-500 text-small-regular py-2"
+          data-testid="address-error"
+        >
           {formState.error}
         </div>
       )}
       <div className="sg-address-form__actions">
-        <Button type="reset" variant="transparent" onClick={close} data-testid="cancel-button">
+        <Button
+          type="reset"
+          variant="transparent"
+          onClick={close}
+          data-testid="cancel-button"
+        >
           Cancel
         </Button>
         <SubmitButton data-testid="save-button">Save</SubmitButton>
@@ -89,7 +103,9 @@ const AddAddress = ({
       <header className="sg-account-panel__header sg-address-book__header">
         <div>
           <h1>Your addresses</h1>
-          <p>{count} {count === 1 ? "address" : "addresses"}</p>
+          <p>
+            {count} {count === 1 ? "address" : "addresses"}
+          </p>
         </div>
         <Button
           type="button"
@@ -114,15 +130,25 @@ const AddAddress = ({
       </Button>
 
       {isOpen && !isMobile && (
-        <section className="sg-address-form-card" data-testid="add-address-inline-form">
+        <section
+          className="sg-address-form-card"
+          data-testid="add-address-inline-form"
+        >
           <h2>Add new address</h2>
           {form}
         </section>
       )}
 
       {isMobile && (
-        <Modal isOpen={isOpen} close={close} mobileSheet data-testid="add-address-modal">
-          <Modal.Title><Heading className="mb-2">Add address</Heading></Modal.Title>
+        <Modal
+          isOpen={isOpen}
+          close={close}
+          mobileSheet
+          data-testid="add-address-modal"
+        >
+          <Modal.Title>
+            <Heading className="mb-2">Add address</Heading>
+          </Modal.Title>
           <Modal.Body>{form}</Modal.Body>
         </Modal>
       )}

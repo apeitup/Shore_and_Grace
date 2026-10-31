@@ -11,21 +11,18 @@ type VerificationState = "verifying" | "success" | "error"
 const VerifyAccount = () => {
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
-  const [state, setState] = useState<VerificationState>("verifying")
+  const [state, setState] = useState<VerificationState>(() =>
+    token ? "verifying" : "error"
+  )
   // Guard against the effect running twice in React Strict Mode, which would
   // consume the single-use token before the customer sees the result.
   const confirmed = useRef(false)
 
   useEffect(() => {
-    if (confirmed.current) {
+    if (!token || confirmed.current) {
       return
     }
     confirmed.current = true
-
-    if (!token) {
-      setState("error")
-      return
-    }
 
     confirmEmailVerification(token).then(({ success }) =>
       setState(success ? "success" : "error")

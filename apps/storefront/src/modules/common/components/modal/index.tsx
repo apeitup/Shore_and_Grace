@@ -57,10 +57,10 @@ const Modal = ({
           >
             <Transition.Child
               as={Fragment}
-              enter="ease-out duration-[220ms]"
+              enter="ease-out duration-200"
               enterFrom="opacity-0 scale-95 sg-responsive-modal-enter-from"
               enterTo="opacity-100 scale-100 sg-responsive-modal-enter-to"
-              leave="ease-in duration-[220ms]"
+              leave="ease-in duration-200"
               leaveFrom="opacity-100 scale-100 sg-responsive-modal-leave-from"
               leaveTo="opacity-0 scale-95 sg-responsive-modal-leave-to"
             >
@@ -79,7 +79,10 @@ const Modal = ({
                 )}
               >
                 {mobileSheet && (
-                  <span className="sg-responsive-modal__handle" aria-hidden="true" />
+                  <span
+                    className="sg-responsive-modal__handle"
+                    aria-hidden="true"
+                  />
                 )}
                 <ModalProvider close={close}>{children}</ModalProvider>
               </Dialog.Panel>

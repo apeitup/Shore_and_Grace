@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useActionState } from "react";
+import React, { useActionState } from "react"
 
 import Input from "@modules/common/components/input"
 
@@ -32,7 +32,16 @@ const ProfileName: React.FC<MyInformationProps> = ({ customer }) => {
     }
   }
 
-  const [state, formAction] = useActionState(updateCustomerName, {
+  const saveCustomerName = async (
+    currentState: { error: string | null; success: boolean },
+    formData: FormData
+  ) => {
+    const result = await updateCustomerName(currentState, formData)
+    setSuccessState(result.success)
+    return result
+  }
+
+  const [state, formAction] = useActionState(saveCustomerName, {
     error: null as string | null,
     success: false,
   })
@@ -40,10 +49,6 @@ const ProfileName: React.FC<MyInformationProps> = ({ customer }) => {
   const clearState = () => {
     setSuccessState(false)
   }
-
-  useEffect(() => {
-    setSuccessState(state.success)
-  }, [state])
 
   return (
     <form action={formAction} className="w-full overflow-visible">

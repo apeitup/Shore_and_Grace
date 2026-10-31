@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useActionState, useEffect, useMemo } from "react"
+import React, { useActionState, useMemo } from "react"
 
 import Input from "@modules/common/components/input"
 import NativeSelect from "@modules/common/components/native-select"
@@ -48,18 +48,23 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
     initialState.addressId = billingAddress.id
   }
 
-  const [state, formAction] = useActionState(
-    billingAddress ? updateCustomerAddress : addCustomerAddress,
-    initialState
-  )
+  const saveBillingAddress = async (
+    currentState: Record<string, unknown>,
+    formData: FormData
+  ) => {
+    const saveAddress = billingAddress
+      ? updateCustomerAddress
+      : addCustomerAddress
+    const result = await saveAddress(currentState, formData)
+    setSuccessState(result.success)
+    return result
+  }
+
+  const [state, formAction] = useActionState(saveBillingAddress, initialState)
 
   const clearState = () => {
     setSuccessState(false)
   }
-
-  useEffect(() => {
-    setSuccessState(!!state.success)
-  }, [state])
 
   const currentInfo = useMemo(() => {
     if (!billingAddress) {
