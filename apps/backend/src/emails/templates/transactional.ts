@@ -29,7 +29,7 @@ export const renderSimpleActionEmail = (
     : ""
   const html = `
     <div class="sg-eyebrow" style="font-family:Montserrat,Arial,sans-serif;font-size:11px;line-height:16px;font-weight:600;letter-spacing:1.4px;color:${colors.sage};text-transform:uppercase">${escapeHtml(data.eyebrow)}</div>
-    <h1 class="sg-title" style="padding-top:24px;font-family:'Cormorant Garamond',Georgia,serif;font-size:36px;line-height:42px;font-weight:400;color:${colors.ink};margin:0">${escapeHtml(data.title)}</h1>
+    <h1 class="sg-title" style="padding-top:24px;font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;line-height:1.2;font-weight:400;color:${colors.ink};margin:0">${escapeHtml(data.title)}</h1>
     <div class="sg-copy" style="padding-top:24px;font-family:Montserrat,Arial,sans-serif;font-size:16px;line-height:24px;font-weight:600;color:${colors.ink}">Hello ${escapeHtml(data.recipientName)},</div>
     <div class="sg-copy" style="padding-top:16px;font-family:Montserrat,Arial,sans-serif;font-size:15px;line-height:24px;color:${colors.ink}">${escapeHtml(data.intro)}</div>
     ${paragraphs}

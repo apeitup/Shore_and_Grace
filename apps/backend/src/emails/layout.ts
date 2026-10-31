@@ -103,7 +103,7 @@ export const renderEmailLayout = ({
       body{height:100%!important;margin:0!important;padding:0!important;width:100%!important;background:#f7f6f4;color:${colors.ink}}
       .sg-copy{font-family:Montserrat,Arial,sans-serif;font-size:15px;line-height:24px;color:${colors.ink}}
       .sg-secondary{color:${colors.secondary}}
-      .sg-title{font-family:"Cormorant Garamond",Georgia,serif;font-size:36px;line-height:42px;font-weight:400;color:${colors.ink};margin:0}
+      .sg-title{font-family:"Cormorant Garamond",Georgia,serif;font-size:32px;line-height:1.2;font-weight:400;color:${colors.ink};margin:0}
       .sg-section-title{font-family:Montserrat,Arial,sans-serif;font-size:19px;line-height:26px;font-weight:600;color:${colors.ink};margin:0}
       .sg-eyebrow{font-family:Montserrat,Arial,sans-serif;font-size:11px;line-height:16px;font-weight:600;letter-spacing:1.4px;color:${colors.sage};text-transform:uppercase}
       .sg-container{width:600px;max-width:600px;table-layout:fixed}
@@ -170,7 +170,7 @@ export const renderEmailLayout = ({
               </div>
               <div class="sg-footer-copy" style="font-family:Montserrat,Arial,sans-serif;font-size:12px;line-height:18px;color:${colors.ink}">contact@shoreandgrace.com</div>
               <div class="sg-footer-copy" style="padding-top:8px;font-family:Montserrat,Arial,sans-serif;font-size:11px;line-height:18px;color:${colors.secondary}">© ${year} Shore &amp; Grace. All rights reserved.</div>
-              <div class="sg-footer-copy" style="font-family:Montserrat,Arial,sans-serif;font-size:11px;line-height:18px;color:${colors.secondary}">${unsubscribeUrl ? `<a href="${escapeHtml(unsubscribeUrl)}" style="color:${colors.secondary}">Unsubscribe</a> &nbsp;·&nbsp; ` : ""}<a href="${escapeHtml(`${normalizedSiteUrl}/privacy-policy`)}" style="color:${colors.secondary}">Privacy policy</a> &nbsp;·&nbsp; <a href="${escapeHtml(`${normalizedSiteUrl}/cookie-policy`)}" style="color:${colors.secondary}">Cookie policy</a></div>
+              <div class="sg-footer-copy" style="font-family:Montserrat,Arial,sans-serif;font-size:11px;line-height:18px;color:${colors.secondary}">${unsubscribeUrl ? `<a href="${escapeHtml(unsubscribeUrl)}" style="color:${colors.secondary}">Unsubscribe</a> &nbsp;·&nbsp; ` : ""}<a href="${escapeHtml(`${normalizedSiteUrl}/privacy`)}" style="color:${colors.secondary}">Privacy policy</a> &nbsp;·&nbsp; <a href="${escapeHtml(`${normalizedSiteUrl}/cookies`)}" style="color:${colors.secondary}">Cookie policy</a></div>
             </td>
           </tr>
         </table>

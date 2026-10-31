@@ -31,6 +31,12 @@ export type PasswordResetState = {
   error?: string
 } | null
 
+async function sendPasswordReset(email: string) {
+  await sdk.auth.resetPassword("customer", "emailpass", {
+    identifier: email,
+  })
+}
+
 // Requests a verification email for the given customer. The request must be
 // authenticated with a token tied to the auth identity (the token returned by
 // register or by a login that requires verification).
@@ -156,12 +162,32 @@ export async function requestPasswordReset(
   }
 
   try {
-    await sdk.auth.resetPassword("customer", "emailpass", {
-      identifier: email,
-    })
+    await sendPasswordReset(email)
   } catch {
     // Return the same response whether or not the account exists so this form
     // cannot be used to discover customer email addresses.
+  }
+
+  return { state: "requested" }
+}
+
+export async function requestAccountPasswordChange(): Promise<PasswordResetState> {
+  const customer = await retrieveCustomer()
+
+  if (!customer?.email) {
+    return {
+      state: "error",
+      error: "Sign in again before requesting a password change.",
+    }
+  }
+
+  try {
+    await sendPasswordReset(customer.email)
+  } catch {
+    return {
+      state: "error",
+      error: "We could not send the password change email. Please try again.",
+    }
   }
 
   return { state: "requested" }
@@ -193,18 +219,18 @@ export async function completePasswordReset(
   }
 
   try {
-    await sdk.auth.updateProvider(
-      "customer",
-      "emailpass",
-      { password },
-      token,
-    )
+    await sdk.auth.updateProvider("customer", "emailpass", { password }, token)
   } catch {
     return {
       state: "error",
       error: "This password reset link is invalid or has expired.",
     }
   }
+
+  await removeAuthToken()
+
+  const customerCacheTag = await getCacheTag("customers")
+  revalidateTag(customerCacheTag, { expire: 0 })
 
   return { state: "success" }
 }

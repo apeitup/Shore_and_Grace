@@ -22,6 +22,45 @@ export type InternalContactEnquiryData = ContactAcknowledgementData & {
   message: string
 }
 
+export type ContactReplyData = ContactAcknowledgementData & {
+  subject: string
+  message: string
+  originalMessage: string
+}
+
+export const renderContactReplyEmail = ({
+  name,
+  reference,
+  subject,
+  message,
+  originalMessage,
+}: ContactReplyData): EmailContent => {
+  const firstName = name.trim().split(/\s+/)[0] || name
+  const replyTitle = /^re:/i.test(subject.trim())
+    ? subject.trim()
+    : `Re: ${subject.trim()}`
+  const html = `
+    <div class="sg-eyebrow" style="font-family:Montserrat,Arial,sans-serif;font-size:11px;line-height:16px;font-weight:600;letter-spacing:1.4px;color:${colors.sage};text-transform:uppercase">Contact us reply</div>
+    <h1 class="sg-title" style="padding-top:24px;font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;line-height:1.2;font-weight:400;color:${colors.ink};margin:0">${escapeHtml(replyTitle)}</h1>
+    <div class="sg-copy" style="padding-top:24px;font-family:Montserrat,Arial,sans-serif;font-size:16px;line-height:24px;color:${colors.ink}">Hello ${escapeHtml(firstName)},</div>
+    <div class="sg-copy" style="padding-top:24px;font-family:Montserrat,Arial,sans-serif;font-size:15px;line-height:24px;color:${colors.ink}">${lineBreaks(message)}</div>
+    <div style="padding-top:24px">${infoCard(`
+      <div class="sg-eyebrow" style="font-family:Montserrat,Arial,sans-serif;font-size:11px;line-height:16px;font-weight:600;letter-spacing:1.2px;color:${colors.sage};text-transform:uppercase">Your enquiry</div>
+      <div class="sg-section-title" style="padding-top:6px;font-family:Montserrat,Arial,sans-serif;font-size:16px;line-height:21px;font-weight:600;color:${colors.ink}">REF: ${escapeHtml(reference)}</div>
+      <div class="sg-copy" style="padding-top:6px;font-family:Montserrat,Arial,sans-serif;font-size:15px;line-height:24px;color:${colors.ink}">${lineBreaks(originalMessage)}</div>
+    `)}</div>
+    <div class="sg-copy sg-secondary" style="padding-top:24px;font-family:Montserrat,Arial,sans-serif;font-size:14px;line-height:22px;color:${colors.secondary}">Reply to this email if you would like to add anything to your enquiry.</div>
+    <div style="height:1px;background:${colors.border};margin-top:24px"></div>
+    <div style="padding-top:24px">${emailSignature("informal")}</div>`
+
+  return contentResult(
+    subject,
+    `${replyTitle}\n\nHello ${firstName},\n\n${message}\n\nYour enquiry\nREF: ${reference}\n${originalMessage}\n\nReply to this email if you would like to add anything to your enquiry.\n\n${emailSignatureText("informal")}`,
+    html,
+    `${subject} — enquiry ${reference}`,
+  )
+}
+
 export const renderContactAcknowledgementEmail = ({
   name,
   reference,
@@ -34,7 +73,7 @@ export const renderContactAcknowledgementEmail = ({
   `)
   const html = `
     <div class="sg-eyebrow" style="font-family:Montserrat,Arial,sans-serif;font-size:11px;line-height:16px;font-weight:600;letter-spacing:1.4px;color:${colors.sage};text-transform:uppercase">Message received</div>
-    <h1 class="sg-title" style="padding-top:24px;font-family:'Cormorant Garamond',Georgia,serif;font-size:36px;line-height:42px;font-weight:400;color:${colors.ink};margin:0">Thank you for getting in touch</h1>
+    <h1 class="sg-title" style="padding-top:24px;font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;line-height:1.2;font-weight:400;color:${colors.ink};margin:0">Thank you for getting in touch</h1>
     <div class="sg-copy" style="padding-top:24px;font-family:Montserrat,Arial,sans-serif;font-size:16px;line-height:24px;font-weight:600;color:${colors.ink}">Hello ${escapeHtml(name)},</div>
     <div class="sg-copy" style="padding-top:24px;font-family:Montserrat,Arial,sans-serif;font-size:15px;line-height:24px;color:${colors.ink}">Thank you for contacting Shore &amp; Grace. We have received your message and aim to reply within two working days.</div>
     <div style="padding-top:24px">${card}</div>
@@ -64,7 +103,7 @@ export const renderInternalContactEnquiryEmail = (
   ].join("")
   const html = `
     <div class="sg-eyebrow" style="font-family:Montserrat,Arial,sans-serif;font-size:11px;line-height:16px;font-weight:600;letter-spacing:1.4px;color:${colors.sage};text-transform:uppercase">New contact enquiry</div>
-    <h1 class="sg-title" style="padding-top:24px;font-family:'Cormorant Garamond',Georgia,serif;font-size:36px;line-height:42px;font-weight:400;color:${colors.ink};margin:0">${escapeHtml(enquiry.name)} has sent a message</h1>
+    <h1 class="sg-title" style="padding-top:24px;font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;line-height:1.2;font-weight:400;color:${colors.ink};margin:0">${escapeHtml(enquiry.name)} has sent a message</h1>
     <div style="padding-top:24px">${infoCard(`
       <p class="sg-copy" style="margin:0 0 8px"><strong>Reference:</strong> ${escapeHtml(enquiry.reference)}</p>
       <p class="sg-copy" style="margin:0 0 8px"><strong>Category:</strong> ${escapeHtml(enquiry.category)}</p>

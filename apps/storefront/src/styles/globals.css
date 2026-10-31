@@ -1089,6 +1089,33 @@ body {
   min-width: 132px;
 }
 
+.sg-account-password {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #d9d8d6;
+}
+
+.sg-account-password h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 25px;
+}
+
+.sg-account-password p {
+  margin: 4px 0 0;
+  color: #77716b;
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.sg-account-password .sg-brand-button {
+  flex: 0 0 auto;
+}
+
 .sg-account-details .sg-input-field[data-read-only="true"] .sg-input-field__control,
 .sg-account-details .sg-select-field[data-read-only="true"] .sg-select-field__control {
   height: 50px !important;
@@ -1688,6 +1715,13 @@ body {
     width: 100%;
     min-width: 0;
   }
+  .sg-account-password {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .sg-account-password p { font-size: 16px; line-height: 24px; }
+  .sg-account-password .sg-brand-button { width: 100%; }
   .sg-occasions { display: flex; flex-direction: column; gap: 12px; padding-bottom: 40px; }
   .sg-occasions .sg-account-panel__header {
     min-height: 0;

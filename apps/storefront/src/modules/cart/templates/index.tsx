@@ -70,7 +70,16 @@ const CartTemplate = ({
           </div>
         )}
       </div>
-      <CartRelatedProducts countryCode={countryCode} />
+      <CartRelatedProducts
+        countryCode={countryCode}
+        sourceProductIds={Array.from(
+          new Set(
+            (cart?.items || [])
+              .map((item) => item.product_id)
+              .filter((id): id is string => Boolean(id)),
+          ),
+        )}
+      />
     </div>
   )
 }

@@ -6,6 +6,7 @@ import {
 import {
   Button,
   Container,
+  Drawer,
   FocusModal,
   Heading,
   IconButton,
@@ -159,6 +160,7 @@ const NewsletterBuilderPage = () => {
   const [searchParams] = useSearchParams()
   const requestedCampaignId = searchParams.get("id") || undefined
   const requestedTemplateId = searchParams.get("template") || undefined
+  const requestedPreset = searchParams.get("preset") || undefined
   const requestedKind = searchParams.get("kind") === "template"
     ? "template"
     : "newsletter"
@@ -170,9 +172,7 @@ const NewsletterBuilderPage = () => {
   const [history, setHistory] = useState<NewsletterBlock[][]>([])
   const [future, setFuture] = useState<NewsletterBlock[][]>([])
   const [campaignId, setCampaignId] = useState<string | undefined>()
-  const [name, setName] = useState(
-    requestedKind === "template" ? "Untitled template" : "Untitled newsletter",
-  )
+  const [name, setName] = useState("")
   const [subject, setSubject] = useState("")
   const [preheader, setPreheader] = useState("")
   const [campaignKind, setCampaignKind] = useState<"newsletter" | "template">(
@@ -191,6 +191,22 @@ const NewsletterBuilderPage = () => {
   useEffect(() => {
     const sourceId = requestedCampaignId || requestedTemplateId
 
+    if (requestedPreset === "default") {
+      setCampaignId(undefined)
+      setName(
+        requestedKind === "template"
+          ? "Shore & Grace Default"
+          : "",
+      )
+      setSubject("")
+      setPreheader("")
+      setCampaignKind(requestedKind)
+      setCampaignStatus("draft")
+      setBlocks(initialBlocks)
+      setSelectedBlockId(initialBlocks[0].id)
+      return
+    }
+
     if (sourceId) {
       sdk.client.fetch<{
         newsletter: {
@@ -208,7 +224,7 @@ const NewsletterBuilderPage = () => {
           : initialBlocks
 
         setCampaignId(requestedTemplateId ? undefined : newsletter.id)
-        setName(requestedTemplateId ? `${newsletter.name} newsletter` : newsletter.name)
+        setName(requestedTemplateId ? "" : newsletter.name)
         setSubject(newsletter.subject || "")
         setPreheader(newsletter.preheader || "")
         setCampaignKind(requestedTemplateId ? "newsletter" : newsletter.kind)
@@ -233,7 +249,11 @@ const NewsletterBuilderPage = () => {
         setBlocks(parsed.blocks)
         setSelectedBlockId(parsed.selectedBlockId || parsed.blocks[0].id)
         setCampaignId(parsed.campaignId)
-        setName(parsed.name || "Untitled newsletter")
+        setName(
+          ["Untitled newsletter", "Untitled template"].includes(parsed.name)
+            ? ""
+            : parsed.name || "",
+        )
         setSubject(parsed.subject || "")
         setPreheader(parsed.preheader || "")
         setCampaignKind(parsed.kind || requestedKind)
@@ -241,7 +261,12 @@ const NewsletterBuilderPage = () => {
     } catch {
       window.localStorage.removeItem("shore-grace-newsletter-draft")
     }
-  }, [requestedCampaignId, requestedKind, requestedTemplateId])
+  }, [
+    requestedCampaignId,
+    requestedKind,
+    requestedPreset,
+    requestedTemplateId,
+  ])
 
   const selectedBlock = useMemo(
     () => blocks.find((block) => block.id === selectedBlockId),
@@ -363,8 +388,8 @@ const NewsletterBuilderPage = () => {
       return
     }
 
-    if (validate) {
-      if (campaignKind === "newsletter" && !subject.trim()) {
+    if (validate && campaignKind === "newsletter") {
+      if (!subject.trim()) {
         setDetailsOpen(true)
         toast.error("Add an email subject")
         return
@@ -557,7 +582,9 @@ const NewsletterBuilderPage = () => {
           <div>
             <Heading>Newsletter Builder</Heading>
             <Text size="small" className="text-ui-fg-subtle">
-              {name}
+              {name.trim() || (campaignKind === "template"
+                ? "Untitled template"
+                : "Untitled newsletter")}
             </Text>
           </div>
           <StatusBadge color={campaignStatus === "sent" ? "green" : "grey"}>
@@ -568,10 +595,10 @@ const NewsletterBuilderPage = () => {
         </div>
         <div className="flex items-center gap-2">
           <Button asChild size="small" variant="secondary">
-            <Link to="/newsletter/templates">Choose template</Link>
+            <Link to="/newsletter/templates?from=builder">Choose template</Link>
           </Button>
           <Button size="small" variant="secondary" onClick={() => setDetailsOpen(true)}>
-            Campaign details
+            {campaignKind === "template" ? "Template details" : "Newsletter details"}
           </Button>
           <div className="flex items-center rounded-md border border-ui-border-base bg-ui-bg-base">
             <Tooltip content="Undo">
@@ -686,20 +713,32 @@ const NewsletterBuilderPage = () => {
         <BlockSettings block={selectedBlock} onChange={updateBlock} />
       </div>
 
-      <FocusModal open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <FocusModal.Content>
-          <FocusModal.Header>
-            <div>
-              <FocusModal.Title>Campaign details</FocusModal.Title>
-              <FocusModal.Description>
-                Set the internal name and inbox copy for this newsletter.
-              </FocusModal.Description>
-            </div>
-          </FocusModal.Header>
-          <FocusModal.Body className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
+      <Drawer open={detailsOpen} onOpenChange={setDetailsOpen}>
+        <Drawer.Content>
+          <Drawer.Header>
+            <Drawer.Title>
+              {campaignKind === "template" ? "Template details" : "Newsletter details"}
+            </Drawer.Title>
+            <Drawer.Description>
+              {campaignKind === "template"
+                ? "Give this reusable template a clear internal name."
+                : "Set the internal name and inbox copy for this newsletter."}
+            </Drawer.Description>
+          </Drawer.Header>
+          <Drawer.Body className="flex flex-1 flex-col gap-6 overflow-auto p-6">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="campaign-name">Name</Label>
-              <Input id="campaign-name" value={name} onChange={(event) => setName(event.target.value)} />
+              <Label htmlFor="campaign-name">
+                {campaignKind === "template" ? "Template name" : "Newsletter name"}
+              </Label>
+              <Input
+                id="campaign-name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder={campaignKind === "template"
+                  ? "For example, Christmas collection"
+                  : "For example, Christmas collection launch"}
+                autoFocus
+              />
               <Text size="xsmall" className="text-ui-fg-subtle">Only visible in Medusa Admin.</Text>
             </div>
             {campaignKind === "newsletter" && (
@@ -715,13 +754,31 @@ const NewsletterBuilderPage = () => {
                 </div>
               </>
             )}
-            <div className="flex justify-end gap-2">
-              <Button variant="secondary" onClick={() => setDetailsOpen(false)}>Cancel</Button>
-              <Button onClick={() => setDetailsOpen(false)}>Done</Button>
+          </Drawer.Body>
+          <Drawer.Footer>
+            <div className="flex items-center justify-end gap-2">
+              <Drawer.Close asChild>
+                <Button variant="secondary">Cancel</Button>
+              </Drawer.Close>
+              <Button
+                isLoading={isSaving}
+                disabled={isSaving || !name.trim()}
+                onClick={async () => {
+                  const id = await persistCampaign({ validate: false })
+
+                  if (id) {
+                    setDetailsOpen(false)
+                  }
+                }}
+              >
+                {campaignId ? "Save changes" : campaignKind === "template"
+                  ? "Save template"
+                  : "Save newsletter"}
+              </Button>
             </div>
-          </FocusModal.Body>
-        </FocusModal.Content>
-      </FocusModal>
+          </Drawer.Footer>
+        </Drawer.Content>
+      </Drawer>
 
       <FocusModal open={testOpen} onOpenChange={setTestOpen}>
         <FocusModal.Content>

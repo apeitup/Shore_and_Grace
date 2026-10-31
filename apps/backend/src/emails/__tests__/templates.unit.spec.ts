@@ -1,6 +1,7 @@
 import {
   renderAccountWelcomeEmail,
   renderContactAcknowledgementEmail,
+  renderContactReplyEmail,
   renderDeliveryDelayedEmail,
   renderEmailVerificationEmail,
   renderNewsletterConfirmationEmail,
@@ -13,6 +14,35 @@ import {
 } from ".."
 
 describe("Shore & Grace email templates", () => {
+  it("renders a branded contact reply without exposing unescaped content", () => {
+    const email = renderContactReplyEmail({
+      name: "Troy <Halliday>",
+      reference: "SG-C-20261031-ABC123",
+      subject: "Your bouquet & delivery",
+      message: "Thank you for your message.\nWe can help with <that>.",
+      originalMessage: "Can you deliver this on Saturday? <please>",
+    })
+
+    expect(email.subject).toBe("Your bouquet & delivery")
+    expect(email.text).toContain("SG-C-20261031-ABC123")
+    expect(email.text).toContain("Warmest regards,\nAmanda\nShore & Grace")
+    expect(email.html).toContain("Your bouquet &amp; delivery")
+    expect(email.html).toContain("Contact us reply")
+    expect(email.html).toContain("font-size:32px;line-height:1.2")
+    expect(email.html).not.toContain("font-size:36px;line-height:42px")
+    expect(email.html).toContain("Hello Troy,")
+    expect(email.html).not.toContain("Hello Troy &lt;Halliday&gt;,")
+    expect(email.html).toContain("We can help with &lt;that&gt;.")
+    expect(email.html).toContain("Your enquiry")
+    expect(email.html).toContain("REF: SG-C-20261031-ABC123")
+    expect(email.html).toContain("Can you deliver this on Saturday? &lt;please&gt;")
+    expect(email.html).toContain("class=\"sg-logo-lockup\"")
+    expect(email.html).toContain("http://localhost:8000/privacy")
+    expect(email.html).toContain("http://localhost:8000/cookies")
+    expect(email.html).not.toContain("/privacy-policy")
+    expect(email.html).not.toContain("/cookie-policy")
+  })
+
   it("renders the contact acknowledgement with branded responsive typography", () => {
     const email = renderContactAcknowledgementEmail({
       name: "Troy <Halliday>",

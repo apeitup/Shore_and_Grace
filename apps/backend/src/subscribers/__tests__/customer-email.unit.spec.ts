@@ -1,7 +1,4 @@
-import {
-  ContainerRegistrationKeys,
-  Modules,
-} from "@medusajs/framework/utils"
+import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import customerEmailHandler from "../customer-email"
 
 describe("customer email subscriber", () => {
@@ -88,7 +85,7 @@ describe("customer email subscriber", () => {
         template: "email-verification",
         content: expect.objectContaining({
           html: expect.stringContaining(
-            "https://shoreandgrace.com/gb/verify-account?token=verify-token",
+            "https://shoreandgrace.com/verify-account?token=verify-token",
           ),
         }),
       }),
@@ -118,7 +115,7 @@ describe("customer email subscriber", () => {
         template: "password-reset",
         content: expect.objectContaining({
           html: expect.stringContaining(
-            "https://shoreandgrace.com/gb/reset-password?token=reset-token",
+            "https://shoreandgrace.com/reset-password?token=reset-token",
           ),
         }),
       }),

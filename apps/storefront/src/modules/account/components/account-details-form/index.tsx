@@ -1,10 +1,14 @@
 "use client"
 
-import { updateCustomer } from "@lib/data/customer"
+import {
+  type PasswordResetState,
+  requestAccountPasswordChange,
+  updateCustomer,
+} from "@lib/data/customer"
 import { HttpTypes } from "@medusajs/types"
 import BrandButton from "@modules/brand/components/button"
 import Input from "@modules/common/components/input"
-import { useActionState, useState } from "react"
+import { useActionState, useState, useTransition } from "react"
 import { useFormStatus } from "react-dom"
 
 type State = { success: boolean; error: string | null }
@@ -27,6 +31,9 @@ export default function AccountDetailsForm({
   customer: HttpTypes.StoreCustomer
 }) {
   const [isDirty, setIsDirty] = useState(false)
+  const [passwordState, setPasswordState] =
+    useState<PasswordResetState>(null)
+  const [passwordPending, startPasswordTransition] = useTransition()
 
   const save = async (_state: State, formData: FormData): Promise<State> => {
     try {
@@ -44,6 +51,14 @@ export default function AccountDetailsForm({
   }
 
   const [state, action] = useActionState(save, initialState)
+
+  const requestPasswordChange = () => {
+    startPasswordTransition(async () => {
+      const result = await requestAccountPasswordChange()
+
+      setPasswordState(result)
+    })
+  }
 
   return (
     <form
@@ -102,6 +117,42 @@ export default function AccountDetailsForm({
         </div>
         <div className="sg-account-details__actions">
           <SaveButton disabled={!isDirty} />
+        </div>
+        <section
+          className="sg-account-password"
+          aria-labelledby="password-heading"
+        >
+          <div>
+            <h2 id="password-heading">Password</h2>
+            <p>
+              We will email a secure password-change link to {customer.email}.
+              The link expires after 15 minutes.
+            </p>
+          </div>
+          <BrandButton
+            type="button"
+            variant="secondary"
+            disabled={passwordPending}
+            onClick={requestPasswordChange}
+          >
+            {passwordPending
+              ? "Sending…"
+              : passwordState?.state === "requested"
+                ? "Send another email"
+                : "Change password"}
+          </BrandButton>
+        </section>
+        <div aria-live="polite">
+          {passwordState?.state === "requested" && (
+            <p className="sg-form-message sg-form-message--success">
+              Check your inbox for your secure password-change link.
+            </p>
+          )}
+          {passwordState?.state === "error" && (
+            <p className="sg-form-message sg-form-message--error">
+              {passwordState.error}
+            </p>
+          )}
         </div>
       </div>
     </form>

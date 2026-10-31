@@ -19,6 +19,7 @@ import {
 } from "@medusajs/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+import { formatContactReplySubject } from "../../lib/contact-enquiry";
 import { sdk } from "../../lib/sdk";
 
 type EnquiryStatus = "new" | "in_progress" | "resolved" | "spam";
@@ -37,6 +38,16 @@ type ContactEnquiry = {
   resolved_at?: string | null;
   retained_until: string;
   created_at: string;
+};
+
+type ContactEnquiryMessage = {
+  id: string;
+  direction: "inbound" | "outbound";
+  subject: string;
+  body: string;
+  recipient_email: string;
+  sender_email: string;
+  sent_at: string;
 };
 
 const statusLabels: Record<EnquiryStatus, string> = {
@@ -71,6 +82,9 @@ const ContactEnquiriesPage = () => {
   const [status, setStatus] = useState<EnquiryStatus>("new");
   const [statusFilter, setStatusFilter] = useState("all");
   const [notes, setNotes] = useState("");
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [replySubject, setReplySubject] = useState("");
+  const [replyMessage, setReplyMessage] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [pagination, setPagination] = useState<DataTablePaginationState>({
@@ -131,10 +145,53 @@ const ContactEnquiriesPage = () => {
       toast.error(error.message || "Unable to update the enquiry"),
   });
 
+  const { data: conversation, isLoading: isConversationLoading } = useQuery<{
+    messages: ContactEnquiryMessage[];
+  }>({
+    queryKey: ["contact-enquiry-messages", selected?.id],
+    queryFn: () =>
+      sdk.client.fetch(
+        `/admin/contact-enquiries/${selected?.id}/messages`,
+      ),
+    enabled: Boolean(selected?.id),
+  });
+
+  const sendReply = useMutation({
+    mutationFn: () =>
+      sdk.client.fetch(`/admin/contact-enquiries/${selected?.id}/replies`, {
+        method: "POST",
+        body: {
+          request_id: crypto.randomUUID(),
+          subject: replySubject.trim(),
+          message: replyMessage.trim(),
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["contact-enquiry-messages", selected?.id],
+      });
+      queryClient.invalidateQueries({ queryKey: ["contact-enquiries"] });
+      if (status === "new") {
+        setStatus("in_progress");
+        setSelected((current) =>
+          current ? { ...current, status: "in_progress" } : current,
+        );
+      }
+      setReplyMessage("");
+      setReplyOpen(false);
+      toast.success("Reply sent");
+    },
+    onError: (error: Error) =>
+      toast.error(error.message || "Unable to send the reply"),
+  });
+
   const openEnquiry = (enquiry: ContactEnquiry) => {
     setSelected(enquiry);
     setStatus(enquiry.status);
     setNotes(enquiry.internal_notes || "");
+    setReplySubject(formatContactReplySubject(enquiry.message));
+    setReplyMessage("");
+    setReplyOpen(false);
   };
 
   const columns = useMemo(
@@ -208,10 +265,6 @@ const ContactEnquiriesPage = () => {
     getRowId: (row) => row.id,
   });
 
-  const emailSubject = selected
-    ? encodeURIComponent(`Re: ${selected.reference} — Shore & Grace enquiry`)
-    : "";
-
   return (
     <>
       <Container className="p-0">
@@ -283,21 +336,119 @@ const ContactEnquiriesPage = () => {
                 </Text>
               )}
             </div>
-            <div>
+            <div className="flex flex-col gap-3">
               <Text size="small" weight="plus">
-                {selected
+                Conversation
+              </Text>
+              <div className="rounded-lg border border-ui-border-base bg-ui-bg-subtle p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <Text size="small" weight="plus">
+                    {selected?.name}
+                  </Text>
+                  <Text size="xsmall" className="text-ui-fg-subtle">
+                    {selected?.created_at
+                      ? new Date(selected.created_at).toLocaleString("en-GB")
+                      : ""}
+                  </Text>
+                </div>
+                <Text size="xsmall" className="text-ui-fg-subtle">
+                  {selected
                   ? categoryLabels[selected.category] || selected.category
                   : "Enquiry"}
-              </Text>
-              <Text size="small" className="whitespace-pre-wrap">
-                {selected?.message}
-              </Text>
+                </Text>
+                <Text size="small" className="mt-2 whitespace-pre-wrap">
+                  {selected?.message}
+                </Text>
+              </div>
+              {isConversationLoading && (
+                <Text size="small" className="text-ui-fg-subtle">
+                  Loading replies…
+                </Text>
+              )}
+              {conversation?.messages.map((message) => (
+                <div
+                  key={message.id}
+                  className="ml-6 rounded-lg border border-ui-border-base bg-ui-bg-base p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <Text size="small" weight="plus">
+                        Shore &amp; Grace
+                      </Text>
+                      <Text size="xsmall" className="text-ui-fg-subtle">
+                        {message.subject}
+                      </Text>
+                    </div>
+                    <Text size="xsmall" className="text-ui-fg-subtle">
+                      {new Date(message.sent_at).toLocaleString("en-GB")}
+                    </Text>
+                  </div>
+                  <Text size="small" className="mt-2 whitespace-pre-wrap">
+                    {message.body}
+                  </Text>
+                </div>
+              ))}
             </div>
-            <Button asChild variant="secondary" size="small">
-              <a href={`mailto:${selected?.email}?subject=${emailSubject}`}>
-                Reply by email
-              </a>
-            </Button>
+            {!replyOpen ? (
+              <Button
+                variant="secondary"
+                size="small"
+                onClick={() => setReplyOpen(true)}
+              >
+                Reply
+              </Button>
+            ) : (
+              <div className="flex flex-col gap-3 rounded-lg border border-ui-border-base p-4">
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="contact-reply-subject">Subject</Label>
+                  <Input
+                    id="contact-reply-subject"
+                    value={replySubject}
+                    onChange={(event) => setReplySubject(event.target.value)}
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="contact-reply-message">Message</Label>
+                  <Textarea
+                    id="contact-reply-message"
+                    value={replyMessage}
+                    onChange={(event) => setReplyMessage(event.target.value)}
+                    rows={8}
+                    autoFocus
+                  />
+                  <Text
+                    size="small"
+                    leading="compact"
+                    className="text-ui-fg-subtle"
+                  >
+                    Write only the reply itself. The customer’s first name and
+                    the Shore &amp; Grace sign-off are added automatically by
+                    the email template.
+                  </Text>
+                  <Text size="xsmall" className="text-ui-fg-subtle">
+                    Sent to {selected?.email}. Customer replies will go to the
+                    Shore &amp; Grace contact inbox.
+                  </Text>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={() => setReplyOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    size="small"
+                    onClick={() => sendReply.mutate()}
+                    isLoading={sendReply.isPending}
+                    disabled={!replySubject.trim() || !replyMessage.trim()}
+                  >
+                    Send reply
+                  </Button>
+                </div>
+              </div>
+            )}
             <div className="flex flex-col gap-2">
               <Label htmlFor="contact-enquiry-status">Case status</Label>
               <Select

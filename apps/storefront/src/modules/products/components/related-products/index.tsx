@@ -5,6 +5,7 @@ import Product from "../product-preview"
 import Image from "next/image"
 import RelatedProductsCarousel from "./carousel"
 import { retrieveCustomerPreferences } from "@lib/data/customer-preferences"
+import { listMerchandisingProducts } from "@lib/data/merchandising"
 
 type RelatedProductsProps = {
   product: HttpTypes.StoreProduct
@@ -23,6 +24,24 @@ export default async function RelatedProducts({
 
   const preferences = await retrieveCustomerPreferences()
 
+  const [complementary, upsells, frequentlyBoughtTogether] = await Promise.all([
+    listMerchandisingProducts({
+      countryCode,
+      kind: "complementary",
+      sourceProductId: product.id,
+    }),
+    listMerchandisingProducts({
+      countryCode,
+      kind: "upsell",
+      sourceProductId: product.id,
+    }),
+    listMerchandisingProducts({
+      countryCode,
+      kind: "frequently_bought_together",
+      sourceProductId: product.id,
+    }),
+  ])
+
   // edit this function to define your related products logic
   const queryParams: HttpTypes.StoreProductListParams = {}
   if (region?.id) {
@@ -38,16 +57,20 @@ export default async function RelatedProducts({
   }
   queryParams.is_giftcard = false
 
-  let products = await listProducts({
-    queryParams,
-    countryCode,
-  }).then(({ response }) => {
-    return response.products.filter(
-      (responseProduct) => responseProduct.id !== product.id
-    )
-  })
+  let products = complementary.products
 
-  if (products.length < 4) {
+  if (!products.length) {
+    products = await listProducts({
+      queryParams,
+      countryCode,
+    }).then(({ response }) => {
+      return response.products.filter(
+        (responseProduct) => responseProduct.id !== product.id
+      )
+    })
+  }
+
+  if (!complementary.products.length && products.length < 4) {
     const fallbackProducts = await listProducts({
       queryParams: {
         region_id: region.id,
@@ -69,7 +92,7 @@ export default async function RelatedProducts({
     ].slice(0, 4)
   }
 
-  if (products.length < 4) {
+  if (!complementary.products.length && products.length < 4) {
     products = [product, ...products].slice(0, 4)
   }
 
@@ -77,8 +100,29 @@ export default async function RelatedProducts({
     return null
   }
 
-  return (
-    <div className="product-page-constraint sg-related-products__inner">
+  const sections = [
+    {
+      key: "complementary",
+      title: complementary.set?.name || "You may also like",
+      products,
+    },
+    {
+      key: "upsells",
+      title: upsells.set?.name || "A little more special",
+      products: upsells.products,
+    },
+    {
+      key: "frequently-bought-together",
+      title: frequentlyBoughtTogether.set?.name || "Frequently bought together",
+      products: frequentlyBoughtTogether.products,
+    },
+  ].filter((section) => section.products.length)
+
+  return sections.map((section) => (
+    <div
+      className="product-page-constraint sg-related-products__inner"
+      key={section.key}
+    >
       <div className="sg-related-products__heading">
         <Image
           src="/assets/home/sections/section-foliage.svg"
@@ -86,16 +130,16 @@ export default async function RelatedProducts({
           width={159}
           height={63}
         />
-        <h2>You may also like</h2>
+        <h2>{section.title}</h2>
       </div>
 
       <RelatedProductsCarousel>
-        {products.map((product) => (
-          <li key={product.id}>
-            <Product region={region} product={product} />
+        {section.products.map((relatedProduct) => (
+          <li key={relatedProduct.id}>
+            <Product region={region} product={relatedProduct} />
           </li>
         ))}
       </RelatedProductsCarousel>
     </div>
-  )
+  ))
 }

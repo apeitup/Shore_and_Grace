@@ -2,7 +2,6 @@ import { Button, Container, Heading, StatusBadge, Text } from "@medusajs/ui"
 import { useQuery } from "@tanstack/react-query"
 import { Link, useParams } from "react-router-dom"
 import { sdk } from "../../../../lib/sdk"
-import { NewsletterNav } from "../../components/newsletter-nav"
 
 type Campaign = {
   id: string
@@ -68,7 +67,6 @@ const NewsletterReportPage = () => {
 
   return (
     <div className="flex flex-col gap-3">
-      <NewsletterNav />
       <Container className="flex flex-wrap items-start justify-between gap-3 p-6">
         <div>
           <div className="flex items-center gap-2">

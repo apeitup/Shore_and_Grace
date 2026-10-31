@@ -4,51 +4,63 @@ import {
   defineMiddlewares,
   validateAndTransformBody,
   validateAndTransformQuery,
-} from "@medusajs/framework/http"
-import { GetAdminReviewsSchema } from "./admin/reviews/route"
-import { PostAdminUpdateReviewsStatusSchema } from "./admin/reviews/status/route"
-import { GetStoreReviewsSchema } from "./store/products/[id]/reviews/route"
-import { PostStoreReviewSchema } from "./store/reviews/route"
-import { PostStoreWishlistSchema } from "./store/wishlist/route"
-import { GetStoreFloristDeliveryOptionsSchema } from "./store/florist-delivery/options/route"
-import { PostStoreDeliveryReservationSchema } from "./store/florist-delivery/reservations/route"
-import { PostStoreGiftOrderSchema } from "./store/gift-order/route"
-import { PostAdminDeliveryZoneSchema } from "./admin/florist-delivery/route"
-import { PostAdminBlockedDeliveryDateSchema } from "./admin/florist-delivery/blocked-dates/route"
-import { PostAdminOccasionSchema } from "./admin/occasions/route"
-import { PostAdminOccasionUpdateSchema } from "./admin/occasions/[id]/route"
-import { PostStoreOccasionSchema } from "./store/occasions/route"
-import { PostStoreOccasionUpdateSchema } from "./store/occasions/personal/[id]/route"
-import { PostStoreOccasionPreferenceSchema } from "./store/occasions/preferences/route"
-import { PostCustomerPreferencesSchema } from "./store/customer-preferences/route"
-import { PostStorePrivacyRequestSchema } from "./store/privacy-requests/route"
-import { GetAdminPrivacyRequestsSchema } from "./admin/privacy-requests/route"
-import { PostAdminPrivacyRequestSchema } from "./admin/privacy-requests/[id]/route"
-import { GetAdminContactEnquiriesSchema } from "./admin/contact-enquiries/route"
-import { PostAdminContactEnquirySchema } from "./admin/contact-enquiries/[id]/route"
-import { PostStoreContactEnquirySchema } from "./store/contact-enquiries/route"
-import { contactRateLimit } from "./utils/contact-rate-limit"
-import { PostStoreNewsletterSchema } from "./store/newsletter/route"
-import { PostStoreNewsletterConfirmSchema } from "./store/newsletter/confirm/route"
-import { PostStoreNewsletterUnsubscribeSchema } from "./store/newsletter/unsubscribe/route"
-import { GetNewsletterOpenSchema } from "./newsletter/track/open/route"
-import { GetNewsletterClickSchema } from "./newsletter/track/click/route"
-import { GetAdminNewsletterSubscriptionsSchema } from "./admin/newsletter-subscriptions/route"
+} from "@medusajs/framework/http";
+import { GetAdminReviewsSchema } from "./admin/reviews/route";
+import { PostAdminUpdateReviewsStatusSchema } from "./admin/reviews/status/route";
+import { GetStoreReviewsSchema } from "./store/products/[id]/reviews/route";
+import { PostStoreReviewSchema } from "./store/reviews/route";
+import { PostStoreWishlistSchema } from "./store/wishlist/route";
+import { GetStoreFloristDeliveryOptionsSchema } from "./store/florist-delivery/options/route";
+import { PostStoreDeliveryReservationSchema } from "./store/florist-delivery/reservations/route";
+import { PostStoreGiftOrderSchema } from "./store/gift-order/route";
+import { PostAdminDeliveryZoneSchema } from "./admin/florist-delivery/route";
+import { PostAdminBlockedDeliveryDateSchema } from "./admin/florist-delivery/blocked-dates/route";
+import { PostAdminOccasionSchema } from "./admin/occasions/route";
+import { PostAdminOccasionUpdateSchema } from "./admin/occasions/[id]/route";
+import { PostStoreOccasionSchema } from "./store/occasions/route";
+import { PostStoreOccasionUpdateSchema } from "./store/occasions/personal/[id]/route";
+import { PostStoreOccasionPreferenceSchema } from "./store/occasions/preferences/route";
+import { PostCustomerPreferencesSchema } from "./store/customer-preferences/route";
+import { PostStorePrivacyRequestSchema } from "./store/privacy-requests/route";
+import { GetAdminPrivacyRequestsSchema } from "./admin/privacy-requests/route";
+import { PostAdminPrivacyRequestSchema } from "./admin/privacy-requests/[id]/route";
+import { GetAdminContactEnquiriesSchema } from "./admin/contact-enquiries/route";
+import { PostAdminContactEnquirySchema } from "./admin/contact-enquiries/[id]/route";
+import { PostAdminContactEnquiryReplySchema } from "./admin/contact-enquiries/[id]/replies/route";
+import { PostStoreContactEnquirySchema } from "./store/contact-enquiries/route";
+import { contactRateLimit } from "./utils/contact-rate-limit";
+import { passwordResetRateLimit } from "./utils/password-reset-rate-limit";
+import { PostStoreNewsletterSchema } from "./store/newsletter/route";
+import { PostStoreNewsletterConfirmSchema } from "./store/newsletter/confirm/route";
+import { PostStoreNewsletterUnsubscribeSchema } from "./store/newsletter/unsubscribe/route";
+import { GetNewsletterOpenSchema } from "./newsletter/track/open/route";
+import { GetNewsletterClickSchema } from "./newsletter/track/click/route";
+import { GetAdminNewsletterSubscriptionsSchema } from "./admin/newsletter-subscriptions/route";
 import {
   GetAdminNewsletterExportSchema,
   PostAdminNewsletterExportSchema,
-} from "./admin/newsletter-subscriptions/export/route"
-import { PostAdminNewsletterBatchSchema } from "./admin/newsletter-subscriptions/batch/route"
+} from "./admin/newsletter-subscriptions/export/route";
+import { PostAdminNewsletterBatchSchema } from "./admin/newsletter-subscriptions/batch/route";
 import {
   GetAdminNewslettersSchema,
   PostAdminNewsletterSchema,
-} from "./admin/newsletters/route"
-import { PostAdminNewsletterSendSchema } from "./admin/newsletters/[id]/send/route"
+} from "./admin/newsletters/route";
+import { PostAdminNewsletterSendSchema } from "./admin/newsletters/[id]/send/route";
+import {
+  GetAdminMerchandisingSchema,
+  PostAdminMerchandisingSchema,
+} from "./admin/merchandising/route";
+import { GetStoreMerchandisingSchema } from "./store/merchandising/route";
 
 // The product index declares filterable `status` and `sales_channel_ids`, so
 // the route narrows it to published products in the key's sales channels.
 export default defineMiddlewares({
   routes: [
+    {
+      matcher: "/auth/customer/emailpass/reset-password",
+      methods: ["POST"],
+      middlewares: [passwordResetRateLimit],
+    },
     {
       method: ["POST"],
       matcher: "/store/search",
@@ -147,9 +159,7 @@ export default defineMiddlewares({
     {
       matcher: "/store/newsletter/confirm",
       methods: ["POST"],
-      middlewares: [
-        validateAndTransformBody(PostStoreNewsletterConfirmSchema),
-      ],
+      middlewares: [validateAndTransformBody(PostStoreNewsletterConfirmSchema)],
     },
     {
       matcher: "/store/newsletter/unsubscribe",
@@ -159,18 +169,29 @@ export default defineMiddlewares({
       ],
     },
     {
+      matcher: "/store/merchandising",
+      methods: ["GET"],
+      middlewares: [validateAndTransformQuery(GetStoreMerchandisingSchema, {})],
+    },
+    {
+      matcher: "/admin/merchandising",
+      methods: ["GET"],
+      middlewares: [validateAndTransformQuery(GetAdminMerchandisingSchema, {})],
+    },
+    {
+      matcher: "/admin/merchandising",
+      methods: ["POST"],
+      middlewares: [validateAndTransformBody(PostAdminMerchandisingSchema)],
+    },
+    {
       matcher: "/newsletter/track/open",
       methods: ["GET"],
-      middlewares: [
-        validateAndTransformQuery(GetNewsletterOpenSchema, {}),
-      ],
+      middlewares: [validateAndTransformQuery(GetNewsletterOpenSchema, {})],
     },
     {
       matcher: "/newsletter/track/click",
       methods: ["GET"],
-      middlewares: [
-        validateAndTransformQuery(GetNewsletterClickSchema, {}),
-      ],
+      middlewares: [validateAndTransformQuery(GetNewsletterClickSchema, {})],
     },
     {
       matcher: "/store/occasions",
@@ -197,9 +218,7 @@ export default defineMiddlewares({
     {
       matcher: "/admin/occasions/:id",
       methods: ["POST"],
-      middlewares: [
-        validateAndTransformBody(PostAdminOccasionUpdateSchema),
-      ],
+      middlewares: [validateAndTransformBody(PostAdminOccasionUpdateSchema)],
     },
     {
       matcher: "/store/products/:id/reviews",
@@ -207,13 +226,7 @@ export default defineMiddlewares({
       middlewares: [
         validateAndTransformQuery(GetStoreReviewsSchema, {
           isList: true,
-          defaults: [
-            "id",
-            "rating",
-            "name",
-            "content",
-            "created_at",
-          ],
+          defaults: ["id", "rating", "name", "content", "created_at"],
         }),
       ],
     },
@@ -312,6 +325,13 @@ export default defineMiddlewares({
       middlewares: [validateAndTransformBody(PostAdminContactEnquirySchema)],
     },
     {
+      matcher: "/admin/contact-enquiries/:id/replies",
+      methods: ["POST"],
+      middlewares: [
+        validateAndTransformBody(PostAdminContactEnquiryReplySchema),
+      ],
+    },
+    {
       matcher: "/admin/newsletter-subscriptions",
       methods: ["GET"],
       middlewares: [
@@ -341,16 +361,12 @@ export default defineMiddlewares({
     {
       matcher: "/admin/newsletter-subscriptions/export",
       methods: ["POST"],
-      middlewares: [
-        validateAndTransformBody(PostAdminNewsletterExportSchema),
-      ],
+      middlewares: [validateAndTransformBody(PostAdminNewsletterExportSchema)],
     },
     {
       matcher: "/admin/newsletter-subscriptions/batch",
       methods: ["POST"],
-      middlewares: [
-        validateAndTransformBody(PostAdminNewsletterBatchSchema),
-      ],
+      middlewares: [validateAndTransformBody(PostAdminNewsletterBatchSchema)],
     },
     {
       matcher: "/admin/newsletters",
@@ -388,9 +404,7 @@ export default defineMiddlewares({
     {
       matcher: "/admin/newsletters/:id/send",
       methods: ["POST"],
-      middlewares: [
-        validateAndTransformBody(PostAdminNewsletterSendSchema),
-      ],
+      middlewares: [validateAndTransformBody(PostAdminNewsletterSendSchema)],
     },
   ],
-})
+});

@@ -1,10 +1,7 @@
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
 import type { INotificationModuleService } from "@medusajs/framework/types"
 import { createHash } from "node:crypto"
-import {
-  ContainerRegistrationKeys,
-  Modules,
-} from "@medusajs/framework/utils"
+import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import {
   renderAccountDeletedEmail,
   renderAccountWelcomeEmail,
@@ -125,7 +122,7 @@ export default async function customerEmailHandler({
         idempotencyKey: `${data.entity_id}:password-reset:${eventAttemptKey(data.token)}:v1`,
         content: renderPasswordResetEmail({
           recipientName: "there",
-          actionUrl: `${storefrontUrl()}/gb/reset-password?token=${encodeURIComponent(data.token)}`,
+          actionUrl: `${storefrontUrl()}/reset-password?token=${encodeURIComponent(data.token)}`,
         }),
       })
 
@@ -152,7 +149,7 @@ export default async function customerEmailHandler({
         idempotencyKey: `${data.entity_id}:email-verification:${eventAttemptKey(data.code)}:v1`,
         content: renderEmailVerificationEmail({
           recipientName: "there",
-          actionUrl: `${storefrontUrl()}/gb/verify-account?token=${encodeURIComponent(data.code)}`,
+          actionUrl: `${storefrontUrl()}/verify-account?token=${encodeURIComponent(data.code)}`,
         }),
       })
 
@@ -184,7 +181,7 @@ export default async function customerEmailHandler({
       resourceId: customer.id,
       content: renderAccountWelcomeEmail({
         recipientName: customer.first_name || "there",
-        actionUrl: `${storefrontUrl()}/gb/account`,
+        actionUrl: `${storefrontUrl()}/account`,
       }),
     })
 

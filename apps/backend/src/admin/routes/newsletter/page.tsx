@@ -20,7 +20,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { sdk } from "../../lib/sdk"
-import { NewsletterNav } from "./components/newsletter-nav"
 
 type NewsletterStatus = "pending" | "subscribed" | "unsubscribed"
 
@@ -279,7 +278,6 @@ const NewsletterPage = () => {
 
   return (
     <div className="flex flex-col gap-3">
-      <NewsletterNav />
       <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
         {summaryCards.map((card) => (
           <Container key={card.label} className="flex flex-col gap-1 p-4">

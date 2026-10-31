@@ -5,8 +5,10 @@ import {
   createDataTableColumnHelper,
   DataTable,
   DataTablePaginationState,
+  Drawer,
   Heading,
   Input,
+  Label,
   Select,
   StatusBadge,
   Text,
@@ -18,7 +20,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { sdk } from "../../../lib/sdk"
-import { NewsletterNav } from "./newsletter-nav"
 
 type CampaignStatus = "draft" | "scheduled" | "sending" | "sent" | "archived"
 type CampaignKind = "newsletter" | "template"
@@ -71,6 +72,8 @@ export const CampaignList = ({ kind }: { kind: CampaignKind }) => {
     pageIndex: 0,
     pageSize: 25,
   })
+  const [templateSource, setTemplateSource] = useState<Campaign | null>(null)
+  const [templateName, setTemplateName] = useState("")
   const prompt = usePrompt()
   const queryClient = useQueryClient()
   const offset = pagination.pageIndex * pagination.pageSize
@@ -117,11 +120,19 @@ export const CampaignList = ({ kind }: { kind: CampaignKind }) => {
   })
 
   const duplicateCampaign = useMutation({
-    mutationFn: ({ campaign, nextKind }: { campaign: Campaign; nextKind: CampaignKind }) =>
+    mutationFn: ({
+      campaign,
+      nextKind,
+      nextName,
+    }: {
+      campaign: Campaign
+      nextKind: CampaignKind
+      nextName?: string
+    }) =>
       sdk.client.fetch<{ newsletter: Campaign }>("/admin/newsletters", {
         method: "POST",
         body: {
-          name: `${campaign.name}${nextKind === "template" ? " template" : " copy"}`,
+          name: nextName?.trim() || `${campaign.name} copy`,
           subject: campaign.subject,
           preheader: campaign.preheader,
           status: "draft",
@@ -133,6 +144,8 @@ export const CampaignList = ({ kind }: { kind: CampaignKind }) => {
     onSuccess: ({ newsletter }) => {
       queryClient.invalidateQueries({ queryKey: ["newsletter-campaigns"] })
       toast.success(newsletter.kind === "template" ? "Template saved" : "Newsletter duplicated")
+      setTemplateSource(null)
+      setTemplateName("")
     },
     onError: (error: Error) => toast.error(error.message || "Unable to duplicate item"),
   })
@@ -201,10 +214,10 @@ export const CampaignList = ({ kind }: { kind: CampaignKind }) => {
               <Button
                 size="small"
                 variant="secondary"
-                onClick={() => duplicateCampaign.mutate({
-                  campaign: row.original,
-                  nextKind: "template",
-                })}
+                onClick={() => {
+                  setTemplateSource(row.original)
+                  setTemplateName(`${row.original.name} template`)
+                }}
               >
                 Save as template
               </Button>
@@ -248,7 +261,6 @@ export const CampaignList = ({ kind }: { kind: CampaignKind }) => {
 
   return (
     <div className="flex flex-col gap-3">
-      <NewsletterNav />
       <Container className="p-0">
         <DataTable instance={table}>
           <DataTable.Toolbar className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
@@ -298,6 +310,62 @@ export const CampaignList = ({ kind }: { kind: CampaignKind }) => {
           <DataTable.Pagination />
         </DataTable>
       </Container>
+      <Drawer
+        open={Boolean(templateSource)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setTemplateSource(null)
+            setTemplateName("")
+          }
+        }}
+      >
+        <Drawer.Content>
+          <Drawer.Header>
+            <Drawer.Title>Save as template</Drawer.Title>
+            <Drawer.Description>
+              Choose the internal name shown in the template library.
+            </Drawer.Description>
+          </Drawer.Header>
+          <Drawer.Body className="flex flex-1 flex-col gap-2 overflow-auto p-6">
+            <Label htmlFor="template-name">Template name</Label>
+            <Input
+              id="template-name"
+              value={templateName}
+              onChange={(event) => setTemplateName(event.target.value)}
+              placeholder="For example, Christmas collection"
+              autoFocus
+            />
+            <Text size="xsmall" className="text-ui-fg-subtle">
+              Only visible in Medusa Admin.
+            </Text>
+          </Drawer.Body>
+          <Drawer.Footer>
+            <div className="flex items-center justify-end gap-2">
+              <Drawer.Close asChild>
+                <Button size="small" variant="secondary">Cancel</Button>
+              </Drawer.Close>
+              <Button
+                size="small"
+                isLoading={duplicateCampaign.isPending}
+                disabled={!templateSource || !templateName.trim() || duplicateCampaign.isPending}
+                onClick={() => {
+                  if (!templateSource) {
+                    return
+                  }
+
+                  duplicateCampaign.mutate({
+                    campaign: templateSource,
+                    nextKind: "template",
+                    nextName: templateName,
+                  })
+                }}
+              >
+                Save template
+              </Button>
+            </div>
+          </Drawer.Footer>
+        </Drawer.Content>
+      </Drawer>
     </div>
   )
 }

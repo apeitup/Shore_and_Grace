@@ -102,7 +102,7 @@ export const renderOrderConfirmationEmail = (
 
   const html = `
     <div class="sg-eyebrow" style="font-family:Montserrat,Arial,sans-serif;font-size:11px;line-height:16px;font-weight:600;letter-spacing:1.4px;color:${colors.sage};text-transform:uppercase">Order confirmed</div>
-    <h1 class="sg-title" style="padding-top:16px;font-family:'Cormorant Garamond',Georgia,serif;font-size:35px;line-height:42px;font-weight:400;color:${colors.ink};margin:0">Thank you for your order</h1>
+    <h1 class="sg-title" style="padding-top:16px;font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;line-height:1.2;font-weight:400;color:${colors.ink};margin:0">Thank you for your order</h1>
     <div class="sg-copy" style="padding-top:20px;font-family:Montserrat,Arial,sans-serif;font-size:16px;line-height:24px;font-weight:600;color:${colors.ink}">Hello ${escapeHtml(data.purchaserName)},</div>
     <div class="sg-copy sg-secondary" style="padding-top:5px;font-family:Montserrat,Arial,sans-serif;font-size:14px;line-height:22px;color:${colors.secondary}">Your order is confirmed. We have sent the receipt and updates to ${escapeHtml(data.purchaserEmail)}.</div>
     <div style="padding-top:20px">${reference}</div>
