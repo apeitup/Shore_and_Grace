@@ -326,7 +326,7 @@ export async function confirmEmailVerification(
   }
 }
 
-export async function signout(countryCode: string) {
+export async function signout(_countryCode: string) {
   await sdk.auth.logout()
 
   await removeAuthToken()
@@ -339,7 +339,7 @@ export async function signout(countryCode: string) {
   const cartCacheTag = await getCacheTag("carts")
   revalidateTag(cartCacheTag, { expire: 0 })
 
-  redirect(`/${countryCode}/account`)
+  redirect("/account")
 }
 
 export async function transferCart() {

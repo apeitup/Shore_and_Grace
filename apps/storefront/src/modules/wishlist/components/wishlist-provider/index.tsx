@@ -1,7 +1,7 @@
 "use client"
 
 import { setWishlistProduct } from "@lib/data/wishlist"
-import { useParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import {
   createContext,
   ReactNode,
@@ -31,7 +31,6 @@ export const WishlistProvider = ({
   const [pendingProductIds, setPendingProductIds] = useState(
     () => new Set<string>()
   )
-  const { countryCode = "gb" } = useParams<{ countryCode?: string }>()
   const router = useRouter()
 
   const toggle = useCallback(
@@ -64,7 +63,7 @@ export const WishlistProvider = ({
             else next.delete(productId)
             return next
           })
-          router.push(`/${countryCode}/account`)
+          router.push("/account")
           return wasSaved
         }
 
@@ -92,7 +91,7 @@ export const WishlistProvider = ({
         })
       }
     },
-    [countryCode, pendingProductIds, productIds, router]
+    [pendingProductIds, productIds, router]
   )
 
   const value = useMemo(

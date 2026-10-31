@@ -4,7 +4,7 @@ import { headers } from "next/headers"
 export const STORE_NAME = "Shore & Grace"
 
 export const DEFAULT_COUNTRY_CODE = (
-  process.env.NEXT_PUBLIC_DEFAULT_REGION || "dk"
+  process.env.NEXT_PUBLIC_DEFAULT_REGION || "gb"
 ).toLowerCase()
 
 const configuredUrl = () => process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "")

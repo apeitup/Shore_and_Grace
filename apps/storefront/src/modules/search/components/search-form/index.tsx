@@ -1,17 +1,16 @@
 import { clx } from "@modules/common/components/ui"
 
 type SearchFormProps = {
-  countryCode: string
   defaultValue?: string
   className?: string
 }
 
 /** Plain GET form so search works without JavaScript and for browser agents. */
-const SearchForm = ({ countryCode, defaultValue, className }: SearchFormProps) => (
+const SearchForm = ({ defaultValue, className }: SearchFormProps) => (
   <form
     role="search"
     method="get"
-    action={`/${countryCode}/search`}
+    action="/search"
     className={clx("flex gap-2", className)}
     {...{
       toolname: "search_products",

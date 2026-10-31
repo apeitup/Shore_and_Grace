@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { listProducts } from "@lib/data/products"
-import { getRegion, listRegions } from "@lib/data/regions"
+import { getRegion } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
 import { isVariantInStock } from "@lib/util/inventory"
@@ -10,7 +10,7 @@ import {
   getPricedVariants,
   toJsonLd,
 } from "@lib/util/product-structured-data"
-import { getSiteOrigin, listCountryCodes, STORE_NAME } from "@lib/util/site"
+import { getSiteOrigin, STORE_NAME } from "@lib/util/site"
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
@@ -36,9 +36,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
-  const [origin, regions] = await Promise.all([getSiteOrigin(), listRegions()])
+  const origin = await getSiteOrigin()
   const path = `/products/${product.handle}`
-  const productUrl = `${origin}/${params.countryCode}${path}`
+  const productUrl = `${origin}${path}`
   const description = product.description || product.title
 
   return {
@@ -46,12 +46,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     description,
     alternates: {
       canonical: productUrl,
-      languages: Object.fromEntries(
-        listCountryCodes(regions).map((code) => [
-          `en-${code.toUpperCase()}`,
-          `${origin}/${code}${path}`,
-        ]),
-      ),
+      languages: { "en-GB": productUrl },
       types: { "text/markdown": `${productUrl}.md` },
     },
     openGraph: {
@@ -124,7 +119,7 @@ export default async function ProductPage(props: Props) {
     product: pricedProduct,
     region,
     countryCode: params.countryCode,
-    productUrl: `${origin}/${params.countryCode}/products/${pricedProduct.handle}`,
+    productUrl: `${origin}/products/${pricedProduct.handle}`,
   })
 
   return (

@@ -9,6 +9,7 @@ const S3_HOSTNAME = process.env.MEDUSA_CLOUD_S3_HOSTNAME
 const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
 const MEDUSA_BACKEND_URL =
   process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "gb"
 
 /**
  * @type {import('next').NextConfig}
@@ -23,7 +24,7 @@ const nextConfig = {
         headers: [{ key: "Link", value: '</.well-known/ucp>; rel="ucp"' }],
       },
       {
-        source: "/:countryCode/products/:handle",
+        source: "/products/:handle",
         headers: [{ key: "Vary", value: "Accept" }],
       },
     ]
@@ -38,6 +39,10 @@ const nextConfig = {
         {
           source: "/:countryCode/medusa/:path*",
           destination: `${MEDUSA_BACKEND_URL}/:path*`,
+        },
+        {
+          source: "/products/:handle([^/.]+).md",
+          destination: `/${DEFAULT_REGION}/products/:handle/markdown`,
         },
         {
           source: "/:countryCode/products/:handle([^/.]+).md",

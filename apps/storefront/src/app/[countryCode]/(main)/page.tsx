@@ -4,31 +4,23 @@ import Hero from "@modules/home/components/hero"
 import HomeSections from "@modules/home/components/home-sections"
 import { getRegion, listRegions } from "@lib/data/regions"
 import { toJsonLd } from "@lib/util/product-structured-data"
-import { getSiteOrigin, listCountryCodes, STORE_NAME } from "@lib/util/site"
+import { getSiteOrigin, STORE_NAME } from "@lib/util/site"
 import { buildRegionsReturnPolicies } from "@lib/util/store-policies"
 
 export const dynamic = "force-static"
 export const revalidate = 60
 
-export async function generateMetadata(props: {
-  params: Promise<{ countryCode: string }>
-}): Promise<Metadata> {
-  const { countryCode } = await props.params
-  const [origin, regions] = await Promise.all([getSiteOrigin(), listRegions()])
+export async function generateMetadata(): Promise<Metadata> {
+  const origin = await getSiteOrigin()
 
   return {
     title: "Shore & Grace | Flowers, botanicals and thoughtful gifts",
     description:
       "Fresh flowers, lasting botanicals and thoughtful gifts, arranged with care on the Essex coast.",
     alternates: {
-      canonical: `${origin}/${countryCode}`,
+      canonical: origin,
       languages: {
-        ...Object.fromEntries(
-          listCountryCodes(regions).map((code) => [
-            `en-${code.toUpperCase()}`,
-            `${origin}/${code}`,
-          ]),
-        ),
+        "en-GB": origin,
         "x-default": origin,
       },
     },
@@ -49,7 +41,7 @@ export default async function Home(props: {
   }
 
   const [origin, regions] = await Promise.all([getSiteOrigin(), listRegions()])
-  const homeUrl = `${origin}/${countryCode}`
+  const homeUrl = origin
   const returnPolicies = buildRegionsReturnPolicies(regions)
   const structuredData = [
     {

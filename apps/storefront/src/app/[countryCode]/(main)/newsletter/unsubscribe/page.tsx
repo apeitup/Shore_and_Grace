@@ -9,18 +9,13 @@ export const metadata: Metadata = {
 }
 
 type NewsletterUnsubscribePageProps = {
-  params: Promise<{ countryCode: string }>
   searchParams: Promise<{ token?: string }>
 }
 
 export default async function NewsletterUnsubscribePage({
-  params,
   searchParams,
 }: NewsletterUnsubscribePageProps) {
-  const [{ countryCode }, { token }] = await Promise.all([
-    params,
-    searchParams,
-  ])
+  const { token } = await searchParams
 
   return (
     <main className="sg-newsletter-confirmation-page">
@@ -30,7 +25,7 @@ export default async function NewsletterUnsubscribePage({
       />
       <div className="content-container">
         {token ? (
-          <NewsletterUnsubscribe countryCode={countryCode} token={token} />
+          <NewsletterUnsubscribe token={token} />
         ) : (
           <section className="sg-newsletter-confirmation" role="alert">
             <p className="sg-newsletter-confirmation__eyebrow">

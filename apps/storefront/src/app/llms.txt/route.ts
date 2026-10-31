@@ -2,12 +2,7 @@ import { listCategories } from "@lib/data/categories"
 import { listCollections } from "@lib/data/collections"
 import { listRegions } from "@lib/data/regions"
 import { UCP_MCP_PATH, UCP_REST_BASE_PATH } from "@lib/ucp/ucp"
-import {
-  getDefaultCountryCode,
-  getRequestOrigin,
-  listCountryCodes,
-  STORE_NAME,
-} from "@lib/util/site"
+import { getRequestOrigin, listCountryCodes, STORE_NAME } from "@lib/util/site"
 
 export async function GET(request: Request) {
   const origin = getRequestOrigin(request)
@@ -19,7 +14,7 @@ export async function GET(request: Request) {
   ])
 
   const countries = listCountryCodes(regions)
-  const base = `${origin}/${getDefaultCountryCode(regions)}`
+  const base = origin
   const currencies = Array.from(
     new Set(regions.map((r) => r.currency_code?.toUpperCase()).filter(Boolean))
   )
@@ -35,7 +30,7 @@ export async function GET(request: Request) {
 
 > Online store. Ships to ${countries.length} countries. Prices in ${currencies.join(", ")}.
 
-URLs are prefixed with a two-letter country code that sets currency and pricing, for example \`${base}\`. Available country codes: ${countries.join(", ")}.
+This is a UK-only store. Public storefront URLs do not use a country prefix.
 
 ## Shop
 - [All products](${base}/store)

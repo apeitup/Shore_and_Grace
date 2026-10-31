@@ -77,12 +77,14 @@ type LayoutInput = {
   preheader: string
   content: string
   siteUrl?: string
+  unsubscribeUrl?: string
 }
 
 export const renderEmailLayout = ({
   preheader,
   content,
   siteUrl = process.env.STOREFRONT_URL || "http://localhost:8000",
+  unsubscribeUrl,
 }: LayoutInput) => {
   const normalizedSiteUrl = siteUrl.replace(/\/$/, "")
   const year = new Date().getFullYear()
@@ -168,7 +170,7 @@ export const renderEmailLayout = ({
               </div>
               <div class="sg-footer-copy" style="font-family:Montserrat,Arial,sans-serif;font-size:12px;line-height:18px;color:${colors.ink}">contact@shoreandgrace.com</div>
               <div class="sg-footer-copy" style="padding-top:8px;font-family:Montserrat,Arial,sans-serif;font-size:11px;line-height:18px;color:${colors.secondary}">© ${year} Shore &amp; Grace. All rights reserved.</div>
-              <div class="sg-footer-copy" style="font-family:Montserrat,Arial,sans-serif;font-size:11px;line-height:18px;color:${colors.secondary}"><a href="${escapeHtml(`${normalizedSiteUrl}/gb/privacy-policy`)}" style="color:${colors.secondary}">Privacy policy</a> &nbsp;·&nbsp; <a href="${escapeHtml(`${normalizedSiteUrl}/gb/cookie-policy`)}" style="color:${colors.secondary}">Cookie policy</a></div>
+              <div class="sg-footer-copy" style="font-family:Montserrat,Arial,sans-serif;font-size:11px;line-height:18px;color:${colors.secondary}">${unsubscribeUrl ? `<a href="${escapeHtml(unsubscribeUrl)}" style="color:${colors.secondary}">Unsubscribe</a> &nbsp;·&nbsp; ` : ""}<a href="${escapeHtml(`${normalizedSiteUrl}/privacy-policy`)}" style="color:${colors.secondary}">Privacy policy</a> &nbsp;·&nbsp; <a href="${escapeHtml(`${normalizedSiteUrl}/cookie-policy`)}" style="color:${colors.secondary}">Cookie policy</a></div>
             </td>
           </tr>
         </table>

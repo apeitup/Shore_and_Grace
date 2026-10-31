@@ -179,7 +179,7 @@ export default function ProductActions({
       <div className="flex flex-col gap-y-2">
         <form
           method="post"
-          action={`/${countryCode}/cart/add`}
+          action="/cart/add"
           onSubmit={handleSubmit}
           className="flex flex-col gap-y-2"
           {...{

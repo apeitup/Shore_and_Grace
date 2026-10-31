@@ -8,14 +8,10 @@ import BrandButton from "@modules/brand/components/button"
 type UnsubscribeState = "loading" | "success" | "error"
 
 type NewsletterUnsubscribeProps = {
-  countryCode: string
   token: string
 }
 
-export default function NewsletterUnsubscribe({
-  countryCode,
-  token,
-}: NewsletterUnsubscribeProps) {
+export default function NewsletterUnsubscribe({ token }: NewsletterUnsubscribeProps) {
   const [state, setState] = useState<UnsubscribeState>("loading")
   const requested = useRef(false)
 
@@ -51,7 +47,7 @@ export default function NewsletterUnsubscribe({
             We won’t send you newsletter emails. Essential emails about your
             orders and account are not affected.
           </p>
-          <BrandButton href={`/${countryCode}/store`} tone="ink">
+          <BrandButton href="/store" tone="ink">
             Continue shopping
           </BrandButton>
         </>
@@ -66,7 +62,7 @@ export default function NewsletterUnsubscribe({
             Please use the complete link from your newsletter, or contact us
             and we’ll help update your preferences.
           </p>
-          <BrandButton href={`/${countryCode}/contact`} variant="secondary">
+          <BrandButton href="/contact" variant="secondary">
             Contact us
           </BrandButton>
         </>

@@ -10,12 +10,12 @@ export const metadata: Metadata = {
 export default async function WishlistPage(props: {
   params: Promise<{ countryCode: string }>
 }) {
-  const { countryCode } = await props.params
+  await props.params
   const customer = await retrieveCustomer().catch(() => null)
 
   if (!customer) {
-    redirect(`/${countryCode}/account`)
+    redirect("/account")
   }
 
-  redirect(`/${countryCode}/account/wishlist`)
+  redirect("/account/wishlist")
 }

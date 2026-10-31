@@ -2,7 +2,10 @@ import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 import { MedusaError } from "@medusajs/framework/utils"
 import { NEWSLETTER_MODULE } from "../../modules/newsletter"
 import NewsletterModuleService from "../../modules/newsletter/service"
-import { verifyNewsletterUnsubscribeToken } from "../../utils/newsletter-unsubscribe-token"
+import {
+  verifyCampaignNewsletterUnsubscribeToken,
+  verifyNewsletterUnsubscribeToken,
+} from "../../utils/newsletter-unsubscribe-token"
 
 export type UnsubscribeNewsletterSubscriptionStepInput = {
   token: string
@@ -14,6 +17,7 @@ type PreviousSubscription = {
   confirmation_token_hash?: string | null
   confirmation_expires_at?: Date | null
   unsubscribed_at?: Date | null
+  created_event_id?: string
 }
 
 type UnsubscribeNewsletterSubscriptionStepOutput = {
@@ -32,7 +36,10 @@ export const unsubscribeNewsletterSubscriptionStep = createStep(
       PreviousSubscription
     >
   > => {
-    const subscriptionId = verifyNewsletterUnsubscribeToken(input.token)
+    const campaignToken = verifyCampaignNewsletterUnsubscribeToken(input.token)
+    const subscriptionId =
+      campaignToken?.subscriptionId ||
+      verifyNewsletterUnsubscribeToken(input.token)
 
     if (!subscriptionId) {
       throw new MedusaError(
@@ -53,6 +60,27 @@ export const unsubscribeNewsletterSubscriptionStep = createStep(
       confirmation_token_hash: subscription.confirmation_token_hash,
       confirmation_expires_at: subscription.confirmation_expires_at,
       unsubscribed_at: subscription.unsubscribed_at,
+    }
+
+    if (campaignToken) {
+      const [existingEvent] = await service.listNewsletterEvents(
+        {
+          campaign_id: campaignToken.campaignId,
+          subscription_id: subscription.id,
+          event_type: "unsubscribed",
+        },
+        { take: 1 },
+      )
+
+      if (!existingEvent) {
+        const event = await service.createNewsletterEvents({
+          campaign_id: campaignToken.campaignId,
+          subscription_id: subscription.id,
+          event_type: "unsubscribed",
+          occurred_at: new Date(),
+        })
+        previous.created_event_id = event.id
+      }
     }
 
     if (subscription.status === "unsubscribed") {
@@ -83,6 +111,10 @@ export const unsubscribeNewsletterSubscriptionStep = createStep(
     const service: NewsletterModuleService = container.resolve(
       NEWSLETTER_MODULE
     )
-    await service.updateNewsletterSubscriptions(previous)
+    const { created_event_id: createdEventId, ...subscription } = previous
+    if (createdEventId) {
+      await service.deleteNewsletterEvents(createdEventId)
+    }
+    await service.updateNewsletterSubscriptions(subscription)
   }
 )

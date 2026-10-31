@@ -28,7 +28,7 @@ const AccountNav = ({ onNavigate }: { onNavigate: (href: string) => void }) => {
   return (
     <nav
       className={clx("sg-account-nav", {
-        "sg-account-nav--overview": route === `/${countryCode}/account`,
+        "sg-account-nav--overview": route === "/account",
       })}
       aria-label="Account"
       data-testid="account-nav"
@@ -69,12 +69,9 @@ const AccountNavLink = ({
   onNavigate,
   "data-testid": dataTestId,
 }: AccountNavLinkProps) => {
-  const { countryCode }: { countryCode: string } = useParams()
-
-  const localRoute = route.split(countryCode)[1]
   const active = href === "/account"
-    ? localRoute === href
-    : localRoute === href || localRoute.startsWith(`${href}/`)
+    ? route === href
+    : route === href || route.startsWith(`${href}/`)
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (
@@ -94,7 +91,7 @@ const AccountNavLink = ({
       return
     }
 
-    onNavigate(`/${countryCode}${href}`)
+    onNavigate(href)
   }
 
   return (

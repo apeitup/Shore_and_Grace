@@ -8,7 +8,7 @@ import {
 } from "@lib/data/customer-preferences"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { COOKIE_CONSENT_EVENT } from "@modules/layout/components/cookie-consent"
-import { useParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
 
 type Preference = {
@@ -172,7 +172,6 @@ export default function AccountPreferences({
   } | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteConfirmation, setDeleteConfirmation] = useState("")
-  const { countryCode = "gb" } = useParams<{ countryCode?: string }>()
   const router = useRouter()
 
   useEffect(() => {
@@ -298,7 +297,7 @@ export default function AccountPreferences({
     setMessage(null)
     try {
       await deleteCustomerAccount()
-      router.push(`/${countryCode}?account-deleted=true`)
+      router.push("/?account-deleted=true")
       router.refresh()
     } catch (error) {
       setMessage({

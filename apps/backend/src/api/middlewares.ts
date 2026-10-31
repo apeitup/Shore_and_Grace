@@ -31,12 +31,19 @@ import { contactRateLimit } from "./utils/contact-rate-limit"
 import { PostStoreNewsletterSchema } from "./store/newsletter/route"
 import { PostStoreNewsletterConfirmSchema } from "./store/newsletter/confirm/route"
 import { PostStoreNewsletterUnsubscribeSchema } from "./store/newsletter/unsubscribe/route"
+import { GetNewsletterOpenSchema } from "./newsletter/track/open/route"
+import { GetNewsletterClickSchema } from "./newsletter/track/click/route"
 import { GetAdminNewsletterSubscriptionsSchema } from "./admin/newsletter-subscriptions/route"
 import {
   GetAdminNewsletterExportSchema,
   PostAdminNewsletterExportSchema,
 } from "./admin/newsletter-subscriptions/export/route"
 import { PostAdminNewsletterBatchSchema } from "./admin/newsletter-subscriptions/batch/route"
+import {
+  GetAdminNewslettersSchema,
+  PostAdminNewsletterSchema,
+} from "./admin/newsletters/route"
+import { PostAdminNewsletterSendSchema } from "./admin/newsletters/[id]/send/route"
 
 // The product index declares filterable `status` and `sales_channel_ids`, so
 // the route narrows it to published products in the key's sales channels.
@@ -149,6 +156,20 @@ export default defineMiddlewares({
       methods: ["POST"],
       middlewares: [
         validateAndTransformBody(PostStoreNewsletterUnsubscribeSchema),
+      ],
+    },
+    {
+      matcher: "/newsletter/track/open",
+      methods: ["GET"],
+      middlewares: [
+        validateAndTransformQuery(GetNewsletterOpenSchema, {}),
+      ],
+    },
+    {
+      matcher: "/newsletter/track/click",
+      methods: ["GET"],
+      middlewares: [
+        validateAndTransformQuery(GetNewsletterClickSchema, {}),
       ],
     },
     {
@@ -329,6 +350,46 @@ export default defineMiddlewares({
       methods: ["POST"],
       middlewares: [
         validateAndTransformBody(PostAdminNewsletterBatchSchema),
+      ],
+    },
+    {
+      matcher: "/admin/newsletters",
+      methods: ["GET"],
+      middlewares: [
+        validateAndTransformQuery(GetAdminNewslettersSchema, {
+          isList: true,
+          defaults: [
+            "id",
+            "name",
+            "subject",
+            "preheader",
+            "status",
+            "kind",
+            "season",
+            "content",
+            "scheduled_at",
+            "sent_at",
+            "created_at",
+            "updated_at",
+          ],
+        }),
+      ],
+    },
+    {
+      matcher: "/admin/newsletters",
+      methods: ["POST"],
+      middlewares: [validateAndTransformBody(PostAdminNewsletterSchema)],
+    },
+    {
+      matcher: "/admin/newsletters/:id",
+      methods: ["POST"],
+      middlewares: [validateAndTransformBody(PostAdminNewsletterSchema)],
+    },
+    {
+      matcher: "/admin/newsletters/:id/send",
+      methods: ["POST"],
+      middlewares: [
+        validateAndTransformBody(PostAdminNewsletterSendSchema),
       ],
     },
   ],

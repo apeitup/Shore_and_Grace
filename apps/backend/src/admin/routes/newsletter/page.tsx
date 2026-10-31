@@ -18,7 +18,9 @@ import {
 } from "@medusajs/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useEffect, useMemo, useState } from "react"
+import { Link } from "react-router-dom"
 import { sdk } from "../../lib/sdk"
+import { NewsletterNav } from "./components/newsletter-nav"
 
 type NewsletterStatus = "pending" | "subscribed" | "unsubscribed"
 
@@ -277,6 +279,7 @@ const NewsletterPage = () => {
 
   return (
     <div className="flex flex-col gap-3">
+      <NewsletterNav />
       <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
         {summaryCards.map((card) => (
           <Container key={card.label} className="flex flex-col gap-1 p-4">
@@ -292,21 +295,26 @@ const NewsletterPage = () => {
         <DataTable instance={table}>
           <DataTable.Toolbar className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div>
-              <Heading>Newsletter</Heading>
+              <Heading>Subscribers</Heading>
               <Text size="small" className="text-ui-fg-subtle">
                 View subscribers and the consent evidence recorded for each
                 address.
               </Text>
             </div>
-            <Button
-              variant="secondary"
-              size="small"
-              onClick={() => exportSubscriptions.mutate(undefined)}
-              isLoading={exportSubscriptions.isPending}
-            >
-              <ArrowDownTray />
-              Export filtered
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button asChild size="small">
+                <Link to="/newsletter/builder">Create newsletter</Link>
+              </Button>
+              <Button
+                variant="secondary"
+                size="small"
+                onClick={() => exportSubscriptions.mutate(undefined)}
+                isLoading={exportSubscriptions.isPending}
+              >
+                <ArrowDownTray />
+                Export filtered
+              </Button>
+            </div>
           </DataTable.Toolbar>
           {selectedIds.length > 0 && (
             <DataTable.Toolbar className="flex flex-wrap items-center justify-between gap-3 border-t px-6 py-3">

@@ -4,6 +4,7 @@ import {
   renderDeliveryDelayedEmail,
   renderEmailVerificationEmail,
   renderNewsletterConfirmationEmail,
+  renderNewsletterEmail,
   renderOrderConfirmationEmail,
   renderOrderDispatchedEmail,
   renderOrderDeliveredEmail,
@@ -164,5 +165,36 @@ describe("Shore & Grace email templates", () => {
     expect(dispatched.text).not.toContain("Your flowers have left")
     expect(delivered.html).toContain("Your order has arrived")
     expect(delivered.html).not.toContain("Your flowers have arrived")
+  })
+
+  it("renders newsletter blocks, hides empty content and supports tracking", () => {
+    const email = renderNewsletterEmail({
+      subject: "A little seasonal magic",
+      preheader: "The Christmas collection",
+      recipientName: "Troy",
+      unsubscribeUrl: "https://shoreandgrace.com/newsletter/unsubscribe?token=test",
+      trackingPixelUrl: "https://api.shoreandgrace.com/store/newsletter/track/open?token=test",
+      transformLink: (url) =>
+        `https://api.shoreandgrace.com/store/newsletter/track/click?target=${encodeURIComponent(url)}`,
+      blocks: [
+        {
+          type: "hero",
+          eyebrow: " ",
+          title: "Hello {{ first_name }}",
+          body: "Our winter collection has arrived.",
+          buttonLabel: "Explore the collection",
+          buttonLink: "https://shoreandgrace.com/store",
+        },
+        { type: "spacer", spacerSize: "small" },
+      ],
+    })
+
+    expect(email.html).toContain("Hello Troy")
+    expect(email.html).not.toContain(
+      '<div class="sg-eyebrow" style="padding-bottom:8px">',
+    )
+    expect(email.html).toContain("/store/newsletter/track/click")
+    expect(email.html).toContain("/store/newsletter/track/open")
+    expect(email.html).toContain("Unsubscribe")
   })
 })

@@ -10,7 +10,7 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ countryCode: string; cartId: string }> }
 ) {
-  const { countryCode, cartId } = await params
+  const { cartId } = await params
 
   try {
     const { cart } = await sdk.store.cart.retrieve(cartId, {
@@ -29,7 +29,7 @@ export async function GET(
   await activateCart(cartId)
 
   return NextResponse.redirect(
-    `${getRequestOrigin(request)}/${countryCode}/checkout`,
+    `${getRequestOrigin(request)}/checkout`,
     { status: 303, headers: NO_STORE }
   )
 }

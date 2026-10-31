@@ -1,11 +1,14 @@
 import {
+  createCampaignNewsletterUnsubscribeToken,
   createNewsletterUnsubscribeToken,
+  verifyCampaignNewsletterUnsubscribeToken,
   verifyNewsletterUnsubscribeToken,
 } from "../newsletter-unsubscribe-token"
 
 describe("newsletter unsubscribe tokens", () => {
   const secret = "a-test-secret-that-is-not-used-outside-this-suite"
   const subscriptionId = "newsl_01TESTSUBSCRIPTION"
+  const campaignId = "newscamp_01TESTCAMPAIGN"
 
   it("round trips a subscription id", () => {
     const token = createNewsletterUnsubscribeToken(subscriptionId, secret)
@@ -33,6 +36,20 @@ describe("newsletter unsubscribe tokens", () => {
     expect(
       verifyNewsletterUnsubscribeToken(token, "another-secret")
     ).toBeNull()
+  })
+
+  it("round trips campaign attribution without breaking legacy tokens", () => {
+    const token = createCampaignNewsletterUnsubscribeToken(
+      subscriptionId,
+      campaignId,
+      secret,
+    )
+
+    expect(verifyCampaignNewsletterUnsubscribeToken(token, secret)).toEqual({
+      subscriptionId,
+      campaignId,
+    })
+    expect(verifyNewsletterUnsubscribeToken(token, secret)).toBeNull()
   })
 
   it.each(["", "v1", "v2.payload.signature", "v1.payload.signature.extra"])(
