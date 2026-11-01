@@ -93,7 +93,7 @@ export default function Footer() {
               </LocalizedClientLink>
             </li>
             <li>
-              <LocalizedClientLink href="/contact">FAQ</LocalizedClientLink>
+              <LocalizedClientLink href="/faq">FAQ</LocalizedClientLink>
             </li>
             <li>
               <LocalizedClientLink href="/account/orders">

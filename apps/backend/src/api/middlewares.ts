@@ -51,6 +51,12 @@ import {
   PostAdminMerchandisingSchema,
 } from "./admin/merchandising/route";
 import { GetStoreMerchandisingSchema } from "./store/merchandising/route";
+import { PostAdminFaqCategorySchema } from "./admin/faq/categories/route";
+import {
+  GetAdminFaqQuestionsSchema,
+  PostAdminFaqQuestionSchema,
+} from "./admin/faq/questions/route";
+import { GetStoreFaqsSchema } from "./store/faqs/route";
 
 // The product index declares filterable `status` and `sales_channel_ids`, so
 // the route narrows it to published products in the key's sales channels.
@@ -182,6 +188,38 @@ export default defineMiddlewares({
       matcher: "/admin/merchandising",
       methods: ["POST"],
       middlewares: [validateAndTransformBody(PostAdminMerchandisingSchema)],
+    },
+    {
+      matcher: "/admin/faq/categories",
+      methods: ["POST"],
+      middlewares: [validateAndTransformBody(PostAdminFaqCategorySchema)],
+    },
+    {
+      matcher: "/admin/faq/categories/:id",
+      methods: ["POST"],
+      middlewares: [validateAndTransformBody(PostAdminFaqCategorySchema)],
+    },
+    {
+      matcher: "/admin/faq/questions",
+      methods: ["GET"],
+      middlewares: [
+        validateAndTransformQuery(GetAdminFaqQuestionsSchema, {}),
+      ],
+    },
+    {
+      matcher: "/admin/faq/questions",
+      methods: ["POST"],
+      middlewares: [validateAndTransformBody(PostAdminFaqQuestionSchema)],
+    },
+    {
+      matcher: "/admin/faq/questions/:id",
+      methods: ["POST"],
+      middlewares: [validateAndTransformBody(PostAdminFaqQuestionSchema)],
+    },
+    {
+      matcher: "/store/faqs",
+      methods: ["GET"],
+      middlewares: [validateAndTransformQuery(GetStoreFaqsSchema, {})],
     },
     {
       matcher: "/newsletter/track/open",
