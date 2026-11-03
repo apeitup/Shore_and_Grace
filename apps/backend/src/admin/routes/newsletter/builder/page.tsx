@@ -576,7 +576,7 @@ const NewsletterBuilderPage = () => {
   }
 
   return (
-    <Container className="flex h-[calc(100dvh-64px)] max-h-[calc(100dvh-64px)] min-h-0 flex-col overflow-hidden p-0">
+    <Container className="isolate flex h-[calc(100dvh-64px)] max-h-[calc(100dvh-64px)] min-h-0 flex-col overflow-hidden p-0">
       <header className="flex items-center justify-between border-b border-ui-border-base px-6 py-4">
         <div className="flex items-center gap-3">
           <div>
@@ -714,7 +714,10 @@ const NewsletterBuilderPage = () => {
       </div>
 
       <Drawer open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <Drawer.Content>
+        <Drawer.Content
+          className="z-50"
+          overlayProps={{ className: "z-40" }}
+        >
           <Drawer.Header>
             <Drawer.Title>
               {campaignKind === "template" ? "Template details" : "Newsletter details"}
