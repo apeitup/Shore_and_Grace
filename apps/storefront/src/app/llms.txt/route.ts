@@ -50,6 +50,8 @@ ${links.join("\n")}
 - [Terms of service](${base}/terms)
 - [Privacy policy](${base}/privacy)
 - [Cookie policy](${base}/cookies)
+- [About Shore & Grace](${base}/about)
+- [Floral services](${base}/services)
 - [Contact](${base}/contact)
 
 ## For agents

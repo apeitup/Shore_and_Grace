@@ -15,9 +15,7 @@ export default function BrandSignature({
   const markWidth = isFooter ? (mobile ? 124 : 122.269) : mobile ? 87 : 78
   const markHeight = isFooter ? (mobile ? 109 : 109.702) : mobile ? 56 : 50
   const mark = isFooter
-    ? mobile
-      ? "/assets/brand/footer-botanical-mobile.svg"
-      : "/assets/brand/footer-botanical.svg"
+    ? "/assets/brand/footer-botanical.svg"
     : mobile
       ? "/assets/brand/header-botanical-mobile.svg"
       : "/assets/brand/header-botanical.svg"

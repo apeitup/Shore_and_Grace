@@ -54,3 +54,59 @@
 - Adjust only any residual optical spacing visible in a same-viewport mobile capture.
 
 final result: blocked
+
+---
+
+# Services ornament and divider correction
+
+**Comparison Target**
+
+- Source visual truth: homepage foliage asset at `apps/storefront/public/assets/home/sections/section-foliage.svg` and the user-supplied `/Users/troyhalliday/Downloads/Divider.svg`.
+- User-supplied divider reference capture: `/var/folders/0f/xbl37n855_j48rxldlmhjc5m0000gn/T/TemporaryItems/NSIRD_screencaptureui_Dcb0SD/Screenshot 2026-11-03 at 07.47.05.png` (1522 x 156 pixels).
+- Desktop implementation capture: `/private/tmp/shore-grace-services-desktop-corrected.png` (1512 x 6854 pixels at a 1512 x 1000 CSS viewport, device density 1).
+- Mobile implementation capture: `/private/tmp/shore-grace-services-mobile-corrected.png` (390 x 6874 pixels at a 390 x 844 CSS viewport, device density 1).
+- State: Services quick links at rest; mobile Fresh Flowers anchor also tested after smooth scrolling settled.
+
+**Full-view Comparison Evidence**
+
+- Desktop and mobile captures show the Services page using the same horizontal foliage artwork as the homepage rather than the previous vertical flourish.
+- Desktop quick links now use four curved 6 x 62 SVG separators instead of straight CSS borders.
+- Mobile quick links retain horizontal scrolling and use the same curved separators without the previous pill borders.
+
+**Focused Region Comparison Evidence**
+
+- Foliage source and implementation side-by-side: `/private/tmp/shore-grace-icon-comparison.png` (1600 x 143 pixels). The visible artwork is identical because the Services component now references the homepage source asset directly.
+- Divider reference and implementation side-by-side: `/private/tmp/shore-grace-divider-comparison.png` (3034 x 224 pixels). The curved path, stroke colour, and 6 x 62 rendered geometry match the supplied SVG.
+- Focused regions were required because the ornament and 6-pixel divider curvature are too small to judge reliably in the full-page captures.
+
+**Required Fidelity Surfaces**
+
+- Fonts and typography: unchanged from the existing Services implementation; quick-link type remains on the existing brand body-family scale.
+- Spacing and layout rhythm: desktop links remain evenly distributed; mobile remains horizontally scrollable with 366px visible width and 794px scroll width.
+- Colors and visual tokens: divider uses the supplied `#D9D8D6` stroke; foliage uses the homepage asset's existing brand colour.
+- Image quality and asset fidelity: both corrections use source SVG files; no CSS-drawn or raster substitutes remain.
+- Copy and content: all five service labels and section copy remain unchanged.
+
+**Comparison History**
+
+- P1: Services used a separate vertical flourish that did not match the homepage section ornament. Fixed by referencing `section-foliage.svg`; post-fix rendered size is 159 x 63 desktop and 90 x 32 mobile.
+- P1: quick links used straight CSS borders on desktop and outlined pills on mobile. Fixed by rendering the supplied curved divider SVG between links; post-fix size is 6 x 62 at both breakpoints.
+- Post-fix evidence: both focused comparisons show the source assets and rendered implementation in the same image; no actionable P0/P1/P2 differences remain.
+
+**Findings**
+
+- No remaining P0, P1, or P2 fidelity issues in the requested ornament and quick-link divider corrections.
+
+**Implementation Checklist**
+
+- Homepage foliage asset reused in both Services ornament locations.
+- Four supplied curved dividers rendered between five quick links.
+- Desktop and 390px mobile layouts verified.
+- Mobile smooth-scroll anchor settles at the 74px sticky-header offset.
+- Browser console checked with no errors.
+
+**Follow-up Polish**
+
+- None required for this correction.
+
+final result: passed

@@ -105,7 +105,7 @@ export default function HomeSections() {
         <div className="sg-home-services__track">
           {services.map((service) => (
             <LocalizedClientLink
-              href={`/services/${service.slug}`}
+              href="/services"
               className="sg-home-service-card"
               key={service.slug}
             >

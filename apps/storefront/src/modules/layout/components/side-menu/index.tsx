@@ -2,7 +2,6 @@
 
 import { Popover, PopoverPanel, Transition } from "@headlessui/react"
 import { signout } from "@lib/data/customer"
-import { serviceLinks } from "@lib/service-links"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import {
@@ -23,6 +22,15 @@ type SideMenuProps = {
 }
 
 type AccordionName = "shop" | "services"
+
+const serviceLinks = [
+  { title: "All Services", href: "/services" },
+  { title: "Funeral Flowers", href: "/services#funeral-flowers" },
+  { title: "Faux Flowers", href: "/services#faux-flowers" },
+  { title: "Fresh Flowers", href: "/services#fresh-flowers" },
+  { title: "Floral Gifts", href: "/services#floral-gifts" },
+  { title: "Bespoke Designs", href: "/services#bespoke-designs" },
+] as const
 
 function PageTransform({ open }: { open: boolean }) {
   useEffect(() => {
@@ -168,9 +176,9 @@ function MenuContents({
                   className="sg-mobile-menu__subnav"
                 >
                   {serviceLinks.map((service) => (
-                    <li key={service.slug}>
+                    <li key={service.href}>
                       <MenuLink
-                        href={`/services/${service.slug}`}
+                        href={service.href}
                         label={service.title}
                         close={close}
                       />
@@ -180,7 +188,7 @@ function MenuContents({
               )}
             </li>
             <li>
-              <MenuLink href="/contact" label="About" close={close} />
+              <MenuLink href="/about" label="About" close={close} />
             </li>
             <li>
               <MenuLink href="/contact" label="Contact" close={close} />

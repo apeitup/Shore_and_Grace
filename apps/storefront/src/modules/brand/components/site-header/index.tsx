@@ -45,8 +45,8 @@ export default function SiteHeader({ cart, menu }: SiteHeaderProps) {
         <div className="sg-nav__links">
           <LocalizedClientLink href="/">Home</LocalizedClientLink>
           <LocalizedClientLink href="/store">Shop</LocalizedClientLink>
-          <LocalizedClientLink href="/contact">Services</LocalizedClientLink>
-          <LocalizedClientLink href="/contact">About</LocalizedClientLink>
+          <LocalizedClientLink href="/services">Services</LocalizedClientLink>
+          <LocalizedClientLink href="/about">About</LocalizedClientLink>
           <LocalizedClientLink href="/contact">Contact</LocalizedClientLink>
         </div>
 
