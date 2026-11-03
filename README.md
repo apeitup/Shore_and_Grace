@@ -49,7 +49,9 @@ pnpm holding:dev
 - Storefront: `http://localhost:8000`
 - Medusa API and Admin: `http://localhost:9000` and `http://localhost:9000/app`
 
-Use `pnpm dev` to start all three applications together after the database has been migrated and the storefront API key has been configured.
+Use `pnpm commerce:dev` to start PostgreSQL and Redis if needed, then launch only the Medusa backend and storefront together. Stop both development servers with `Ctrl+C`; the Docker services remain running so their data is preserved.
+
+Use `pnpm dev` to start all three applications, including the holding page, after the database has been migrated and the storefront API key has been configured.
 
 ## UK market configuration
 

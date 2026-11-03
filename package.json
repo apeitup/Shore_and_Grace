@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "pnpm -r dev",
+    "commerce:dev": "pnpm infra:up && turbo dev --filter=@shore-and-grace/backend --filter=@shore-and-grace/storefront",
     "build": "pnpm -r build",
     "start": "turbo start",
     "lint": "turbo lint",
