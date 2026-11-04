@@ -1,21 +1,32 @@
 import BrandButton from "@modules/brand/components/button"
 import Image from "next/image"
 
+import styles from "./about.module.css"
+
 const values = [
   {
     number: "01",
     title: "Personally chosen",
     body: "Every flower, gift and finishing detail is selected with purpose.",
+    image: "/assets/about/value-personally-chosen.png",
+    mobileImage: "/assets/about/value-personally-chosen-mobile.png",
+    alt: "Amanda selecting eucalyptus foliage for a floral arrangement",
   },
   {
     number: "02",
     title: "Made with care",
     body: "Each order receives the attention we would want for someone close to us.",
+    image: "/assets/about/value-made-with-care.png",
+    mobileImage: "/assets/about/value-made-with-care-mobile.png",
+    alt: "Amanda carefully tying a pink hand-tied bouquet at the studio bench",
   },
   {
     number: "03",
     title: "Genuinely personal",
     body: "Gentle guidance and thoughtful details shaped around the person and occasion.",
+    image: "/assets/about/value-genuinely-personal.png",
+    mobileImage: "/assets/about/value-genuinely-personal-mobile.png",
+    alt: "Amanda writing a personal Shore and Grace gift card beside flowers and a wrapped gift",
   },
 ]
 
@@ -37,30 +48,73 @@ const process = [
   },
 ]
 
-type DetailCardProps = {
-  number: string
-  title: string
-  body: string
-}
-
-function DetailCard({ number, title, body }: DetailCardProps) {
+function HeroImage() {
   return (
-    <article className="sg-about-card">
-      <p className="sg-about-card__number">{number}</p>
-      <h3>{title}</h3>
-      <p>{body}</p>
-    </article>
+    <picture className={styles.heroImage}>
+      <source
+        media="(min-width: 768px)"
+        srcSet="/assets/about/hero-kraft-desktop.png"
+      />
+      <source
+        media="(max-width: 767px)"
+        srcSet="/assets/about/hero-kraft-mobile.png"
+      />
+      <img
+        src="/assets/about/hero-kraft-mobile.png"
+        alt=""
+        width={1024}
+        height={512}
+        fetchPriority="high"
+      />
+    </picture>
   )
 }
 
-function Flourish() {
+type ArtDirectedImageProps = {
+  alt: string
+  desktop: {
+    height: number
+    src: string
+    width: number
+  }
+  mobile: {
+    height: number
+    src: string
+    width: number
+  }
+  sizes: string
+}
+
+function ArtDirectedImage({
+  alt,
+  desktop,
+  mobile,
+  sizes,
+}: ArtDirectedImageProps) {
+  return (
+    <picture className={styles.artDirectedImage}>
+      <source media="(min-width: 768px)" srcSet={desktop.src} />
+      <source media="(max-width: 767px)" srcSet={mobile.src} />
+      <img
+        src={mobile.src}
+        alt={alt}
+        width={mobile.width}
+        height={mobile.height}
+        sizes={sizes}
+        loading="lazy"
+      />
+    </picture>
+  )
+}
+
+function Flourish({ large = false }: { large?: boolean }) {
   return (
     <Image
-      className="sg-about-flourish"
+      className={large ? styles.flourishLarge : styles.flourish}
       src="/assets/home/sections/section-foliage.svg"
       alt=""
-      width={159}
-      height={63}
+      width={large ? 159 : 80}
+      height={large ? 63 : 32}
       aria-hidden="true"
     />
   )
@@ -68,154 +122,231 @@ function Flourish() {
 
 export default function AboutTemplate() {
   return (
-    <main className="sg-about">
-      <section className="sg-about-hero" aria-labelledby="about-title">
-        <Image
-          className="sg-about-hero__image"
-          src="/assets/about/banner-desktop.png"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-        />
-        <div className="sg-about-hero__content">
+    <main className={styles.page}>
+      <section className={styles.hero} aria-labelledby="about-title">
+        <HeroImage />
+        <div className={styles.heroContent}>
           <h1 id="about-title">
-            <span>About</span>{" "}
-            <span>Shore &amp; Grace</span>
+            <span>About</span> <span>Shore &amp; Grace</span>
           </h1>
           <p>
-            <span>Thoughtful flowers for</span>{" "}
-            <span>the moments that matter</span>
+            Thoughtful flowers for <span>the moments that matter</span>
           </p>
         </div>
-        <span className="sg-about-hero__curve" aria-hidden="true" />
+        <span className={styles.heroCurve} aria-hidden="true" />
       </section>
 
-      <section className="sg-about-founder sg-about-section">
-        <div className="sg-about-founder__copy">
-          <p className="sg-about-eyebrow">Meet Amanda</p>
-          <h2>Flowers, gifts and thoughtful details, chosen personally.</h2>
-          <p>
-            I’m Amanda, founder of Shore &amp; Grace. What began with a love of
-            flowers and meaningful gifting has grown into an independent studio
-            built around the moments people want to remember.
-          </p>
-          <p>
-            Every bouquet, keepsake and finishing touch is considered with care.
-            Whether you are celebrating something joyful, offering comfort or
-            simply letting someone know they are in your thoughts, I want the
-            experience to feel warm, personal and beautifully uncomplicated.
-          </p>
-          <BrandButton href="/contact" variant="secondary">
-            Ask Amanda
-          </BrandButton>
-        </div>
-        <div className="sg-about-founder__image sg-about-image">
-          <Image
-            src="/assets/about/amanda-desktop.png"
-            alt="Amanda, founder of Shore & Grace, standing among colourful tulips"
-            fill
-            priority
+      <section className={styles.founder} aria-labelledby="founder-title">
+        <p className={styles.eyebrow}>Meet Amanda</p>
+        <h2 id="founder-title">
+          Flowers, gifts and thoughtful details, chosen personally.
+        </h2>
+        <div className={`${styles.imageFrame} ${styles.founderImage}`}>
+          <ArtDirectedImage
+            alt="Amanda, founder of Shore and Grace, among colourful tulips"
+            desktop={{
+              src: "/assets/about/founder-desktop.png",
+              width: 582,
+              height: 546,
+            }}
+            mobile={{
+              src: "/assets/about/founder-mobile.png",
+              width: 342,
+              height: 357,
+            }}
             sizes="(max-width: 767px) calc(100vw - 48px), 582px"
           />
         </div>
+        <p className={styles.founderBodyOne}>
+          I’m Amanda, founder of Shore &amp; Grace. What began with a love of
+          flowers and meaningful gifting has grown into an independent studio
+          built around the moments people want to remember.
+        </p>
+        <p className={styles.founderBodyTwo}>
+          Every bouquet, keepsake and finishing touch is considered with care.
+          Whether you are celebrating something joyful, offering comfort or
+          simply letting someone know they are in your thoughts, I want the
+          experience to feel warm, personal and beautifully uncomplicated.
+        </p>
+        <BrandButton
+          className={styles.founderButton}
+          href="/contact"
+          variant="secondary"
+        >
+          Talk to Amanda
+        </BrandButton>
       </section>
 
-      <section className="sg-about-quote sg-about-centered sg-about-section--linen">
-        <Flourish />
-        <p className="sg-about-eyebrow">The heart of Shore &amp; Grace</p>
+      <section className={styles.quote} aria-labelledby="quote-title">
+        <Flourish large />
+        <p className={styles.eyebrow}>The heart of Shore &amp; Grace</p>
         <blockquote>
-          <p>“It is never just the flowers. It is the feeling behind them.”</p>
+          <p id="quote-title">
+            “It is never just the flowers.
+            <br className={styles.desktopBreak} /> It is the feeling behind
+            them.”
+          </p>
           <cite>– Amanda, founder of Shore &amp; Grace</cite>
         </blockquote>
-        <p className="sg-about-quote__supporting">
+        <p className={styles.quoteSupporting}>
           Shore &amp; Grace is here to make heartfelt gestures feel effortless,
           without losing the care and individuality that make them meaningful.
         </p>
       </section>
 
-      <section className="sg-about-values sg-about-section sg-about-centered">
+      <section className={styles.values} aria-labelledby="values-title">
         <Flourish />
-        <p className="sg-about-eyebrow">Our values</p>
-        <h2>Three principles shape every order we create.</h2>
-        <p className="sg-about-intro">
-          Whether you’re planning a meaningful gift, arranging flowers for an
-          event, or have a question about an order, our team is here to help.
+        <p className={styles.eyebrow}>Our values</p>
+        <h2 id="values-title">Three principles shape every order we create.</h2>
+        <p className={styles.intro}>
+          Whatever the occasion, three simple promises guide how we choose, make
+          and send every order.
         </p>
-        <div className="sg-about-card-grid">
-          {values.map((value) => (
-            <DetailCard key={value.number} {...value} />
+        <div className={styles.valueGrid}>
+          {values.map((value, index) => (
+            <article
+              className={`${styles.value} ${
+                index === 1 ? styles.valueOffset : ""
+              }`}
+              key={value.number}
+            >
+              <div className={styles.valueImage}>
+                <ArtDirectedImage
+                  alt={value.alt}
+                  desktop={{
+                    src: value.image,
+                    width: 379,
+                    height: 480,
+                  }}
+                  mobile={{
+                    src: value.mobileImage,
+                    width: 342,
+                    height: 430,
+                  }}
+                  sizes="(max-width: 767px) calc(100vw - 48px), 379px"
+                />
+              </div>
+              <div className={styles.valueCopy}>
+                <p className={styles.number}>{value.number}</p>
+                <div>
+                  <h3>{value.title}</h3>
+                  <p>{value.body}</p>
+                </div>
+              </div>
+            </article>
           ))}
         </div>
       </section>
 
-      <section className="sg-about-process sg-about-section--linen sg-about-centered">
-        <Flourish />
-        <p className="sg-about-eyebrow">Our approach</p>
-        <h2>From first hello to final flourish</h2>
-        <p className="sg-about-intro">
+      <section className={styles.approach} aria-labelledby="approach-title">
+        <Flourish large />
+        <p className={styles.eyebrow}>Our approach</p>
+        <h2 id="approach-title">From first hello to final flourish</h2>
+        <p className={styles.intro}>
           A calm, considered experience at every step.
         </p>
-        <div className="sg-about-card-grid">
+        <div className={styles.approachTimeline} aria-hidden="true">
+          <span>Start</span>
+          <Image
+            className={styles.approachLine}
+            src="/assets/about/approach-line.svg"
+            alt=""
+            width={880}
+            height={15}
+          />
+          {["first", "second", "third"].map((position) => (
+            <Image
+              className={`${styles.approachDot} ${styles[position]}`}
+              key={position}
+              src="/assets/about/approach-dot.svg"
+              alt=""
+              width={14}
+              height={14}
+            />
+          ))}
+          <span>Finish</span>
+        </div>
+        <div className={styles.stepGrid}>
           {process.map((step) => (
-            <DetailCard key={step.number} {...step} />
+            <article className={styles.step} key={step.number}>
+              <div className={styles.stepHeading}>
+                <p className={styles.number}>{step.number}</p>
+                <h3>{step.title}</h3>
+              </div>
+              <p>{step.body}</p>
+            </article>
           ))}
         </div>
       </section>
 
-      <section className="sg-about-studio sg-about-section">
-        <div className="sg-about-studio__image sg-about-image">
-          <Image
-            src="/assets/about/studio-desktop.png"
-            alt="A florist carefully arranging flowers at the Shore & Grace studio"
-            fill
+      <section className={styles.studio} aria-labelledby="studio-title">
+        <p className={styles.eyebrow}>Independent &amp; personal</p>
+        <h2 id="studio-title">A small studio with time for the details.</h2>
+        <div className={`${styles.imageFrame} ${styles.studioImage}`}>
+          <ArtDirectedImage
+            alt="Amanda arranging flowers by hand at the Shore and Grace studio workbench"
+            desktop={{
+              src: "/assets/about/studio-figma-desktop.png",
+              width: 582,
+              height: 600,
+            }}
+            mobile={{
+              src: "/assets/about/studio-mobile.png",
+              width: 342,
+              height: 354,
+            }}
             sizes="(max-width: 767px) calc(100vw - 48px), 582px"
           />
         </div>
-        <div className="sg-about-studio__copy">
-          <p className="sg-about-eyebrow">Independent &amp; personal</p>
-          <h2>A small studio with time for the details.</h2>
-          <p>
-            As an independent studio, we can stay close to every order. We
-            listen properly, choose our partners carefully and give the
-            finishing details the time they deserve.
-          </p>
-          <p>
-            As Shore &amp; Grace grows, that promise remains the same, considered
-            floristry, thoughtful gifting and a genuinely warm experience.
-          </p>
-        </div>
+        <p className={styles.studioBodyOne}>
+          As an independent studio, we can stay close to every order. We listen
+          properly, choose our partners carefully and give the finishing details
+          the time they deserve.
+        </p>
+        <p className={styles.studioBodyTwo}>
+          As Shore &amp; Grace grows, that promise remains the same, considered
+          floristry, thoughtful gifting and a genuinely warm experience.
+        </p>
       </section>
 
-      <section className="sg-about-cta sg-about-centered">
-        <p className="sg-about-eyebrow">Here when you need us</p>
-        <h2>Ready to send something thoughtful?</h2>
+      <section className={styles.cta} aria-labelledby="cta-title">
+        <p className={styles.eyebrow}>Here when you need us</p>
+        <h2 id="cta-title">Ready to send something thoughtful?</h2>
         <p>
           Explore the collection or talk to Amanda if you would like a little
           guidance.
         </p>
-        <div className="sg-about-cta__actions">
-          <BrandButton href="/store" variant="tertiary">
+        <div className={styles.ctaActions}>
+          <BrandButton
+            className={styles.ctaShop}
+            href="/store"
+            variant="tertiary"
+          >
             Shop flowers and gifts
           </BrandButton>
-          <BrandButton href="/contact" variant="tertiary">
-            Ask Amanda
+          <BrandButton
+            className={styles.ctaContact}
+            href="/contact"
+            variant="secondary"
+          >
+            Talk to Amanda
           </BrandButton>
         </div>
       </section>
 
-      <section className="sg-about-closing sg-about-centered">
+      <section className={styles.closing} aria-label="Shore and Grace motto">
         <Image
           src="/assets/about/floral-detail-desktop.png"
-          alt="Green pom-pom flower"
+          alt=""
           width={94}
           height={94}
+          aria-hidden="true"
         />
-        <h2>
+        <p>
           Thoughtfully gathered.
           <br />
           Beautifully remembered.
-        </h2>
+        </p>
       </section>
     </main>
   )

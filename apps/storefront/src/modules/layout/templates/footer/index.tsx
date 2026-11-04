@@ -25,11 +25,6 @@ const socialLinks = [
     href: "https://www.youtube.com/@shoreandgrace",
     icon: "youtube",
   },
-  {
-    label: "Etsy",
-    href: "https://shoreandgrace.etsy.com/",
-    icon: "etsy",
-  },
 ]
 
 export default function Footer() {

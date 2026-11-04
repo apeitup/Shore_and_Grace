@@ -35,7 +35,7 @@ function SocialIcon({ name }: { name: SocialName }) {
 
 function SocialLinks({ mobile = false }: { mobile?: boolean }) {
   const names: SocialName[] = mobile
-    ? ['Facebook', 'Instagram', 'Pinterest', 'YouTube', 'Etsy']
+    ? ['Facebook', 'Instagram', 'Pinterest', 'YouTube']
     : ['Facebook', 'Instagram', 'Etsy']
 
   return (
