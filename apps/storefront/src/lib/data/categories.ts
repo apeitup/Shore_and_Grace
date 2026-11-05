@@ -26,6 +26,21 @@ export const listCategories = async (query?: Record<string, unknown>) => {
     .then(({ product_categories }) => product_categories)
 }
 
+export const listHomepageCategories = async () =>
+  sdk.client
+    .fetch<{ product_categories: HttpTypes.StoreProductCategory[] }>(
+      "/store/product-categories",
+      {
+        query: {
+          fields: "id,name,handle,+metadata",
+          limit: 100,
+        },
+        next: { revalidate: 60 },
+        cache: "force-cache",
+      },
+    )
+    .then(({ product_categories }) => product_categories)
+
 export const getCategoryByHandle = async (categoryHandle: string[]) => {
   const handle = `${categoryHandle.join("/")}`
 

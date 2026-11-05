@@ -5,10 +5,7 @@ import { HttpTypes } from "@medusajs/types"
 import { listProducts } from "./products"
 
 export type MerchandisingKind =
-  | "featured"
-  | "upsell"
-  | "complementary"
-  | "frequently_bought_together"
+  "featured" | "upsell" | "complementary" | "frequently_bought_together"
 
 export type StoreMerchandisingSet = {
   id: string
@@ -39,11 +36,13 @@ export const listMerchandisingProducts = async ({
   kind,
   sourceProductId,
   handle,
+  includeGiftCards = false,
 }: {
   countryCode: string
   kind?: MerchandisingKind
   sourceProductId?: string
   handle?: string
+  includeGiftCards?: boolean
 }): Promise<{
   set: StoreMerchandisingSet | null
   products: HttpTypes.StoreProduct[]
@@ -64,7 +63,7 @@ export const listMerchandisingProducts = async ({
     queryParams: {
       id: set.product_ids,
       limit: set.product_ids.length,
-      is_giftcard: false,
+      ...(includeGiftCards ? {} : { is_giftcard: false }),
     },
   })
   const productsById = new Map(

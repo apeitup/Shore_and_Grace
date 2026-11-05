@@ -1,8 +1,11 @@
 import BrandSignature from "@modules/brand/components/brand-signature"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import CookieSettingsButton from "@modules/layout/components/cookie-settings-button"
 import NewsletterSignup from "@modules/layout/components/newsletter-signup"
 import Image from "next/image"
+
+import { footerGroups } from "./footer-links"
+import FooterNavigation from "./footer-navigation"
+import styles from "./footer.module.css"
 
 const socialLinks = [
   {
@@ -29,8 +32,8 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="sg-footer">
-      <div className="sg-footer__curve" aria-hidden="true">
+    <footer className={styles.footer}>
+      <div className={styles.curve} aria-hidden="true">
         <picture>
           <source
             media="(max-width: 767px)"
@@ -45,15 +48,15 @@ export default function Footer() {
         </picture>
       </div>
 
-      <div className="content-container sg-footer__content">
-        <div className="sg-footer__studio">
-          <span className="sg-footer__signature-desktop">
+      <div className={`content-container ${styles.content}`}>
+        <div className={styles.studio}>
+          <span className={styles.desktopSignature}>
             <BrandSignature context="footer" tone="dark" />
           </span>
-          <span className="sg-footer__signature-mobile">
+          <span className={styles.mobileSignature}>
             <BrandSignature context="footer" tone="dark" mobile />
           </span>
-          <div className="sg-footer__socials" aria-label="Social media">
+          <div className={styles.socials} aria-label="Social media">
             {socialLinks.map(({ label, href, icon }) => (
               <a
                 key={label}
@@ -79,36 +82,26 @@ export default function Footer() {
           </div>
         </div>
 
-        <nav className="sg-footer__service" aria-label="Customer service">
-          <h2>Customer Service</h2>
-          <ul>
-            <li>
-              <LocalizedClientLink href="/account">
-                My account
-              </LocalizedClientLink>
-            </li>
-            <li>
-              <LocalizedClientLink href="/faq">FAQ</LocalizedClientLink>
-            </li>
-            <li>
-              <LocalizedClientLink href="/account/orders">
-                Check Order Status
-              </LocalizedClientLink>
-            </li>
-            <li>
-              <LocalizedClientLink href="/contact">
-                Contact Us
-              </LocalizedClientLink>
-            </li>
-            <li>
-              <LocalizedClientLink href="/privacy-request">
-                Privacy Requests
-              </LocalizedClientLink>
-            </li>
-          </ul>
+        <nav className={styles.desktopNavigation} aria-label="Footer navigation">
+          {footerGroups.map((group) => (
+            <section key={group.title}>
+              <h2>{group.title}</h2>
+              <ul>
+                {group.links.map((link) => (
+                  <li key={link.href}>
+                    <LocalizedClientLink href={link.href}>
+                      {link.label}
+                    </LocalizedClientLink>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
         </nav>
 
-        <div className="sg-footer__newsletter">
+        <FooterNavigation />
+
+        <div className={styles.newsletter}>
           <h2>Sign Up To Our Newsletter</h2>
           <p>
             Subscribe to receive updates, access to exclusive deals, and more.
@@ -117,19 +110,21 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="sg-footer__strap">
-        <div className="content-container">
+      <div className={styles.strap}>
+        <div className={`content-container ${styles.strapInner}`}>
           <p>
             © {new Date().getFullYear()} Shore &amp; Grace. All rights reserved.
           </p>
-          <div>
+          <div className={styles.policies}>
+            <LocalizedClientLink href="/terms">
+              Terms &amp; Conditions
+            </LocalizedClientLink>
             <LocalizedClientLink href="/privacy">
               Privacy Policy
             </LocalizedClientLink>
             <LocalizedClientLink href="/cookies">
               Cookie Policy
             </LocalizedClientLink>
-            <CookieSettingsButton className="sg-footer__cookie-settings" />
           </div>
         </div>
       </div>

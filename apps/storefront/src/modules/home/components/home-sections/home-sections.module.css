@@ -1,0 +1,1164 @@
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 150px;
+  padding: 100px 0;
+  overflow: hidden;
+  background: #fff;
+  color: var(--sg-ink);
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+}
+
+.sectionHeading img {
+  display: block;
+  width: 159px;
+  height: 63px;
+  object-fit: contain;
+}
+
+.sectionHeading h2 {
+  margin: 0;
+  font: 500 46px/1.3 var(--sg-display);
+  letter-spacing: -0.015em;
+}
+
+.help {
+  order: 2;
+  height: 1011.667px;
+}
+
+.helpIntro {
+  display: flex;
+  max-width: 800px;
+  margin: 0 auto 40px;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.helpIntro > img {
+  width: 159px;
+  height: 63px;
+  margin-bottom: 24px;
+  object-fit: contain;
+}
+
+.eyebrow,
+.cardEyebrow,
+.personalEyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.eyebrow {
+  color: var(--sg-sage-deep);
+  font: 600 14px/18px var(--sg-body);
+  letter-spacing: 2.52px;
+}
+
+.helpIntro h2 {
+  margin: 16px 0 24px;
+  font: 400 48px/1.2 var(--sg-display);
+  letter-spacing: -0.015em;
+}
+
+.helpLead {
+  color: #66615c;
+  font: 400 16px/1.4 var(--sg-body);
+}
+
+.helpLead p {
+  margin: 0;
+}
+
+.helpLead p + p {
+  margin-top: 12px;
+}
+
+.helpGrid {
+  display: grid;
+  width: min(1200px, calc(100% - 64px));
+  margin: 0 auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.helpCard {
+  min-width: 0;
+  align-self: start;
+}
+
+.helpCard:nth-child(odd) {
+  padding-top: 100px;
+}
+
+.helpCard:nth-child(2) {
+  width: 384px;
+  justify-self: center;
+}
+
+.helpCardFrame {
+  overflow: hidden;
+  border: 1px solid #d9d8d6;
+  border-radius: 12px;
+  background: #fff;
+  transition: box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.helpCard:hover .helpCardFrame,
+.helpCard:focus-within .helpCardFrame {
+  box-shadow: 0 5px 11px rgba(0, 0, 0, 0.14);
+}
+
+.helpImage {
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 1;
+}
+
+.helpImage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.helpCopy {
+  display: flex;
+  padding: 24px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.cardEyebrow {
+  color: var(--sg-sage-deep);
+  font: 600 12px/16px var(--sg-body);
+}
+
+.helpCopy h3 {
+  margin: 0;
+  font: 500 34px/34px var(--sg-display);
+}
+
+.helpCopy > p:not(.cardEyebrow) {
+  min-height: 42px;
+  margin: 0;
+  font: 400 16px/21px var(--sg-body);
+}
+
+.helpCopy a {
+  display: inline-flex;
+  min-width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: inherit;
+  font: 500 14px/16px var(--sg-body);
+  letter-spacing: 0.375px;
+  text-decoration: none;
+}
+
+.helpCtaArrow {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.occasions {
+  order: 1;
+  height: 536px;
+}
+
+.occasions .sectionHeading {
+  gap: 20px;
+}
+
+.occasions .sectionHeading h2 {
+  font-weight: 400;
+}
+
+.occasionGrid {
+  display: grid;
+  width: min(1200px, calc(100% - 64px));
+  margin: 30px auto 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.occasionCard {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 12px;
+  color: inherit;
+  text-align: center;
+  transition: box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.occasionCard:hover,
+.occasionCard:focus-visible {
+  box-shadow: 0 5px 11px rgba(0, 0, 0, 0.14);
+}
+
+.occasionImage {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  aspect-ratio: 1;
+}
+
+.occasionImage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.missingOccasionImage {
+  background: linear-gradient(145deg, #f2f0eb, #e3e7de);
+}
+
+.occasionCard h3 {
+  display: flex;
+  width: 100%;
+  height: 76px;
+  margin: 0;
+  padding: 20px 15px;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  font: 400 24px/16px var(--sg-body);
+}
+
+.personal {
+  display: grid;
+  order: 3;
+  height: 550px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.personalImage,
+.personalImage img {
+  width: 100%;
+  height: 100%;
+}
+
+.personalImage {
+  position: relative;
+}
+
+.personalImage img {
+  display: block;
+  object-fit: cover;
+  object-position: center 47%;
+}
+
+.personalPanel {
+  display: flex;
+  align-items: center;
+  background: var(--sg-sage);
+  color: #fff;
+}
+
+.personalCopy {
+  display: flex;
+  width: min(600px, calc(100% - 48px));
+  padding: 80px 0 80px 24px;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.personalEyebrow {
+  color: rgba(255, 255, 255, 0.8);
+  font: 600 14px/18px var(--sg-body);
+  letter-spacing: 0.18em;
+}
+
+.personalCopy h2 {
+  margin: 0;
+  font: 500 48px/1.2 var(--sg-display);
+  letter-spacing: -0.015em;
+}
+
+.personalCopy > p:not(.personalEyebrow) {
+  max-width: 560px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font: 400 16px/28px var(--sg-body);
+}
+
+.personalButton,
+.closingActions a,
+.giftButton {
+  display: inline-flex;
+  height: 50px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font: 600 14px/18px var(--sg-body);
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.personalButton {
+  min-width: 204px;
+  margin-top: 8px;
+  padding: 0 28px;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.personalButton:hover {
+  background: #fff;
+  color: var(--sg-sage-deep);
+}
+
+.gifts {
+  order: 4;
+  height: 782.867px;
+  text-align: center;
+}
+
+.gifts .sectionHeading {
+  gap: 20px;
+}
+
+.gifts .sectionHeading h2 {
+  font-weight: 400;
+  line-height: 59.8px;
+}
+
+.giftGrid {
+  display: grid;
+  width: min(1200px, calc(100% - 64px));
+  height: 508.266px;
+  margin: 30px auto 0;
+  padding-bottom: 20px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  overflow: hidden;
+}
+
+.giftProduct {
+  display: flex;
+  height: 488.266px;
+  min-width: 0;
+  align-items: center;
+  flex-direction: column;
+  color: inherit;
+}
+
+.giftImage,
+.giftCardArt {
+  display: block;
+  width: 100%;
+  height: 401.664px;
+}
+
+.giftProduct:first-child .giftImage {
+  overflow: hidden;
+  border-radius: 12px 0 0 12px;
+}
+
+.giftProduct:nth-child(3) .giftImage {
+  overflow: hidden;
+  border-radius: 0 12px 12px 0;
+}
+
+.giftImage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dynamicGiftImage {
+  position: relative;
+  background: #f6f5f7;
+}
+
+.dynamicGiftImage img {
+  object-fit: contain;
+}
+
+.giftCardArt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 20px;
+  padding: 40px 0;
+  background: #f2ebe0;
+  color: var(--sg-ink);
+}
+
+.giftCardDesktopLockup {
+  position: relative;
+  width: 292.832px;
+  height: 187.705px;
+  flex: 0 0 187.705px;
+}
+
+.giftCardDesktopLockup img {
+  position: absolute;
+  top: 0;
+  left: 72.89px;
+  width: 143.793px;
+  height: 129.013px;
+}
+
+.giftCardDesktopLockup p,
+.giftCardDesktopLockup span {
+  position: absolute;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.giftCardDesktopLockup p {
+  top: 122.56px;
+  left: 0;
+  width: 292.832px;
+  font: 400 40.541px/normal var(--sg-display);
+  letter-spacing: 2.4325px;
+}
+
+.giftCardDesktopLockup span {
+  top: 175.17px;
+  left: 37.98px;
+  width: 216.912px;
+  font: 500 10.135px/normal var(--sg-body);
+  letter-spacing: 5.0676px;
+  text-transform: uppercase;
+}
+
+.giftCardSignature {
+  position: relative;
+  display: none;
+  width: 77%;
+  height: 58%;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: #fbfaf5;
+  color: var(--sg-sage-deep);
+}
+
+.giftCardSignature picture {
+  position: absolute;
+  inset: 0;
+}
+
+.giftCardSignature img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.giftCardSignature p,
+.giftCardSignature span {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+}
+
+.giftCardSignature p {
+  font: 500 31px/1 var(--sg-display);
+}
+
+.giftCardSignature span {
+  margin-top: 5px;
+  font: 500 7px/1 var(--sg-body);
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+}
+
+.giftCardArt strong {
+  font: 400 48px/84.48px var(--sg-display);
+}
+
+.giftProduct h3 {
+  width: 100%;
+  height: 40px;
+  margin: 20px 0 0;
+  padding: 0 15px 10px;
+  font: 400 24px/30px var(--sg-body);
+}
+
+.giftProduct > p {
+  width: 100%;
+  height: 26.602px;
+  margin: 0;
+  color: #6a6a6a;
+  font: 400 14px/19.6px var(--sg-body);
+}
+
+.giftMobileTitle,
+.giftDots {
+  display: none;
+}
+
+.giftButton {
+  width: 200px;
+  min-width: 200px;
+  margin-top: 30px;
+  padding: 0 15px;
+  border: 1px solid #a09d99;
+  color: var(--sg-ink);
+  font: 500 16px/16px var(--sg-body);
+  letter-spacing: 0.375px;
+}
+
+.giftButton:hover,
+.closingActions a:hover {
+  background: var(--sg-ink);
+  color: #fff;
+}
+
+.follow {
+  order: 5;
+  height: 421px;
+}
+
+.followGrid {
+  display: grid;
+  width: 100%;
+  height: 302px;
+  margin-top: 16px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.followItem,
+.followItem picture,
+.followItem img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.followItem {
+  overflow: hidden;
+}
+
+.followItem img {
+  object-fit: cover;
+}
+
+.closing {
+  display: flex;
+  order: 6;
+  height: 382px;
+  margin-top: -150px;
+  padding: 0 24px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.closing > img {
+  width: 66px;
+  height: 66px;
+  object-fit: contain;
+}
+
+.closing h2 {
+  margin: 16px 0 0;
+  font: 500 48px/54px var(--sg-display);
+  letter-spacing: -0.015em;
+}
+
+.closing > p {
+  margin: 16px 0 0;
+  font: 400 14px/24px var(--sg-body);
+}
+
+.closingActions {
+  display: flex;
+  margin-top: 22px;
+  gap: 16px;
+}
+
+.closingActions a {
+  min-width: 168px;
+  padding: 0 24px;
+  border: 1px solid var(--sg-ink);
+  color: var(--sg-ink);
+}
+
+[data-motion-ready="true"] .sections [data-sg-reveal] {
+  opacity: 0;
+  filter: blur(3px);
+  transform: translateY(10px);
+  transition:
+    opacity 440ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 440ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 440ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-motion-ready="true"] .sections [data-sg-reveal][data-sg-visible="true"] {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+.helpCtaArrow,
+.giftImage img,
+.followItem img {
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.helpCopy a:hover .helpCtaArrow {
+  transform: translate(2px, -2px);
+}
+
+.giftProduct:hover .giftImage img,
+.followItem:hover img {
+  transform: scale(1.025);
+}
+
+.personalButton,
+.closingActions a,
+.giftButton {
+  transition:
+    background-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.personalButton:active,
+.closingActions a:active,
+.giftButton:active {
+  transform: scale(0.98);
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .sections {
+    gap: 100px;
+    padding: 80px 0;
+  }
+
+  .occasions,
+  .help {
+    height: auto;
+  }
+
+  .occasionGrid,
+  .helpGrid,
+  .giftGrid {
+    width: calc(100% - 48px);
+  }
+
+  .helpGrid {
+    gap: 20px;
+  }
+
+  .helpCard:nth-child(2) {
+    width: 100%;
+  }
+
+  .helpCopy {
+    padding: 20px;
+  }
+
+  .helpCopy h3 {
+    font-size: 30px;
+    line-height: 31px;
+  }
+
+  .helpCopy > p:not(.cardEyebrow) {
+    min-height: 63px;
+  }
+
+  .occasionCard h3 {
+    height: 66px;
+    padding-inline: 8px;
+    font-size: 20px;
+  }
+
+  .giftCardDesktopLockup {
+    transform: scale(0.8);
+    transform-origin: top center;
+  }
+}
+
+@media (max-width: 767px) {
+  .sections {
+    gap: 80px;
+    padding: 50px 0;
+  }
+
+  .sectionHeading {
+    gap: 8px;
+  }
+
+  .sectionHeading img {
+    width: 90px;
+    height: 32px;
+  }
+
+  .sectionHeading h2 {
+    font-size: 34px;
+    line-height: 1.2;
+  }
+
+  .help {
+    order: 1;
+    height: auto;
+    padding: 0;
+  }
+
+  .helpIntro {
+    width: 342px;
+    max-width: 100%;
+    height: 298.64px;
+    margin: 0 auto 24px;
+  }
+
+  .helpIntro > img {
+    width: 95px;
+    height: 37.64px;
+    margin-bottom: 12px;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    line-height: 14px;
+  }
+
+  .helpIntro h2 {
+    margin: 5px 0 13px;
+    font-size: 38px;
+    line-height: 42px;
+  }
+
+  .helpLead {
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  .helpLead p + p {
+    margin-top: 10px;
+  }
+
+  .helpGrid {
+    display: flex;
+    width: min(calc(100% - 48px), 550px);
+    margin: 0 auto;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .helpCard,
+  .helpCard:nth-child(odd) {
+    width: 100%;
+    height: auto;
+    padding-top: 0;
+  }
+
+  .helpCard:nth-child(2) {
+    width: auto;
+  }
+
+  .helpCardFrame {
+    width: 100%;
+    overflow: hidden;
+    border: 0.903px solid #d9d8d6;
+    border-radius: 10.838px;
+    background: #fff;
+  }
+
+  .helpImage {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .helpCopy {
+    height: auto;
+    padding: 21.676px;
+    gap: 10.838px;
+  }
+
+  .cardEyebrow {
+    font-size: 10px;
+    line-height: 14px;
+  }
+
+  .helpCopy h3 {
+    font-size: 27px;
+    line-height: 30.7px;
+  }
+
+  .helpCopy > p:not(.cardEyebrow) {
+    min-height: auto;
+    font-size: 14.45px;
+    line-height: 18.97px;
+  }
+
+  .helpCopy a {
+    height: 32.514px;
+    justify-content: center;
+    font-size: 12.64px;
+    line-height: 14.451px;
+    letter-spacing: 0.375px;
+    text-decoration: none;
+  }
+
+  .helpCtaArrow {
+    display: block;
+    width: 16.257px;
+    height: 16.257px;
+  }
+
+  .occasions {
+    order: 2;
+    height: 644px;
+    padding: 0 16px;
+  }
+
+  .occasions .sectionHeading {
+    height: auto;
+    gap: 16px;
+  }
+
+  .occasions .sectionHeading h2 {
+    max-width: 300px;
+  }
+
+  .occasionGrid {
+    width: 358px;
+    max-width: 100%;
+    margin: 24px auto 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .occasionCard {
+    height: 237px;
+  }
+
+  .occasionCard:hover,
+  .occasionCard:focus-visible {
+    box-shadow:
+      0 0 0 1px #d9d8d6,
+      0 5px 11px rgba(0, 0, 0, 0.14);
+  }
+
+  .occasionCard:nth-child(2) {
+    grid-row: 2;
+    grid-column: 1;
+  }
+
+  .occasionCard:nth-child(3) {
+    grid-row: 1;
+    grid-column: 2;
+  }
+
+  .occasionCard:nth-child(4) {
+    grid-row: 2;
+    grid-column: 2;
+  }
+
+  .occasionImage {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  .occasionCard h3 {
+    height: 66px;
+    margin: 0;
+    padding: 15px 5px;
+    font: 400 20px/16px var(--sg-body);
+    text-decoration: none;
+  }
+
+  .personal {
+    display: block;
+    order: 3;
+    height: 404px;
+  }
+
+  .personalImage {
+    display: none;
+  }
+
+  .personalPanel {
+    height: 100%;
+    padding: 58px 24px 56px;
+  }
+
+  .personalCopy {
+    width: 342px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .personalEyebrow {
+    font-size: 11px;
+    line-height: 16px;
+  }
+
+  .personalCopy h2 {
+    font-size: 43px;
+    line-height: 46px;
+  }
+
+  .personalCopy > p:not(.personalEyebrow) {
+    font-size: 16px;
+    line-height: 28px;
+  }
+
+  .personalButton {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .gifts {
+    order: 4;
+    height: 455.547px;
+    text-align: center;
+  }
+
+  .gifts .sectionHeading {
+    height: 97.547px;
+    gap: 8px;
+  }
+
+  .gifts .sectionHeading h2 {
+    line-height: 1.2;
+  }
+
+  .gifts .sectionHeading img {
+    width: 120px;
+    height: 47.547px;
+  }
+
+  .giftGrid {
+    display: flex;
+    width: 358px;
+    max-width: calc(100% - 32px);
+    height: 285px;
+    margin: 30px auto 0;
+    padding-bottom: 0;
+    gap: 16px;
+    overflow: visible;
+    border-radius: 0;
+  }
+
+  .giftProduct {
+    width: 171px;
+    min-width: 171px;
+    height: 265px;
+  }
+
+  .giftProduct:nth-child(3) {
+    display: none;
+  }
+
+  .giftImage,
+  .giftCardArt {
+    width: 171px;
+    height: 171px;
+    aspect-ratio: auto;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+
+  .giftProduct:first-child .giftImage,
+  .giftProduct:nth-child(3) .giftImage {
+    border-radius: 12px;
+  }
+
+  .giftCardArt {
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+    background: #d6ddd0;
+    color: #fff;
+  }
+
+  .giftCardDesktopLockup {
+    display: none;
+  }
+
+  .giftCardSignature {
+    display: flex;
+  }
+
+  .giftCardSignature p {
+    font-size: 14px;
+  }
+
+  .giftCardSignature span {
+    font-size: 4px;
+  }
+
+  .giftCardArt strong {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    font: 500 7px/1 var(--sg-body);
+  }
+
+  .giftProduct h3 {
+    width: auto;
+    height: auto;
+    margin: 12px 0 2px;
+    padding: 0;
+    font: 500 17px/22px var(--sg-body);
+  }
+
+  .giftProduct > p {
+    width: auto;
+    height: auto;
+    color: inherit;
+    font: 400 14px/20px var(--sg-body);
+  }
+
+  .giftDesktopTitle,
+  .giftButton {
+    display: none;
+  }
+
+  .giftMobileTitle {
+    display: block;
+  }
+
+  .giftDots {
+    display: flex;
+    height: 13px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .giftDots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #d2d2ce;
+  }
+
+  .giftDots .activeDot {
+    width: 8px;
+    height: 8px;
+    background: var(--sg-sage);
+  }
+
+  .follow {
+    order: 5;
+    height: 810px;
+    padding: 0 16px;
+  }
+
+  .follow .sectionHeading {
+    height: 86px;
+  }
+
+  .followGrid {
+    display: grid;
+    width: 358px;
+    max-width: 100%;
+    height: 700px;
+    margin: 24px auto 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: 342px 167px 167px;
+    gap: 12px;
+  }
+
+  .followItem:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .closing {
+    order: 6;
+    height: 382px;
+    margin-top: 0;
+    padding: 0 24px;
+  }
+
+  .closing > img {
+    width: 66px;
+    height: 66px;
+  }
+
+  .closing h2 {
+    width: 342px;
+    max-width: 100%;
+    margin-top: 22px;
+    font-size: 38px;
+    line-height: 42px;
+  }
+
+  .closing > p {
+    width: 320px;
+    max-width: 100%;
+    margin-top: 22px;
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  .closingActions {
+    width: 342px;
+    max-width: 100%;
+    margin-top: 22px;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .closingActions a {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-motion-ready="true"] .sections [data-sg-reveal] {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    transition: none;
+  }
+
+  .helpCtaArrow,
+  .helpCardFrame,
+  .giftImage img,
+  .followItem img,
+  .occasionCard,
+  .personalButton,
+  .closingActions a,
+  .giftButton {
+    transition: none;
+  }
+
+  .helpCopy a:hover .helpCtaArrow,
+  .giftProduct:hover .giftImage img,
+  .followItem:hover img,
+  .personalButton:active,
+  .closingActions a:active,
+  .giftButton:active {
+    transform: none;
+  }
+}

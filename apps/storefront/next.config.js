@@ -1,4 +1,5 @@
 const checkEnvVariables = require("./check-env-variables")
+const { networkInterfaces } = require("node:os")
 
 checkEnvVariables()
 
@@ -10,13 +11,21 @@ const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
 const MEDUSA_BACKEND_URL =
   process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
 const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "gb"
+const LOCAL_DEV_ORIGINS = [
+  ...new Set(
+    Object.values(networkInterfaces())
+      .flatMap((network) => network || [])
+      .filter(({ family, internal }) => family === "IPv4" && !internal)
+      .map(({ address }) => address)
+  ),
+]
 
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
   reactStrictMode: true,
-  allowedDevOrigins: ["192.168.1.163"],
+  allowedDevOrigins: LOCAL_DEV_ORIGINS,
   async headers() {
     return [
       {

@@ -1,0 +1,322 @@
+.footer {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  background: var(--sg-linen);
+  color: var(--sg-ink);
+}
+.curve {
+  display: block;
+  width: 100%;
+  height: 56px;
+  overflow: hidden;
+}
+
+.curve picture {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+}
+
+.curve img {
+  display: block;
+  width: 3073.61px;
+  max-width: none;
+  height: auto;
+  flex: none;
+}
+
+.content {
+  display: grid;
+  min-height: 250px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.studio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-block: 40px;
+  gap: 20px;
+}
+
+.mobileSignature,
+.mobileNavigation {
+  display: none;
+}
+
+.socials {
+  display: flex;
+  height: 50px;
+  align-items: center;
+  gap: 10px;
+}
+
+.socials a {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid var(--sg-sage);
+  border-radius: 50%;
+}
+
+.socials img {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.desktopNavigation {
+  display: grid;
+  grid-column: 2 / span 2;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 20px;
+  padding-block: 80px 40px;
+}
+
+.desktopNavigation h2,
+.newsletter h2 {
+  margin: 0 0 20px;
+  font-family: var(--sg-display);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 30px;
+}
+
+.desktopNavigation li {
+  display: flex;
+  min-height: 24px;
+  align-items: center;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.desktopNavigation a:hover,
+.desktopNavigation a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.newsletter {
+  grid-column: 4;
+  padding-block: 80px 40px;
+}
+
+.newsletter > p {
+  max-width: 260px;
+  margin: 0 0 20px;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.newsletter :global(form) {
+  display: grid;
+  gap: 12px;
+}
+
+.newsletter :global(.sg-brand-input input) {
+  height: 44px;
+  border-color: var(--sg-sage);
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.newsletter :global(.sg-brand-button) {
+  display: none;
+}
+
+.strap {
+  min-height: 64px;
+  background: var(--sg-sage);
+  color: white;
+  font-size: 11px;
+}
+
+.strapInner {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.policies {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.policies a:hover,
+.policies a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+  .curve {
+    height: 18px;
+  }
+
+  .curve img {
+    width: 200%;
+    max-width: none;
+    height: 18px;
+  }
+
+  .content {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 32px;
+    padding: 32px 24px 40px;
+  }
+
+  .desktopSignature,
+  .desktopNavigation {
+    display: none;
+  }
+
+  .mobileSignature,
+  .mobileNavigation {
+    display: block;
+  }
+
+  .studio {
+    padding-block: 0;
+    gap: 24px;
+  }
+
+  .mobileSignature {
+    display: inline-flex;
+  }
+
+  .socials {
+    gap: 12px;
+  }
+
+  .socials a {
+    width: 48px;
+    height: 48px;
+  }
+
+  .socials img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .mobileNavigation {
+    width: 100%;
+  }
+
+  .mobileGroup {
+    border-bottom: 1px solid var(--sg-soft-sand);
+  }
+
+  .mobileGroupButton {
+    display: flex;
+    width: 100%;
+    min-height: 60px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--sg-ink);
+    cursor: pointer;
+    font-family: var(--sg-body);
+    font-size: 18px;
+    text-align: left;
+  }
+
+  .mobileGroupIcon {
+    width: 16px;
+    height: 16px;
+    transition: transform 180ms ease;
+  }
+
+  .mobileGroupButton[aria-expanded="true"] .mobileGroupIcon {
+    transform: rotate(180deg);
+  }
+
+  .mobileGroupLinks {
+    display: grid;
+    padding: 0 12px 12px;
+  }
+
+  .mobileGroupLinks a {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .newsletter {
+    padding: 0;
+  }
+
+  .newsletter h2 {
+    margin-bottom: 16px;
+    font-size: 28px;
+    line-height: 1.2;
+  }
+
+  .newsletter > p {
+    max-width: none;
+    margin-bottom: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .newsletter :global(form) {
+    gap: 16px;
+  }
+
+  .newsletter :global(.sg-brand-input input) {
+    height: 50px;
+    border-color: var(--sg-border);
+    border-radius: 12px;
+    font-size: 16px;
+  }
+
+  .newsletter :global(.sg-brand-button) {
+    display: inline-flex;
+    width: 100%;
+    border-radius: 12px;
+    font-size: 16px;
+    text-transform: none;
+  }
+
+  .strap {
+    min-height: 116px;
+  }
+
+  .strapInner {
+    min-height: 116px;
+    flex-direction: column-reverse;
+    justify-content: center;
+    gap: 0;
+    text-align: center;
+  }
+
+  .policies {
+    min-height: 44px;
+    justify-content: center;
+    gap: 16px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .strapInner > p {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mobileGroupIcon {
+    transition: none;
+  }
+}

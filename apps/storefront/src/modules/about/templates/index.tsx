@@ -1,4 +1,5 @@
 import BrandButton from "@modules/brand/components/button"
+import EditorialMotion from "@modules/common/components/editorial-motion"
 import Image from "next/image"
 
 import styles from "./about.module.css"
@@ -50,7 +51,7 @@ const process = [
 
 function HeroImage() {
   return (
-    <picture className={styles.heroImage}>
+    <picture className={styles.heroImage} data-sg-reveal="hero-media">
       <source
         media="(min-width: 768px)"
         srcSet="/assets/about/hero-kraft-desktop.png"
@@ -122,10 +123,11 @@ function Flourish({ large = false }: { large?: boolean }) {
 
 export default function AboutTemplate() {
   return (
-    <main className={styles.page}>
+    <main className={styles.page} data-sg-motion-root="about">
+      <EditorialMotion />
       <section className={styles.hero} aria-labelledby="about-title">
         <HeroImage />
-        <div className={styles.heroContent}>
+        <div className={styles.heroContent} data-sg-reveal="hero-copy">
           <h1 id="about-title">
             <span>About</span> <span>Shore &amp; Grace</span>
           </h1>
@@ -138,10 +140,13 @@ export default function AboutTemplate() {
 
       <section className={styles.founder} aria-labelledby="founder-title">
         <p className={styles.eyebrow}>Meet Amanda</p>
-        <h2 id="founder-title">
+        <h2 id="founder-title" data-sg-reveal="content">
           Flowers, gifts and thoughtful details, chosen personally.
         </h2>
-        <div className={`${styles.imageFrame} ${styles.founderImage}`}>
+        <div
+          className={`${styles.imageFrame} ${styles.founderImage}`}
+          data-sg-reveal="image"
+        >
           <ArtDirectedImage
             alt="Amanda, founder of Shore and Grace, among colourful tulips"
             desktop={{
@@ -180,7 +185,7 @@ export default function AboutTemplate() {
       <section className={styles.quote} aria-labelledby="quote-title">
         <Flourish large />
         <p className={styles.eyebrow}>The heart of Shore &amp; Grace</p>
-        <blockquote>
+        <blockquote data-sg-reveal="content">
           <p id="quote-title">
             “It is never just the flowers.
             <br className={styles.desktopBreak} /> It is the feeling behind
@@ -197,7 +202,9 @@ export default function AboutTemplate() {
       <section className={styles.values} aria-labelledby="values-title">
         <Flourish />
         <p className={styles.eyebrow}>Our values</p>
-        <h2 id="values-title">Three principles shape every order we create.</h2>
+        <h2 id="values-title" data-sg-reveal="content">
+          Three principles shape every order we create.
+        </h2>
         <p className={styles.intro}>
           Whatever the occasion, three simple promises guide how we choose, make
           and send every order.
@@ -209,6 +216,8 @@ export default function AboutTemplate() {
                 index === 1 ? styles.valueOffset : ""
               }`}
               key={value.number}
+              data-sg-reveal="card"
+              data-sg-delay={index}
             >
               <div className={styles.valueImage}>
                 <ArtDirectedImage
@@ -241,17 +250,23 @@ export default function AboutTemplate() {
       <section className={styles.approach} aria-labelledby="approach-title">
         <Flourish large />
         <p className={styles.eyebrow}>Our approach</p>
-        <h2 id="approach-title">From first hello to final flourish</h2>
+        <h2 id="approach-title" data-sg-reveal="content">
+          From first hello to final flourish
+        </h2>
         <p className={styles.intro}>
           A calm, considered experience at every step.
         </p>
-        <div className={styles.approachTimeline} aria-hidden="true">
+        <div
+          className={styles.approachTimeline}
+          aria-hidden="true"
+          data-sg-reveal="timeline"
+        >
           <span>Start</span>
           <Image
             className={styles.approachLine}
             src="/assets/about/approach-line.svg"
             alt=""
-            width={880}
+            width={857}
             height={15}
           />
           {["first", "second", "third"].map((position) => (
@@ -266,7 +281,7 @@ export default function AboutTemplate() {
           ))}
           <span>Finish</span>
         </div>
-        <div className={styles.stepGrid}>
+        <div className={styles.stepGrid} data-sg-reveal="content">
           {process.map((step) => (
             <article className={styles.step} key={step.number}>
               <div className={styles.stepHeading}>
@@ -281,8 +296,13 @@ export default function AboutTemplate() {
 
       <section className={styles.studio} aria-labelledby="studio-title">
         <p className={styles.eyebrow}>Independent &amp; personal</p>
-        <h2 id="studio-title">A small studio with time for the details.</h2>
-        <div className={`${styles.imageFrame} ${styles.studioImage}`}>
+        <h2 id="studio-title" data-sg-reveal="content">
+          A small studio with time for the details.
+        </h2>
+        <div
+          className={`${styles.imageFrame} ${styles.studioImage}`}
+          data-sg-reveal="image"
+        >
           <ArtDirectedImage
             alt="Amanda arranging flowers by hand at the Shore and Grace studio workbench"
             desktop={{
@@ -311,12 +331,14 @@ export default function AboutTemplate() {
 
       <section className={styles.cta} aria-labelledby="cta-title">
         <p className={styles.eyebrow}>Here when you need us</p>
-        <h2 id="cta-title">Ready to send something thoughtful?</h2>
+        <h2 id="cta-title" data-sg-reveal="content">
+          Ready to send something thoughtful?
+        </h2>
         <p>
           Explore the collection or talk to Amanda if you would like a little
           guidance.
         </p>
-        <div className={styles.ctaActions}>
+        <div className={styles.ctaActions} data-sg-reveal="content">
           <BrandButton
             className={styles.ctaShop}
             href="/store"
@@ -334,7 +356,11 @@ export default function AboutTemplate() {
         </div>
       </section>
 
-      <section className={styles.closing} aria-label="Shore and Grace motto">
+      <section
+        className={styles.closing}
+        aria-label="Shore and Grace motto"
+        data-sg-reveal="content"
+      >
         <Image
           src="/assets/about/floral-detail-desktop.png"
           alt=""

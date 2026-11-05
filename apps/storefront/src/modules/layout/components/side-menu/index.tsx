@@ -17,19 +17,22 @@ import { useParams } from "next/navigation"
 import { Fragment, ReactNode, useEffect, useState } from "react"
 
 type SideMenuProps = {
-  categories: HttpTypes.StoreProductCategory[]
   customer: HttpTypes.StoreCustomer | null
 }
 
-type AccordionName = "shop" | "services"
+type AccordionName = "shop"
 
-const serviceLinks = [
-  { title: "All Services", href: "/services" },
-  { title: "Funeral Flowers", href: "/services#funeral-flowers" },
-  { title: "Faux Flowers", href: "/services#faux-flowers" },
-  { title: "Fresh Flowers", href: "/services#fresh-flowers" },
-  { title: "Floral Gifts", href: "/services#floral-gifts" },
-  { title: "Bespoke Designs", href: "/services#bespoke-designs" },
+const shopLinks = [
+  { title: "Shop All", href: "/store" },
+  { title: "Fresh Flowers", href: "/categories/fresh-flowers" },
+  { title: "Faux Flowers", href: "/categories/faux-flowers" },
+  { title: "Gifts", href: "/categories/gifts" },
+  {
+    title: "Sympathy & Remembrance",
+    href: "/categories/sympathy-remembrance",
+  },
+  { title: "Shop by Occasion", href: "/categories/shop-by-occasion" },
+  { title: "Wishlist", href: "/wishlist" },
 ] as const
 
 function PageTransform({ open }: { open: boolean }) {
@@ -68,7 +71,6 @@ function MenuLink({
 }
 
 function MenuContents({
-  categories,
   customer,
   close,
 }: SideMenuProps & { close: () => void }) {
@@ -126,66 +128,20 @@ function MenuContents({
               </button>
               {expanded === "shop" && (
                 <ul id="mobile-shop-links" className="sg-mobile-menu__subnav">
-                  <li>
-                    <MenuLink
-                      href="/store"
-                      label="Our Collection"
-                      close={close}
-                    />
-                  </li>
-                  {categories.map((category) => (
-                    <li key={category.id}>
+                  {shopLinks.map((link) => (
+                    <li key={link.href}>
                       <MenuLink
-                        href={`/categories/${category.handle}`}
-                        label={category.name}
+                        href={link.href}
+                        label={link.title}
                         close={close}
                       />
                     </li>
                   ))}
-                  <li>
-                    <MenuLink
-                      href="/wishlist"
-                      label="Wishlist"
-                      close={close}
-                    />
-                  </li>
-                  <li>
-                    <MenuLink href="/cart" label="Cart" close={close} />
-                  </li>
                 </ul>
               )}
             </li>
             <li>
-              <button
-                type="button"
-                className="sg-mobile-menu__row"
-                aria-expanded={expanded === "services"}
-                aria-controls="mobile-service-links"
-                onClick={() => toggleSection("services")}
-              >
-                <span>Services</span>
-                {expanded === "services" ? (
-                  <NavArrowUp aria-hidden="true" />
-                ) : (
-                  <NavArrowDown aria-hidden="true" />
-                )}
-              </button>
-              {expanded === "services" && (
-                <ul
-                  id="mobile-service-links"
-                  className="sg-mobile-menu__subnav"
-                >
-                  {serviceLinks.map((service) => (
-                    <li key={service.href}>
-                      <MenuLink
-                        href={service.href}
-                        label={service.title}
-                        close={close}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <MenuLink href="/services" label="Services" close={close} />
             </li>
             <li>
               <MenuLink href="/about" label="About" close={close} />
@@ -203,17 +159,10 @@ function MenuContents({
           {customer ? (
             <>
               <li>
-                <MenuLink href="/account" label="My Account" close={close} />
+                <MenuLink href="/account" label="Account" close={close} />
               </li>
               <li>
                 <MenuLink href="/account/orders" label="Orders" close={close} />
-              </li>
-              <li>
-                <MenuLink
-                  href="/account/addresses"
-                  label="Addresses"
-                  close={close}
-                />
               </li>
               <li>
                 <button
@@ -231,7 +180,7 @@ function MenuContents({
               <li>
                 <MenuLink
                   href="/account"
-                  label="Sign in"
+                  label="Sign in / My account"
                   close={close}
                   icon={<LogIn aria-hidden="true" />}
                 />
@@ -252,7 +201,7 @@ function MenuContents({
   )
 }
 
-export default function SideMenu({ categories, customer }: SideMenuProps) {
+export default function SideMenu({ customer }: SideMenuProps) {
   return (
     <Popover className="sg-mobile-menu">
       {({ open, close }) => (
@@ -296,11 +245,7 @@ export default function SideMenu({ categories, customer }: SideMenuProps) {
             leaveTo="-translate-x-full"
           >
             <PopoverPanel portal className="sg-mobile-menu__panel">
-              <MenuContents
-                categories={categories}
-                customer={customer}
-                close={close}
-              />
+              <MenuContents customer={customer} close={close} />
             </PopoverPanel>
           </Transition>
         </>
